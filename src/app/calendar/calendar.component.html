@@ -1,0 +1,40 @@
+<section class="content">
+    <div class="card">
+      <div class="content-block">
+        <div class="block-header">
+          <app-breadcrumb [title]="'Attendance'" [items]="['Home']" [active_item]="'Attendance'"></app-breadcrumb>
+        </div>
+      <div class="row">
+        <div class="col-md-1"></div>
+        <div class="col-md-7">
+          <div class="panel-body">
+            <full-calendar [options]="options" [events]="events" ></full-calendar>
+          </div>
+        </div>
+        <div class="col-md-1"> </div>
+        <div class="col-md-2">
+          <div id='external-events'>           	 
+            <p class="text-center" style="font-weight: semi-bold; font-size: larger; color: black;">These cards are for drag and drop to mark your attendance</p>
+            <div class="card-body">
+              <div class='fc-event fc-h-event fc-daygrid-event fc-daygrid-block-event present-event' style="font-size: 10px; font-weight: bold;">
+                <div class='fc-event-main text-center'>1</div>
+              </div>
+            </div>
+            <div class="card-body">
+              <div class='fc-event fc-h-event fc-daygrid-event fc-daygrid-block-event absent-event' style="font-size: 10px; font-weight: bold;">
+                <div class='fc-event-main text-center'>0</div>
+              </div>
+            </div>
+            <div class="card-body">
+              <div class='fc-event fc-h-event fc-daygrid-event fc-daygrid-block-event half-day-event' style="font-size: 10px; font-weight: bold;">
+                <div class='fc-event-main text-center '>0.5</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-1"> </div>
+      </div>
+    </div>
+  </div>
+</section>
+  

@@ -1,0 +1,161 @@
+<div class="addContainer">
+  <div class="modalHeader">
+    <div class="editRowModal">
+      <div class="modalHeader clearfix">
+        <div class="modal-about">
+          {{dialogTitle}}
+        </div>
+      </div>
+    </div>
+    <button mat-icon-button (click)="dialogRef.close()" class="modal-close-button" aria-label="Close dialog">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+  <div mat-dialog-content>
+    <form class="register-form m-4" [formGroup]="myLeavesForm" (ngSubmit)="submit()">
+      <div class="row">
+        <div class=" col-xl-6 col-lg-6 col-md-12 col-sm-12 mb-2">
+          <mat-form-field class="example-full-width" appearance="outline">
+            <mat-label>Start date</mat-label>
+            <input matInput [matDatepicker]="picker1" formControlName="startDate" required>
+              <mat-datepicker-toggle matSuffix [for]="picker1"></mat-datepicker-toggle>
+              <mat-datepicker #picker1></mat-datepicker>
+              @if (myLeavesForm.get('startDate')?.hasError('required')) {
+                <mat-error>
+                  Please select date
+                </mat-error>
+              }
+            </mat-form-field>
+          </div>
+          <div class=" col-xl-6 col-lg-6 col-md-12 col-sm-12 mb-2">
+            <mat-form-field class="example-full-width mb-3" appearance="outline">
+                    <mat-label>startTime</mat-label>
+                    <mat-select formControlName="startTime" required>
+                      <mat-option [value]="'Morning'">
+                        Morning
+                      </mat-option>
+                      <mat-option [value]="'Afternoon'">
+                        Afternoon
+                      </mat-option>
+                      <mat-option [value]="'noone'">
+                        No One
+                      </mat-option>
+                    </mat-select>
+                    @if (myLeavesForm.get('startTime')?.hasError('required')) {
+                      <mat-error>
+                        Select Status
+                      </mat-error>
+                    }
+              </mat-form-field>
+            </div>
+          </div>
+          <div class="row">
+            <div class=" col-xl-6 col-lg-6 col-md-12 col-sm-12 mb-2">
+              <mat-form-field class="example-full-width" appearance="outline">
+                <mat-label>End date</mat-label>
+                <input matInput [matDatepicker]="picker3" formControlName="endDate" required>
+                  <mat-datepicker-toggle matSuffix [for]="picker3"></mat-datepicker-toggle>
+                  <mat-datepicker #picker3></mat-datepicker>
+                  @if (myLeavesForm.get('endDate')?.hasError('required')) {
+                    <mat-error>
+                      Please select date
+                    </mat-error>
+                  }
+                </mat-form-field>
+              </div>
+              <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 mb-2">
+                <mat-form-field class="example-full-width mb-3" appearance="outline">
+                  <mat-label>End time</mat-label>
+                  <mat-select formControlName="endTime" required>
+                    <mat-option [value]="'Morning'">
+                      Morning
+                    </mat-option>
+                    <mat-option [value]="'Afternoon'">
+                      Afternoon
+                    </mat-option>
+                    <mat-option [value]="'noone'">
+                      No One
+                    </mat-option>
+                  </mat-select>
+                  @if (myLeavesForm.get('endTime')?.hasError('required')) {
+                    <mat-error>
+                      Select date
+                    </mat-error>
+                  }
+            </mat-form-field>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 mb-2">
+                  <mat-form-field class="example-full-width mb-3" appearance="outline">
+                    <mat-label>Type of leave</mat-label>
+                    <mat-select formControlName="leaveType" required>
+                      <mat-option [value]="'paid leave'">
+                        paid leave
+                      </mat-option>
+                      <mat-option [value]="'Sick Leave'">
+                        Sick Leave
+                      </mat-option>
+                      <mat-option [value]="'Bereavement'">
+                        Bereavement
+                      </mat-option>
+                      <mat-option [value]="'Personal Reasons'">
+                        Personal Reasons
+                      </mat-option>
+                      <mat-option [value]="'Maternity'">
+                        Maternity
+                      </mat-option>
+                      <mat-option [value]="'Paternity'">
+                        Paternity
+                      </mat-option>
+                      <mat-option [value]="'RTT'">
+                        RTT
+                      </mat-option>
+                      <mat-option [value]="'Other'">
+                        Other
+                      </mat-option>
+                    </mat-select>
+                      @if (myLeavesForm.get('type')?.hasError('required')) {
+                      <mat-error>
+                        Select Any Type
+                      </mat-error>
+                    }
+                  </mat-form-field>
+                </div>
+                <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 mb-2">
+                  <mat-form-field class="example-full-width mb-3" appearance="outline">
+                    <mat-label>Status</mat-label>
+                    <mat-select formControlName="status" [disabled]="true" required>
+                      <mat-option [value]="'Pending'">
+                        Pending
+                      </mat-option>
+                    </mat-select>
+                    @if (myLeavesForm.get('type')?.hasError('required')) {
+                      <mat-error>
+                        Select Status
+                      </mat-error>
+                    }
+                  </mat-form-field>
+                </div>
+              </div>
+              <div class="row">
+                <div class=" col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-2">
+                  <mat-form-field class="example-full-width mb-3" appearance="outline">
+                    <mat-label>Reason</mat-label>
+                    <textarea matInput formControlName="reason"></textarea>
+                  </mat-form-field>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-2">
+                  <div class="example-button-row" align="end">
+                    <button mat-raised-button color="primary" [disabled]="!myLeavesForm.valid" [mat-dialog-close]="1" type="submit"
+               >Save</button>
+                    <button mat-raised-button color="warn" (click)="onNoClick()" tabindex="-1">Cancel</button>
+                  </div>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+        

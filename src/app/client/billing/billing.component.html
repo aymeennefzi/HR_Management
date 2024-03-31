@@ -1,0 +1,54 @@
+<section class="content">
+  <div class="content-block">
+    <div class="block-header">
+      <app-breadcrumb [title]="'Attendance'" [items]="['Home']" [active_item]="'Attendance'"></app-breadcrumb>
+    </div>
+    <div class="row clearfix">
+      <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+        <div class="card">
+          <div class="header">
+            <h2>Validate Attendance</h2>
+          </div>
+          <div class="body">
+            <div class="card-body">
+              <div class="responsive_table">
+                <table class="table table-hover">
+                  <thead>
+                    <tr>
+                      <th>Matricule</th>
+                      <th>Employee Name</th>
+                      <th *ngFor="let day of daysOfWeek">{{ day }}</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let employee of employeesWithAttendances">
+                      <td>#{{ employee.Matricule }}</td>
+                      <td><a href="mailto:{{ employee.email }}">{{ employee.lastName }} {{ employee.firstName }}</a></td>
+                      <td *ngFor="let day of daysOfWeek">
+                        <ng-container *ngIf="employee.attendances">
+                          <div *ngFor="let attendance of employee.attendances">
+                            <div *ngIf="getDayOfWeek(attendance.date) === day">
+                              <div style="display: flex; flex-direction: column;">
+                                <strong [ngStyle]="{'color': getStatusColor(attendance.etat)}">{{ formatDate(attendance.date) }}</strong>
+                                <strong>{{ attendance.status }}</strong>
+                                <div>
+                                  <a (click)="approveAttendance(employee._id ,  attendance)"      ><i class="material-icons m-r-10 col-green">thumb_up</i></a>
+                                  <a (click)="declineAttendance(employee._id ,  attendance)"><i class="material-icons m-r-10 col-red">thumb_down</i></a>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </ng-container>
+                      </td>                     
+                    </tr>                    
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
