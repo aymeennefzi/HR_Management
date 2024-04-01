@@ -8,11 +8,15 @@ export class TruncatePipe implements PipeTransform {
 
   // text truncation pipe
 
-  transform(value: string, args: any[]): string {
+  transform(value: string | null | undefined, args: any[]): string {
+    if (value == null) { // This checks for both null and undefined
+      return ''; // Return an empty string or any other default value
+    }
     const limit = args.length > 0 ? parseInt(args[0], 10) : 20;
     const trail = args.length > 1 ? args[1] : '...';
     return value.length > limit ? value.substring(0, limit) + trail : value;
   }
+  
 
 }
 
@@ -37,6 +41,18 @@ export class PluralPipe implements PipeTransform {
     } else {
       return pluralGenitive;
     }
+  }
+
+}
+@Pipe({
+  name: 'stripHtml',
+  standalone: true
+})
+export class StripHtmlPipe implements PipeTransform {
+
+  transform(value: string): string {
+    if (!value) return '';
+    return value.replace(/<[^>]+>/g, ''); // This regex removes HTML tags
   }
 
 }

@@ -11,24 +11,42 @@
             <h2>Add Projects</h2>
           </div>
           <div class="body">
-            <form class="m-4" [formGroup]="projectForm" (ngSubmit)="onSubmit()">
+            <form class="m-4" [formGroup]="projectForm" (ngSubmit)="addProject">
               <div class="row">
                 <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 mb-3">
                   <mat-form-field class="example-full-width mb-3" appearance="outline">
-                    <mat-label>Project ID</mat-label>
-                    <input matInput formControlName="projectID" required>
-                      @if (projectForm.get('projectID')?.hasError('required')) {
-                        <mat-error>
-                          Project ID is required
-                        </mat-error>
-                      }
-                    </mat-form-field>
+                    <mat-label>type projet</mat-label>
+                    <mat-select formControlName="type" required>
+                      <mat-option [value]="'Website'">
+                        Website
+                      </mat-option>
+                      <mat-option [value]="'Android'">
+                        Android
+                      </mat-option>
+                      <mat-option [value]="'other type'">
+                        other type
+                      </mat-option>
+                      <mat-option [value]="'IPhone'">
+                        IPhone
+                      </mat-option>
+                      <mat-option [value]="'Testing'">
+                        Testing
+                      </mat-option>
+      
+                    </mat-select>
+                    @if (projectForm.get('type')?.hasError('required')) {
+                      <mat-error>
+                        type is required
+                      </mat-error>
+                    }
+                  </mat-form-field>
                   </div>
                   <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 mb-3">
+                    
                     <mat-form-field class="example-full-width" appearance="outline">
                       <mat-label>Project Title</mat-label>
-                      <input matInput formControlName="projectTitle" placeholder="Project Title" required>
-                        @if (projectForm.get('projectTitle')?.hasError('required')) {
+                      <input matInput formControlName="NomProject" placeholder="Project Title" required>
+                        @if (projectForm.get('NomProject')?.hasError('required')) {
                           <mat-error>
                             Project Title is required
                           </mat-error>
@@ -37,44 +55,18 @@
                     </div>
                   </div>
                   <div class="row">
-                    <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 mb-3">
-                      <mat-form-field class="example-full-width mb-3" appearance="outline">
-                        <mat-label>Department</mat-label>
-                        <mat-select formControlName="department" required>
-                          <mat-option [value]="'Designing'">
-                            Designing
-                          </mat-option>
-                          <mat-option [value]="'Development'">
-                            Development
-                          </mat-option>
-                          <mat-option [value]="'Testing'">
-                            Testing
-                          </mat-option>
-                          <mat-option [value]="'Marketing'">
-                            Marketing
-                          </mat-option>
-                          <mat-option [value]="'Accounts'">
-                            Accounts
-                          </mat-option>
-                        </mat-select>
-                        @if (projectForm.get('department')?.hasError('required')) {
-                          <mat-error>
-                            Department is required
-                          </mat-error>
-                        }
-                      </mat-form-field>
-                    </div>
+                   
                     <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 mb-3">
                       <mat-form-field class="example-full-width mb-3" appearance="outline">
                         <mat-label>Project Priority</mat-label>
                         <mat-select formControlName="priority" required>
-                          <mat-option [value]="'Low'">
+                          <mat-option [value]="-1">
                             Low
                           </mat-option>
-                          <mat-option [value]="'Medium'">
+                          <mat-option [value]="0">
                             Medium
                           </mat-option>
-                          <mat-option [value]="'High'">
+                          <mat-option [value]="1">
                             High
                           </mat-option>
                         </mat-select>
@@ -87,37 +79,27 @@
                     </div>
                   </div>
                   <div class="row">
-                    <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 mb-3">
+                  <!--   <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 mb-3">
                       <mat-form-field class="example-full-width mb-3" appearance="outline">
-                        <mat-label>Client</mat-label>
-                        <input matInput formControlName="client" required>
-                          @if (projectForm.get('client')?.hasError('required')) {
+                        <mat-label>chef de projet</mat-label>
+                        <input matInput formControlName="NomChefProjet" required>
+                          @if (projectForm.get('NomChefProjet')?.hasError('required')) {
                             <mat-error>
-                              Client name is required
+                              NomChefProjet name is required
                             </mat-error>
                           }
                         </mat-form-field>
-                      </div>
-                      <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 mb-3">
-                        <mat-form-field class="example-full-width mb-3" appearance="outline">
-                          <mat-label>Price</mat-label>
-                          <input matInput formControlName="price" type="number" required>
-                            @if (projectForm.get('price')?.hasError('required')) {
-                              <mat-error>
-                                Price is required
-                              </mat-error>
-                            }
-                          </mat-form-field>
-                        </div>
+                      </div> -->
+                     
                       </div>
                       <div class="row">
                         <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 mb-3">
                           <mat-form-field class="example-full-width mb-3" appearance="outline">
                             <mat-label>Project Start Date</mat-label>
-                            <input matInput [matDatepicker]="picker" formControlName="startDate" required>
+                            <input matInput [matDatepicker]="picker" formControlName="StartDate" required>
                               <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
                               <mat-datepicker #picker></mat-datepicker>
-                              @if (projectForm.get('startDate')?.hasError('required')) {
+                              @if (projectForm.get('StartDate')?.hasError('required')) {
                                 <mat-error>
                                   Please select date
                                 </mat-error>
@@ -127,10 +109,10 @@
                           <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 mb-3">
                             <mat-form-field class="example-full-width mb-3" appearance="outline">
                               <mat-label>Project End Date</mat-label>
-                              <input matInput [matDatepicker]="picker1" formControlName="endDate" required>
+                              <input matInput [matDatepicker]="picker1" formControlName="FinishDate" required>
                                 <mat-datepicker-toggle matSuffix [for]="picker1"></mat-datepicker-toggle>
                                 <mat-datepicker #picker1></mat-datepicker>
-                                @if (projectForm.get('endDate')?.hasError('required')) {
+                                @if (projectForm.get('FinishDate')?.hasError('required')) {
                                   <mat-error>
                                     Please select date
                                   </mat-error>
@@ -138,7 +120,7 @@
                               </mat-form-field>
                             </div>
                           </div>
-                          <div class="row">
+                    <!--       <div class="row">
                             <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-3">
                               <mat-form-field class="example-full-width" appearance="outline">
                                 <mat-label>Team</mat-label>
@@ -150,35 +132,33 @@
                                 </mat-select>
                               </mat-form-field>
                             </div>
-                          </div>
+                          </div> -->
                           <div class="row">
                             <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-4">
                               <mat-label>Work Status: </mat-label>
-                              <mat-radio-group formControlName="status">
-                                <mat-radio-button value="Active">Active</mat-radio-button>
-                                <mat-radio-button value="Completed">Completed</mat-radio-button>
-                                <mat-radio-button value="Running" [checked]="true">Running</mat-radio-button>
-                                <mat-radio-button value="Pending">Pending</mat-radio-button>
-                                <mat-radio-button value="NotStarted">Not Started</mat-radio-button>
-                                <mat-radio-button value="Cancled">Cancled</mat-radio-button>
+                              <mat-radio-group formControlName="statut">
+                                <mat-radio-button value="0" [checked]="true">NOUVEAU</mat-radio-button>
+                                <mat-radio-button value="3">FINISHED</mat-radio-button>
+                                <mat-radio-button value="1" >RUNNING</mat-radio-button>
+                               
                               </mat-radio-group>
                             </div>
                           </div>
                           <div class="row">
                             <mat-label>Descriptions: </mat-label>
                             <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-3">
-                              <ckeditor [editor]="Editor" data="<p>Project details!</p>"></ckeditor>
+                              <ckeditor  formControlName="description" [editor]="Editor" data="Project details!"></ckeditor>
                             </div>
                           </div>
-                          <div class="row">
+                         <!--  <div class="row">
                             <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-3">
                               <mat-label>Upload Image</mat-label>
                               <app-file-upload formControlName="fileUpload"></app-file-upload>
                             </div>
-                          </div>
+                          </div> -->
                           <div class="row">
                             <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-3">
-                              <button class="btn-space" [disabled]="!projectForm.valid " mat-raised-button
+                              <button class="btn-space" [disabled]="!projectForm.valid " mat-raised-button    (click)="addProject()"
                               color="primary">Submit</button>
                               <button type="button" mat-raised-button color="warn">Cancel</button>
                             </div>
