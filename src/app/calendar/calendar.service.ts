@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
-import { Calendar, Holidayss } from './calendar.model';
+import { Calendar } from './calendar.model';
 import { Observable } from 'rxjs';
 import {
   HttpClient,
@@ -9,17 +9,13 @@ import {
 } from '@angular/common/http';
 import { throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
-import { Attendances } from 'app/employee/attendance/attendance.model';
-import { User } from '@core';
 
 @Injectable({
   providedIn: 'root',
 })
 
 export class CalendarService {
-  private readonly API_URL = 'http://localhost:3000/auth';
-
-  // private readonly API_URL = 'assets/data/calendar.json';
+  private readonly API_URL = 'assets/data/calendar.json';
   httpOptions = {
     headers: new HttpHeaders({
       'Content-Type': 'application/json',
@@ -50,34 +46,13 @@ export class CalendarService {
   errorHandler(error: HttpErrorResponse) {
     let errorMessage = '';
     if (error.error instanceof ErrorEvent) {
+      // Get client-side error
       errorMessage = error.error.message;
     } else {
+      // Get server-side error
       errorMessage = `Error Code: ${error.status}\nMessage: ${error.message}`;
     }
     console.log(errorMessage);
     return throwError(errorMessage);
   }
-
-  updateAttendanceList(personnelId: string, attend: Calendar[]): Observable<void> {
-    return this.httpClient.post<void>(this.API_URL + "/" + personnelId , attend);
-  }
-  getAttendancesForUser(userId: string): Observable<Calendar[]> {
-    return this.httpClient.get<Calendar[]>(this.API_URL + "/" +  userId);
-  }
-  private readonly API_URL1 = 'http://localhost:3000/holidays';
-  private readonly API_URL2 = 'http://localhost:3000/attendance';
-
-
-  getAllHolidays(): Observable<Holidayss[]> {
-    return this.httpClient.get<Holidayss[]>(this.API_URL1);
-  }
-  getAllEmployeesWithAttendances(): Observable<User[]> {
-    return this.httpClient.get<User[]>(this.API_URL2 + "/currentWeek");
-  }
-  validatePresence(personnelId: string, attend: Calendar[]): Observable<void> {
-    return this.httpClient.put<void>(this.API_URL2 + "/" + personnelId  + "/validate-presence", attend);
-  }
-  getUsersWithAttendances(): Observable<User[]> {
-    return this.httpClient.get<User[]>(this.API_URL2 + "/allusers");
-  } 
 }

@@ -30,6 +30,9 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { BreadcrumbComponent } from '@shared/components/breadcrumb/breadcrumb.component';
+import { JobsListService } from '../jobs-list/jobs-list.service';
+import Swal from 'sweetalert2';
+
 
 @Component({
   selector: 'app-candidates',
@@ -58,29 +61,33 @@ export class CandidatesComponent
 {
   displayedColumns = [
     'select',
-    'img',
-    'name',
+    'candidateName',
     'email',
-    'mobile',
-    'title',
-    'role',
-    'jobType',
-    'download',
+    'cv',
+    'jobId',
+    
     'actions',
   ];
   exampleDatabase?: CandidatesService;
   dataSource!: ExampleDataSource;
   selection = new SelectionModel<Candidates>(true, []);
   index?: number;
-  id?: number;
+  id?: string;
   candidates?: Candidates;
+  jobTitles: { [key: string]: string } = {}; 
+  baseUrl: string = 'http://localhost:3000/files'; // URL de base de votre serveur
+  c!: number; // Déclaration de la variable i
+  rol!: Candidates; 
   constructor(
     public httpClient: HttpClient,
     public dialog: MatDialog,
     public candidatesService: CandidatesService,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
+    public JobsListService  : JobsListService,
+
   ) {
     super();
+    this.baseUrl;
   }
   @ViewChild(MatPaginator, { static: true }) paginator!: MatPaginator;
   @ViewChild(MatSort, { static: true }) sort!: MatSort;
@@ -90,6 +97,25 @@ export class CandidatesComponent
   contextMenuPosition = { x: '0px', y: '0px' };
   ngOnInit() {
     this.loadData();
+    this.loadJobTitles();
+
+  }
+  loadJobTitles(): void {
+    this.JobsListService.getJobs().subscribe(
+      (jobs: any[]) => {
+        // Stockez les noms des emplois dans l'objet jobTitles
+        jobs.forEach(job => {
+          this.jobTitles[job._id] = job.title;
+        });
+      },
+      (error) => {
+        console.error('Error fetching job titles:', error);
+      }
+    );
+  }
+  getJobTitle(jobId: string): string {
+    // Obtenez le nom de l'emploi à partir de l'objet jobTitles
+    return this.jobTitles[jobId] || '';
   }
   refresh() {
     this.loadData();
@@ -126,7 +152,7 @@ export class CandidatesComponent
     });
   }
   editCall(row: Candidates) {
-    this.id = row.id;
+    this.id = row._id;
     let tempDirection: Direction;
     if (localStorage.getItem('isRtl') === 'true') {
       tempDirection = 'rtl';
@@ -135,16 +161,23 @@ export class CandidatesComponent
     }
     const dialogRef = this.dialog.open(FormDialogComponent, {
       data: {
+        id: row._id,
         candidates: row,
         action: 'edit',
       },
       direction: tempDirection,
+      // data: {
+      //   id: row._id,
+      //   jobsList: row,
+      //   action: 'edit',
+      // },
+      // direction: tempDirection,
     });
     this.subs.sink = dialogRef.afterClosed().subscribe((result) => {
       if (result === 1) {
         // When using an edit things are little different, firstly we find record inside DataService by id
         const foundIndex = this.exampleDatabase?.dataChange.value.findIndex(
-          (x) => x.id === this.id
+          (x) => x._id === this.id
         );
         // Then you update that record using data from dialogData (values you enetered)
         if (foundIndex != null && this.exampleDatabase) {
@@ -164,7 +197,7 @@ export class CandidatesComponent
   }
   deleteItem(i: number, row: Candidates) {
     this.index = i;
-    this.id = row.id;
+    this.id = row._id;
     let tempDirection: Direction;
     if (localStorage.getItem('isRtl') === 'true') {
       tempDirection = 'rtl';
@@ -174,13 +207,14 @@ export class CandidatesComponent
     const dialogRef = this.dialog.open(DeleteDialogComponent, {
       height: '280px',
       width: '380px',
-      data: row,
+      // data: row,
+      data: { jobId: row._id },
       direction: tempDirection,
     });
     this.subs.sink = dialogRef.afterClosed().subscribe((result) => {
       if (result === 1) {
         const foundIndex = this.exampleDatabase?.dataChange.value.findIndex(
-          (x) => x.id === this.id
+          (x) => x._id === this.id
         );
         // for delete we use splice in order to remove single object from DataService
         if (foundIndex != null && this.exampleDatabase) {
@@ -196,6 +230,40 @@ export class CandidatesComponent
       }
     });
   }
+  // deleteItem(c: number, rol: Candidates): void {
+  //   if (!rol) {
+  //     console.error('Invalid row:', rol);
+  //     return;
+  //   }
+  //   Swal.fire({
+  //     title: 'Êtes-vous sûr?',
+  //     text: 'Vous ne pourrez pas récupérer cette candidature!',
+  //     icon: 'warning',
+  //     showCancelButton: true,
+  //     confirmButtonColor: '#3085d6',
+  //     cancelButtonColor: '#d33',
+  //     confirmButtonText: 'Oui, supprimer!',
+  //     cancelButtonText: 'Annuler'
+  //   }).then((result) => {
+  //     if (result.isConfirmed) {
+  //       // Appeler la fonction de suppression une fois que l'utilisateur a confirmé
+  //       this.candidatesService.deleteCandidate(rol._id).subscribe(
+  //         () => {
+  //           // Afficher une alerte de suppression réussie
+  //           Swal.fire('Supprimé!', 'La candidature a été supprimée avec succès.', 'success');
+  //           // Mettre à jour la liste des candidats après la suppression
+  //           this.exampleDatabase?.getAllCandidatess(); // Mettre à jour les données
+  //         },
+  //         (error) => {
+  //           // Afficher une alerte en cas d'erreur lors de la suppression
+  //           Swal.fire('Erreur!', 'Une erreur est survenue lors de la suppression de la candidature.', 'error');
+  //         }
+  //       );
+  //     }
+  //   });
+  // }
+  
+  
   private refreshTable() {
     this.paginator._changePageSize(this.paginator.pageSize);
   }
@@ -236,7 +304,8 @@ export class CandidatesComponent
     this.dataSource = new ExampleDataSource(
       this.exampleDatabase,
       this.paginator,
-      this.sort
+      this.sort,
+      this.baseUrl, 
     );
     this.subs.sink = fromEvent(this.filter.nativeElement, 'keyup').subscribe(
       () => {
@@ -247,17 +316,18 @@ export class CandidatesComponent
       }
     );
   }
+ 
+  
   // export table data in excel file
   exportExcel() {
     // key name with space add in brackets
     const exportData: Partial<TableElement>[] =
       this.dataSource.filteredData.map((x) => ({
-        Name: x.name,
-        Email: x.email,
-        Mobile: x.mobile,
-        'Job Title': x.title,
-        Role: x.role,
-        'Job Type': x.jobType,
+        Name: x.jobId,
+        Email: x.candidateName,
+        Mobile: x.email,
+        cv: x.cv,
+       
       }));
 
     TableExportUtil.exportToExcel(exportData, 'excel');
@@ -288,6 +358,7 @@ export class CandidatesComponent
   }
 }
 export class ExampleDataSource extends DataSource<Candidates> {
+  baseUrl: string;
   filterChange = new BehaviorSubject('');
   get filter(): string {
     return this.filterChange.value;
@@ -300,11 +371,14 @@ export class ExampleDataSource extends DataSource<Candidates> {
   constructor(
     public exampleDatabase: CandidatesService,
     public paginator: MatPaginator,
-    public _sort: MatSort
+    public _sort: MatSort,
+    baseUrl: string 
   ) {
     super();
+    this.baseUrl = baseUrl;
     // Reset to the first page when the user changes the filter.
     this.filterChange.subscribe(() => (this.paginator.pageIndex = 0));
+    
   }
   /** Connect function called by the table to retrieve one stream containing the data to render. */
   connect(): Observable<Candidates[]> {
@@ -323,15 +397,22 @@ export class ExampleDataSource extends DataSource<Candidates> {
           .slice()
           .filter((candidates: Candidates) => {
             const searchStr = (
-              candidates.title +
+              candidates.jobId +
+              candidates.candidateName +
               candidates.email +
-              candidates.role +
-              candidates.jobType +
-              candidates.mobile +
-              candidates.name
+              candidates.cv
+              
+              
+            
             ).toLowerCase();
             return searchStr.indexOf(this.filter.toLowerCase()) !== -1;
           });
+          this.filteredData.forEach(candidate => {
+            if (!candidate.cv.startsWith('http://localhost:3000/files/uploads')) {
+              candidate.cv = `http://localhost:3000/files/${candidate.cv}`;
+            }
+          });
+         
         // Sort filtered data
         const sortedData = this.sortData(this.filteredData.slice());
         // Grab the page's slice of the filtered sorted data.
@@ -357,20 +438,18 @@ export class ExampleDataSource extends DataSource<Candidates> {
       let propertyB: number | string = '';
       switch (this._sort.active) {
         case 'id':
-          [propertyA, propertyB] = [a.id, b.id];
+          [propertyA, propertyB] = [a._id, b._id];
           break;
-        case 'title':
-          [propertyA, propertyB] = [a.title, b.title];
+        case 'job':
+          [propertyA, propertyB] = [a.jobId, b.jobId];
           break;
-        case 'mobile':
-          [propertyA, propertyB] = [a.mobile, b.mobile];
+        case 'candidatename':
+          [propertyA, propertyB] = [a.candidateName, b.candidateName];
           break;
         case 'time':
           [propertyA, propertyB] = [a.email, b.email];
           break;
-        case 'name':
-          [propertyA, propertyB] = [a.name, b.name];
-          break;
+       
       }
       const valueA = isNaN(+propertyA) ? propertyA : +propertyA;
       const valueB = isNaN(+propertyB) ? propertyB : +propertyB;

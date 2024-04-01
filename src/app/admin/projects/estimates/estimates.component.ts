@@ -1,10 +1,10 @@
-import { ChangeDetectorRef, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { EstimatesService } from './estimates.service';
 import { HttpClient } from '@angular/common/http';
-import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { MatDialog } from '@angular/material/dialog';
 import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
 import { MatSort, MatSortModule } from '@angular/material/sort';
-
+import { Estimates } from './estimates.model';
 import { DataSource } from '@angular/cdk/collections';
 import {
   MatSnackBar,
@@ -29,18 +29,10 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { BreadcrumbComponent } from '@shared/components/breadcrumb/breadcrumb.component';
-import { MatDividerModule } from '@angular/material/divider';
-import * as moment from 'moment';
-import { TasksModel } from '../all-projects/core/project.model';
-import { ActivatedRoute } from '@angular/router';
-import { ProjectService } from '../all-projects/core/project.service';
-import { RowHeightCache } from '@swimlane/ngx-datatable';
-import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-estimates',
   templateUrl: './estimates.component.html',
-
   styleUrls: ['./estimates.component.scss'],
   standalone: true,
   imports: [
@@ -57,34 +49,35 @@ import Swal from 'sweetalert2';
     MatProgressSpinnerModule,
     MatPaginatorModule,
     DatePipe,
-  MatDividerModule,
-  FormDialogComponent
   ],
- 
-  
 })
 export class EstimatesComponent
   extends UnsubscribeOnDestroyAdapter
   implements OnInit
 {
-
-  tasks: TasksModel[] = [];
-  columns: string[] = ['NomTask', 'description', 'statut', 'priority','FinishDate','startDate','actions'];
+  displayedColumns = [
+    'select',
+    'eNo',
+    'cName',
+    'estDate',
+    'expDate',
+    'country',
+    'amount',
+    'status',
+    'details',
+    'actions',
+  ];
   exampleDatabase?: EstimatesService;
   dataSource!: ExampleDataSource;
-  selection = new SelectionModel<TasksModel>(true, []);
+  selection = new SelectionModel<Estimates>(true, []);
   index?: number;
-  id?: string;
-  p!:any
-_id!:any
-  t!:any
+  id?: number;
+  estimates?: Estimates;
   constructor(
-    private actR : ActivatedRoute,
     public httpClient: HttpClient,
-    private projectService: ProjectService,
     public dialog: MatDialog,
     public estimatesService: EstimatesService,
-    private snackBar: MatSnackBar,private cdr: ChangeDetectorRef
+    private snackBar: MatSnackBar
   ) {
     super();
   }
@@ -92,30 +85,12 @@ _id!:any
   @ViewChild(MatSort, { static: true }) sort!: MatSort;
   @ViewChild('filter', { static: true }) filter!: ElementRef;
   ngOnInit() {
-    this.actR.params.subscribe(params => {
-       this._id = params['_id'];
-      this.projectService.getProjectById(this._id).subscribe(data => {
-        this.p= data; 
-   
-      });
-    });
-    this.estimatesService.getTasks().subscribe({
-      next: (data: any) => {
-        this.tasks = data;
-      
-      },
-      error: (error) => {
-        console.error('Il y a eu une erreur lors de la récupération des tâches :', error);
-      }
-    });
-    
-
+    this.loadData();
   }
- 
   refresh() {
-this.ngOnInit()
+    this.loadData();
   }
-  addNew(idProject:string) {
+  addNew() {
     let tempDirection: Direction;
     if (localStorage.getItem('isRtl') === 'true') {
       tempDirection = 'rtl';
@@ -124,73 +99,106 @@ this.ngOnInit()
     }
     const dialogRef = this.dialog.open(FormDialogComponent, {
       data: {
-   idP:this._id,
-       action: 'add',
-         idProject:idProject ,
-         tasks :this.p.tasks   ,
-         task:this.t      
+        estimates: this.estimates,
+        action: 'add',
       },
       direction: tempDirection,
     });
-    this.subs.sink =  dialogRef.afterClosed().subscribe(result => {
-      console.log('Le dialogue a été fermé.', result);
-      if (result) {
-       
-
-        this.p.tasks=  result
-
+    this.subs.sink = dialogRef.afterClosed().subscribe((result) => {
+      if (result === 1) {
+        // After dialog is closed we're doing frontend updates
+        // For add we're just pushing a new row inside DataService
+        this.exampleDatabase?.dataChange.value.unshift(
+          this.estimatesService.getDialogData()
+        );
+        this.refreshTable();
+        this.showNotification(
+          'snackbar-success',
+          'Add Record Successfully...!!!',
+          'bottom',
+          'center'
+        );
       }
     });
   }
-  editCall(row: TasksModel) {
-    this.id = row._id;
+  editCall(row: Estimates) {
+    this.id = row.id;
     let tempDirection: Direction;
     if (localStorage.getItem('isRtl') === 'true') {
       tempDirection = 'rtl';
     } else {
       tempDirection = 'ltr';
     }
-    this.dialog.open(FormDialogComponent, {
+    const dialogRef = this.dialog.open(FormDialogComponent, {
       data: {
-        // estimates: row,
-        taskId:row._id,
+        estimates: row,
         action: 'edit',
-        task:row,
-      tasks :this.p.tasks   },
+      },
       direction: tempDirection,
     });
-
-  }
-  public deleteItem(row: any): void {
-    Swal.fire({
-      title: 'Êtes-vous sûr?',
-      text: "Vous ne pourrez pas revenir en arrière!",
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonColor: '#3085d6',
-      cancelButtonColor: '#d33',
-      confirmButtonText: 'Oui, supprimez-le!'
-    }).then((result) => {
-      if (result.isConfirmed) {
-        this.estimatesService.deleteTask(row._id).subscribe(() => {
-          Swal.fire(
-            'Supprimé!',
-            'Votre task a été supprimé.',
-            'success'
+    this.subs.sink = dialogRef.afterClosed().subscribe((result) => {
+      if (result === 1) {
+        // When using an edit things are little different, firstly we find record inside DataService by id
+        const foundIndex = this.exampleDatabase?.dataChange.value.findIndex(
+          (x) => x.id === this.id
+        );
+        // Then you update that record using data from dialogData (values you enetered)
+        if (foundIndex !== undefined) {
+          if (this.exampleDatabase) {
+            this.exampleDatabase.dataChange.value[foundIndex] =
+              this.estimatesService.getDialogData();
+          }
+          // And lastly refresh table
+          this.refreshTable();
+          this.showNotification(
+            'black',
+            'Edit Record Successfully...!!!',
+            'bottom',
+            'center'
           );
-          this.ngOnInit(); // Ou une autre méthode pour actualiser la liste des projets
-        }, (error) => {
-          // Gérer l'erreur ici, par exemple :
-          Swal.fire(
-            'Erreur!',
-            'La suppression du task a échoué.',
-            'error'
-          );
-        });
+        }
       }
     });
   }
-
+  deleteItem(i: number, row: Estimates) {
+    this.index = i;
+    this.id = row.id;
+    let tempDirection: Direction;
+    if (localStorage.getItem('isRtl') === 'true') {
+      tempDirection = 'rtl';
+    } else {
+      tempDirection = 'ltr';
+    }
+    const dialogRef = this.dialog.open(DeleteDialogComponent, {
+      height: '250px',
+      width: '300px',
+      data: row,
+      direction: tempDirection,
+    });
+    this.subs.sink = dialogRef.afterClosed().subscribe((result) => {
+      if (result === 1) {
+        const foundIndex = this.exampleDatabase?.dataChange.value.findIndex(
+          (x) => x.id === this.id
+        );
+        // for delete we use splice in order to remove single object from DataService
+        if (foundIndex !== undefined) {
+          if (this.exampleDatabase) {
+            this.exampleDatabase.dataChange.value.splice(foundIndex, 1);
+          }
+          this.refreshTable();
+          this.showNotification(
+            'snackbar-danger',
+            'Delete Record Successfully...!!!',
+            'bottom',
+            'center'
+          );
+        }
+      }
+    });
+  }
+  private refreshTable() {
+    this.paginator._changePageSize(this.paginator.pageSize);
+  }
   /** Whether the number of selected elements matches the details number of rows. */
   isAllSelected() {
     const numSelected = this.selection.selected.length;
@@ -214,8 +222,8 @@ this.ngOnInit()
       );
       // console.log(this.dataSource.renderedData.findIndex((d) => d === item));
       this.exampleDatabase?.dataChange.value.splice(index, 1);
-     
-      this.selection = new SelectionModel<TasksModel>(true, []);
+      this.refreshTable();
+      this.selection = new SelectionModel<Estimates>(true, []);
     });
     this.showNotification(
       'snackbar-danger',
@@ -245,13 +253,16 @@ this.ngOnInit()
     // key name with space add in brackets
     const exportData: Partial<TableElement>[] =
       this.dataSource.filteredData.map((x) => ({
-        NomTask: x.NomTask,
-        description: x.description,
-        startDate: x.startDate?.toISOString(), // Convert Date to string
-        FinishDate: x.FinishDate?.toISOString(), 
-        priority: x.priority,
-        statut: x.statut,
-  
+        'Estimate ID': x.eNo,
+        'Client Name': x.cName,
+        'Estimate Date':
+          formatDate(new Date(x.estDate), 'yyyy-MM-dd', 'en') || '',
+        'Expired Date':
+          formatDate(new Date(x.expDate), 'yyyy-MM-dd', 'en') || '',
+        Country: x.country,
+        Amount: x.amount,
+        Status: x.status,
+        Details: x.details,
       }));
 
     TableExportUtil.exportToExcel(exportData, 'excel');
@@ -271,17 +282,16 @@ this.ngOnInit()
     });
   }
 }
-export class ExampleDataSource extends DataSource<any> {
+export class ExampleDataSource extends DataSource<Estimates> {
   filterChange = new BehaviorSubject('');
-
   get filter(): string {
     return this.filterChange.value;
   }
   set filter(filter: string) {
     this.filterChange.next(filter);
   }
-  filteredData: TasksModel[] = [];
-  renderedData: TasksModel[] = [];
+  filteredData: Estimates[] = [];
+  renderedData: Estimates[] = [];
   constructor(
     public exampleDatabase: EstimatesService,
     public paginator: MatPaginator,
@@ -292,7 +302,7 @@ export class ExampleDataSource extends DataSource<any> {
     this.filterChange.subscribe(() => (this.paginator.pageIndex = 0));
   }
   /** Connect function called by the table to retrieve one stream containing the data to render. */
-  connect(): Observable<any[]> {
+  connect(): Observable<Estimates[]> {
     // Listen for any changes in the base data, sorting, filtering, or pagination
     const displayDataChanges = [
       this.exampleDatabase.dataChange,
@@ -300,18 +310,19 @@ export class ExampleDataSource extends DataSource<any> {
       this.filterChange,
       this.paginator.page,
     ];
-    this.exampleDatabase.getTasks();
+    this.exampleDatabase.getAllEstimatess();
     return merge(...displayDataChanges).pipe(
       map(() => {
         // Filter data
         this.filteredData = this.exampleDatabase.data
           .slice()
-          .filter((estimates: TasksModel) => {
+          .filter((estimates: Estimates) => {
             const searchStr = (
-              estimates.NomTask+
-              estimates.description+
-              estimates.startDate+
-              estimates.FinishDate 
+              estimates.cName +
+              estimates.estDate +
+              estimates.country +
+              estimates.expDate +
+              estimates.amount
             ).toLowerCase();
             return searchStr.indexOf(this.filter.toLowerCase()) !== -1;
           });
@@ -331,7 +342,7 @@ export class ExampleDataSource extends DataSource<any> {
     //disconnect
   }
   /** Returns a sorted copy of the database data. */
-  sortData(data: any[]): any[] {
+  sortData(data: Estimates[]): Estimates[] {
     if (!this._sort.active || this._sort.direction === '') {
       return data;
     }
@@ -365,6 +376,4 @@ export class ExampleDataSource extends DataSource<any> {
       );
     });
   }
-
-
 }

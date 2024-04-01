@@ -1,16 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 import { Router, ActivatedRoute, RouterLink } from '@angular/router';
 import { UntypedFormBuilder, UntypedFormGroup, Validators, FormsModule, ReactiveFormsModule } from '@angular/forms';
-import {  AuthService } from '@core';
+import { Role, AuthService } from '@core';
 import { UnsubscribeOnDestroyAdapter } from '@shared';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatButtonModule } from '@angular/material/button';
-import { CookieService } from 'ngx-cookie-service';
-import Swal from 'sweetalert2';
-
-
 @Component({
     selector: 'app-signin',
     templateUrl: './signin.component.html',
@@ -35,86 +31,72 @@ export class SigninComponent
   loading = false;
   error = '';
   hide = true;
-  email !: string ;
-  password !: string ;
+  constructor(
+    private formBuilder: UntypedFormBuilder,
+    private route: ActivatedRoute,
+    private router: Router,
+    private authService: AuthService
+  ) {
+    super();
+  }
 
   ngOnInit() {
     this.authForm = this.formBuilder.group({
-      email: ['', [Validators.required, Validators.email]],
-      password: ['', Validators.required],
+      username: ['admin@software.com', Validators.required],
+      password: ['admin@123', Validators.required],
     });
   }
   get f() {
     return this.authForm.controls;
   }
-
-  constructor(
-    private formBuilder: UntypedFormBuilder,
-    private authService: AuthService,
-    private router: Router,
-    private cookieS : CookieService
-  ) {
-    super();
-  
+  adminSet() {
+    this.authForm.get('username')?.setValue('admin@software.com');
+    this.authForm.get('password')?.setValue('admin@123');
+  }
+  employeeSet() {
+    this.authForm.get('username')?.setValue('employee@software.com');
+    this.authForm.get('password')?.setValue('employee@123');
+  }
+  clientSet() {
+    this.authForm.get('username')?.setValue('client@software.com');
+    this.authForm.get('password')?.setValue('client@123');
   }
   onSubmit() {
-    if (this.authForm.invalid) {
-      return;
-    }
+    this.submitted = true;
+    this.loading = true;
     this.error = '';
-    const email = this.authForm.value.email;
-    const password = this.authForm.value.password;
-  
-    this.authService.login(email, password).subscribe(
-      (response) => {
-          const userData = {
-          token: response.token,
-          user: response.user  
-        };
-        const userDataString = JSON.stringify(userData);
-        const data = this.cookieS.set('user_data', userDataString);
-        const cookieData = this.cookieS.get('user_data'); // Obtenez le contenu du cookie
-        if (cookieData) {
-          try {
-            const userData = JSON.parse(cookieData); // Décoder le contenu du cookie
-          // Utilisez les informations utilisateur extraites
-            const token = userData.token;
-            const user = userData.user;
-            console.log(user);
-             // Déterminez la destination de la redirection en fonction du rôle de l'utilisateur
-          if (user.role.includes('Employe')) {
-            // Redirection vers le tableau de bord de l'employé
-            this.router.navigate(['/employee/dashboard']);
-          } else if (user.role.includes('Client')) {
-            // Redirection vers le tableau de bord du client
-            this.router.navigate(['/client/dashboard']);
-          } else if (user.role.includes('Admin')) {
-            // Redirection vers le tableau de bord de l'administrateur
-            this.router.navigate(['/admin/dashboard']);
-          } else {
-            console.error(`Rôle d'utilisateur invalide : ${user.role}`);
-            // Gérez le cas où le rôle de l'utilisateur n'est pas reconnu
+    if (this.authForm.invalid) {
+      this.error = 'Username and Password not valid !';
+      return;
+    } else {
+      this.subs.sink = this.authService
+        .login(this.f['username'].value, this.f['password'].value)
+        .subscribe(
+          (res) => {
+            if (res) {
+              setTimeout(() => {
+                const role = this.authService.currentUserValue.role;
+                if (role === Role.All || role === Role.Admin) {
+                  this.router.navigate(['/admin/dashboard/main']);
+                } else if (role === Role.Employee) {
+                  this.router.navigate(['/employee/dashboard']);
+                } else if (role === Role.Client) {
+                  this.router.navigate(['/client/dashboard']);
+                } else {
+                  this.router.navigate(['/authentication/signin']);
+                }
+                this.loading = false;
+              }, 1000);
+            } else {
+              this.error = 'Invalid Login';
+            }
+          },
+          (error) => {
+            this.error = error;
+            this.submitted = false;
+            this.loading = false;
           }
-          } catch (error) {
-          console.error('Erreur lors du décodage du cookie:', error);
-          }
-        } else {
-          console.error('Le cookie "user_data" n\'est pas défini');
-        }
-      },
-      (error) => {
-        console.error('Erreur lors de la connexion:', error);
-        Swal.fire({
-          icon: 'error',
-          title: 'Erreur de connexion',
-          text: 'Email ou mot de passe incorrect'
-        });
-        
-      }
-    );
+        );
+    }
   }
 }
-
-
-  
-

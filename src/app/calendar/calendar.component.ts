@@ -1,29 +1,41 @@
-import {  Component, Input, OnInit } from '@angular/core';
-import dayGridPlugin from '@fullcalendar/daygrid';
-import interactionPlugin, { Draggable } from '@fullcalendar/interaction';
-import timeGridPlugin from '@fullcalendar/timegrid';
-
-import { MatDialogModule } from '@angular/material/dialog';
-
+import { Component, ViewChild, OnInit } from '@angular/core';
 import {
+  CalendarOptions,
+  DateSelectArg,
+  EventClickArg,
+  EventApi,
+} from '@fullcalendar/core';
+import { EventInput } from '@fullcalendar/core';
+import dayGridPlugin from '@fullcalendar/daygrid';
+import interactionPlugin from '@fullcalendar/interaction';
+import timeGridPlugin from '@fullcalendar/timegrid';
+import listPlugin from '@fullcalendar/list';
+
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import {
+  UntypedFormBuilder,
+  UntypedFormGroup,
+  Validators,
+} from '@angular/forms';
+import { Calendar } from './calendar.model';
+import { FormDialogComponent } from './dialogs/form-dialog/form-dialog.component';
+import { CalendarService } from './calendar.service';
+import {
+  MatSnackBar,
+  MatSnackBarHorizontalPosition,
+  MatSnackBarVerticalPosition,
+} from '@angular/material/snack-bar';
+import { INITIAL_EVENTS } from './events-util';
+import {
+  MatCheckboxChange,
   MatCheckboxModule,
 } from '@angular/material/checkbox';
 import { UnsubscribeOnDestroyAdapter } from '@shared/UnsubscribeOnDestroyAdapter';
-import {    FullCalendarComponent, FullCalendarModule } from '@fullcalendar/angular';
+import { Direction } from '@angular/cdk/bidi';
+import { FullCalendarModule } from '@fullcalendar/angular';
 import { MatButtonModule } from '@angular/material/button';
 import { BreadcrumbComponent } from '@shared/components/breadcrumb/breadcrumb.component';
 import { OwlDateTimeModule, OwlNativeDateTimeModule } from '@danielmoncada/angular-datetime-picker';
-import { CdkDragDrop, DragDropModule  } from '@angular/cdk/drag-drop';
-import { CalendarService } from './calendar.service';
-import { FormsModule } from '@angular/forms';
-import { AttendancesService } from 'app/employee/attendance/attendance.service';
-import { CookieService } from 'ngx-cookie-service';
-import { Calendar, Holidayss } from './calendar.model';
-import { EventInput } from '@fullcalendar/core';
-import * as moment from 'moment';
-import { CommonModule } from '@angular/common';
-import Swal from 'sweetalert2';
-
 
 
 @Component({
@@ -38,189 +50,260 @@ import Swal from 'sweetalert2';
     FullCalendarModule,
     OwlDateTimeModule,
     OwlNativeDateTimeModule,
-    MatDialogModule,
-    DragDropModule,
-    FormsModule ,
-    CommonModule
+    MatDialogModule
   ],
 })
-  export class CalendarComponent extends UnsubscribeOnDestroyAdapter implements OnInit{
-  events!: any[];
-  holidays!: any[];
-  @Input() event!: EventInput;
-  holidayss!: Holidayss[];
-  combinedEvents !: any ;
-  options: any;
-  theCheckbox: boolean = false;
-  constructor(private scheduleService: AttendancesService , private calanderS : CalendarService , private cookieService : CookieService) {
+export class CalendarComponent
+  extends UnsubscribeOnDestroyAdapter
+  implements OnInit {
+  @ViewChild('calendar', { static: false })
+  calendar: Calendar | null;
+  public addCusForm: UntypedFormGroup;
+  dialogTitle: string;
+  filterOptions = 'All';
+  calendarData!: Calendar;
+  filterItems: string[] = [
+    'work',
+    'personal',
+    'important',
+    'travel',
+    'friends',
+  ];
+
+  calendarEvents?: EventInput[];
+  tempEvents?: EventInput[];
+
+  public filters: Array<{ name: string; value: string; checked: boolean }> = [
+    { name: 'work', value: 'Work', checked: true },
+    { name: 'personal', value: 'Personal', checked: true },
+    { name: 'important', value: 'Important', checked: true },
+    { name: 'travel', value: 'Travel', checked: true },
+    { name: 'friends', value: 'Friends', checked: true },
+  ];
+
+  constructor(
+    private fb: UntypedFormBuilder,
+    private dialog: MatDialog,
+    public calendarService: CalendarService,
+    private snackBar: MatSnackBar
+  ) {
     super();
-    this.events =[];
-    this.holidays =[];
-    this.options = {
-      plugins: [dayGridPlugin, timeGridPlugin, interactionPlugin ],
-     
-      headerToolbar: {
-        left: 'prev,next today',
-        center: 'title',
-        right: 'dayGridMonth,timeGridWeek,timeGridDay'
-      },
-      editable: true,
-      weekends: true,
-      themeSystem: 'bootstrap5',
-      initialView: 'dayGridMonth',
-      drop: this.handleDrop.bind(this),
-      droppable: true,
-      eventDidMount: function(info: any) {
-        const extendedProps = info.event.extendedProps;
-        if (extendedProps && extendedProps.etat) {
-          const etat = extendedProps.etat;
-          let color;
+    this.dialogTitle = 'Add New Event';
+    const blankObject = {} as Calendar;
+    this.calendar = new Calendar(blankObject);
+    this.addCusForm = this.createCalendarForm(this.calendar);
+  }
 
-          switch (etat) {
-            case 'Approved':
-              color = 'green';
-              break;
-              case 'Declined':
-              color = 'red';
-              break;           
-              case 'Pending':
-              color = 'blue';
-              break;
-            default:
-              color = ''; 
-          }
-          if (color) {
-            info.el.style.backgroundColor = color;
-          }
-        }
-      },
+  public ngOnInit(): void {
+    this.calendarEvents = INITIAL_EVENTS;
+    this.tempEvents = this.calendarEvents;
+    this.calendarOptions.initialEvents = this.calendarEvents;
+  }
 
-      dayCellDidMount: (dayRenderInfo: any) => {
-        const dateMoment = moment(dayRenderInfo.date);
-        console.log(dateMoment);
-        if (dateMoment.day() === 6 || dateMoment.day() === 0) {
-          dayRenderInfo.el.style.backgroundColor = '#d6e7e1';
-        } else {
-          dayRenderInfo.el.style.backgroundColor = 'white';
-        } 
-        return dayRenderInfo;
-      }, 
-    };        
+  calendarOptions: CalendarOptions = {
+    plugins: [dayGridPlugin, timeGridPlugin, listPlugin, interactionPlugin],
+    headerToolbar: {
+      left: 'prev,next today',
+      center: 'title',
+      right: 'dayGridMonth,timeGridWeek,timeGridDay,listWeek',
+    },
+    initialView: 'dayGridMonth',
+    weekends: true,
+    editable: true,
+    selectable: true,
+    selectMirror: true,
+    dayMaxEvents: true,
+    select: this.handleDateSelect.bind(this),
+    eventClick: this.handleEventClick.bind(this),
+    eventsSet: this.handleEvents.bind(this),
+  };
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  handleDateSelect(selectInfo: DateSelectArg) {
+    this.addNewEvent();
+  }
+
+  addNewEvent() {
+    let tempDirection: Direction;
+    if (localStorage.getItem('isRtl') === 'true') {
+      tempDirection = 'rtl';
+    } else {
+      tempDirection = 'ltr';
+    }
+    const dialogRef = this.dialog.open(FormDialogComponent, {
+      data: {
+        calendar: this.calendar,
+        action: 'add',
+      },
+      direction: tempDirection,
+    });
+
+    this.subs.sink = dialogRef.afterClosed().subscribe((result) => {
+      if (result === 'submit') {
+        this.calendarData = this.calendarService.getDialogData();
+        console.log(this.calendarData.startDate);
+        this.calendarEvents = this.calendarEvents?.concat({
+          // add new event data. must create new array
+          id: this.calendarData.id,
+          title: this.calendarData.title,
+          start: this.calendarData.startDate,
+          end: this.calendarData.endDate,
+          className: this.getClassNameValue(this.calendarData.category),
+          groupId: this.calendarData.category,
+          details: this.calendarData.details,
+        });
+        this.calendarOptions.events = this.calendarEvents;
+        this.addCusForm.reset();
+        this.showNotification(
+          'snackbar-success',
+          'Add Record Successfully...!!!',
+          'bottom',
+          'center'
+        );
+      }
+    });
+  }
+
+  changeCategory(event: MatCheckboxChange, filter: { name: string }) {
+    if (event.checked) {
+      this.filterItems.push(filter.name);
+    } else {
+      this.filterItems.splice(this.filterItems.indexOf(filter.name), 1);
+    }
+    this.filterEvent(this.filterItems);
+  }
+
+  filterEvent(element: string[]) {
+    const list = this.calendarEvents?.filter((x) =>
+      element.map((y?: string) => y).includes(x.groupId)
+    );
+
+    this.calendarOptions.events = list;
+  }
+
+  handleEventClick(clickInfo: EventClickArg) {
+    this.eventClick(clickInfo);
+  }
+
+  eventClick(row: EventClickArg) {
+    const calendarData = {
+      id: row.event.id,
+      title: row.event.title,
+      category: row.event.groupId,
+      startDate: row.event.start,
+      endDate: row.event.end,
+      details: row.event.extendedProps['details'],
     };
-      ngOnInit() {
-      this.setupDraggableEvents();
-      this.loadEventsAndHolidays(); 
-    }   
-      
-    setupDraggableEvents(): number {
-      const draggableEl = document.getElementById('external-events');
-      let eventValueCount = 0; // Initialiser le compteur à zéro
-    
-      if (draggableEl) {
-        new Draggable(draggableEl, {
-          itemSelector: '.fc-event',
-          eventData: (eventEl: HTMLElement) => {
-            const eventValue = eventEl.querySelector('.fc-event-main')?.textContent;
-                if (eventValue) {
-              eventValueCount++;
-            }
-            return {
-              title: eventValue
-            };
-          }
-        });
-      }
-      return eventValueCount;
+    let tempDirection: Direction;
+    if (localStorage.getItem('isRtl') === 'true') {
+      tempDirection = 'rtl';
+    } else {
+      tempDirection = 'ltr';
     }
-    loadEventsAndHolidays(): void {
-      const cookieData = this.cookieService.get('user_data');
-      const userData = JSON.parse(cookieData);
-      const userId = userData.user.id;
-      // Charger les événements des utilisateurs
-      const test = this.calanderS.getAttendancesForUser(userId).subscribe((userData: Calendar[]) => {
-        this.calanderS.getAllHolidays().subscribe((holidayData: Holidayss[]) => {
-          this.combinedEvents = [...this.mapUserEvents(userData), ...this.mapHolidayEvents(holidayData)];
-          this.updateCalendarOptions(this.combinedEvents);
-          console.log(this.combinedEvents)
-        });
-      });
-    }
-    customDayCellDidMount(dayRenderInfo: any): void {
-        const date = dayRenderInfo.date;
-        const isHoliday = this.holidays.some(event => moment(event.date).isSame(date, 'day') && event.backgroundColor === 'red')
-      // Colorer en rouge les jours fériés
-      if (isHoliday) {
-        dayRenderInfo.el.style.backgroundColor = 'red';
-      } else {
-        // Appliquer la logique de coloration pour les autres jours
-        const dateMoment = moment(dayRenderInfo.date);
-        if (dateMoment.day() === 6 || dateMoment.day() === 0) {
-          dayRenderInfo.el.style.backgroundColor = '#d6e7e1'; // Week-ends
-        } else {
-          dayRenderInfo.el.style.backgroundColor = 'white'; // Autres jours de la semaine
-        }
-      }
-    }  
-    // Mapper les événements des utilisateurs
-    mapUserEvents(userData: Calendar[]): any[] {
-      return userData.map(item => ({
-        title: item.etat,
-        date: new Date(item.date),
-        extendedProps: { etat: item.etat || '' },
-        editable: item.etat !== 'Approved' && item.etat !== 'Declined' // Rendre draggable seulement si l'état n'est pas "Approved" ou "Declined"
+    const dialogRef = this.dialog.open(FormDialogComponent, {
+      width: '600px',
+      data: {
+        calendar: calendarData,
+        action: 'edit',
+      },
+      direction: tempDirection,
+    });
 
-      }));
-    }
-    // Mapper les jours fériés
-    mapHolidayEvents(holidayData: Holidayss[]): any[] {
-      return holidayData.map(item => ({
-        title: item.name,
-        start: item.datee, 
-        allDay: true, 
-        backgroundColor: 'red',
-        display: 'background' 
-      }));
-    }
-    // Mettre à jour les options du calendrier avec la liste combinée d'événements
-    updateCalendarOptions(combinedEvents: any[]): void {
-      this.events = combinedEvents;
-      this.options = { ...this.options, events: this.events };
-    }
-    handleDrop(eventDropInfo: any): void {
-      // Récupérer la date et la valeur de la carte
-      const date = eventDropInfo.dateStr;
-      const cardValue = eventDropInfo.draggedEl.querySelector('.fc-event-main')?.textContent;
-      // Afficher une boîte de dialogue de confirmation avec SweetAlert2
-      Swal.fire({
-        title: 'Confirmer',
-        text: 'Voulez-vous vraiment remettre cette carte dans le calendrier?',
-        icon: 'question',
-        showCancelButton: true,
-        confirmButtonColor: '#3085d6',
-        cancelButtonColor: '#d33',
-        confirmButtonText: 'Oui',
-        cancelButtonText: 'Annuler'
-      }).then((result) => {
-        if (result.isConfirmed) {
-          // Si l'utilisateur confirme, mettre à jour les données dans le calendrier
-          const calendarData: Calendar = {
-            date: date,
-            status: cardValue || '' // Utiliser une chaîne vide si la valeur est nulle
-          };
-          const cookieData = this.cookieService.get('user_data');
-          const userData = JSON.parse(cookieData);
-          const userId = userData.user.id;
-          this.calanderS.updateAttendanceList(userId, [calendarData]).subscribe(
-            () => {
-              console.log('Attendance updated successfully');
-            },
-            error => {
-              console.error('Error updating attendance:', error);
-            }
-          );
-        } else {
-          console.log('Remise de la carte annulée.');
-        }
-      });
-    }
-  }  
+    this.subs.sink = dialogRef.afterClosed().subscribe((result) => {
+      if (result === 'submit') {
+        this.calendarData = this.calendarService.getDialogData();
+        this.calendarEvents?.forEach((element, index) => {
+          if (this.calendarData.id === element.id) {
+            this.editEvent(index, this.calendarData);
+          }
+        }, this);
+        this.showNotification(
+          'black',
+          'Edit Record Successfully...!!!',
+          'bottom',
+          'center'
+        );
+        this.addCusForm.reset();
+      } else if (result === 'delete') {
+        this.calendarData = this.calendarService.getDialogData();
+        this.calendarEvents?.forEach((element) => {
+          if (this.calendarData.id === element.id) {
+            row.event.remove();
+          }
+        }, this);
+
+        this.showNotification(
+          'snackbar-danger',
+          'Delete Record Successfully...!!!',
+          'bottom',
+          'center'
+        );
+      }
+    });
+  }
+
+  editEvent(eventIndex: number, calendarData: Calendar) {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    const calendarEvents = this.calendarEvents!.slice();
+    const singleEvent = Object.assign({}, calendarEvents[eventIndex]);
+    singleEvent.id = calendarData.id;
+    singleEvent.title = calendarData.title;
+    singleEvent.start = calendarData.startDate;
+    singleEvent.end = calendarData.endDate;
+    singleEvent.className = this.getClassNameValue(calendarData.category);
+    singleEvent.groupId = calendarData.category;
+    singleEvent['details'] = calendarData.details;
+    calendarEvents[eventIndex] = singleEvent;
+    this.calendarEvents = calendarEvents; // reassign the array
+
+    this.calendarOptions.events = calendarEvents;
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  handleEvents(events: EventApi[]) {
+    // this.currentEvents = events;
+  }
+
+  createCalendarForm(calendar: Calendar): UntypedFormGroup {
+    return this.fb.group({
+      id: [calendar.id],
+      title: [
+        calendar.title,
+        [Validators.required, Validators.pattern('[a-zA-Z]+([a-zA-Z ]+)*')],
+      ],
+      category: [calendar.category],
+      startDate: [calendar.startDate, [Validators.required]],
+      endDate: [calendar.endDate, [Validators.required]],
+      details: [
+        calendar.details,
+        [Validators.required, Validators.pattern('[a-zA-Z]+([a-zA-Z ]+)*')],
+      ],
+    });
+  }
+
+  showNotification(
+    colorName: string,
+    text: string,
+    placementFrom: MatSnackBarVerticalPosition,
+    placementAlign: MatSnackBarHorizontalPosition
+  ) {
+    this.snackBar.open(text, '', {
+      duration: 2000,
+      verticalPosition: placementFrom,
+      horizontalPosition: placementAlign,
+      panelClass: colorName,
+    });
+  }
+
+  getClassNameValue(category: string) {
+    let className;
+
+    if (category === 'work') className = 'fc-event-success';
+    else if (category === 'personal') className = 'fc-event-warning';
+    else if (category === 'important') className = 'fc-event-primary';
+    else if (category === 'travel') className = 'fc-event-danger';
+    else if (category === 'friends') className = 'fc-event-info';
+
+    return className;
+  }
+}

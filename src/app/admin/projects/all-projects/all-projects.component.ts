@@ -4,7 +4,6 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { BreadcrumbComponent } from '@shared/components/breadcrumb/breadcrumb.component';
 
-
 @Component({
   selector: 'app-all-projects',
   templateUrl: './all-projects.component.html',
@@ -16,7 +15,6 @@ import { BreadcrumbComponent } from '@shared/components/breadcrumb/breadcrumb.co
     MatTooltipModule,
     MatIconModule,
     BoardComponent,
-  
   ],
 })
 export class AllprojectsComponent {

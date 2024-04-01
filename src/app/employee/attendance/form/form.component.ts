@@ -48,10 +48,10 @@ export class FormComponent {
   ) {
     // Set the defaults
     this.action = data.action;
-    if (this.action === 'details') {
-      this.attendances = data.attendances;
-      this.isDetails = true;
-    }
+    // if (this.action === 'details') {
+    //   this.attendances = data.attendances;
+    //   this.isDetails = true;
+    // }
   }
   formControl = new UntypedFormControl('', [
     Validators.required,
@@ -64,21 +64,21 @@ export class FormComponent {
       ? 'Not a valid email'
       : '';
   }
-  createContactForm(): UntypedFormGroup {
-    return this.fb.group({
-      id: [this.attendances.id],
-      date: [
-        formatDate(this.attendances.date, 'yyyy-MM-dd, HH:mm', 'en'),
-        [Validators.required],
-      ],
-      check_in: [this.attendances.check_in],
-      break: [this.attendances.break],
-      check_out: [this.attendances.check_out],
-      hours: [this.attendances.hours],
-      status: [this.attendances.status],
-      details: [this.attendances.details],
-    });
-  }
+  // createContactForm(): UntypedFormGroup {
+  //   return this.fb.group({
+  //     id: [this.attendances.id],
+  //     date: [
+  //       formatDate(this.attendances.date, 'yyyy-MM-dd, HH:mm', 'en'),
+  //       [Validators.required],
+  //     ],
+  //     check_in: [this.attendances.check_in],
+  //     break: [this.attendances.break],
+  //     check_out: [this.attendances.check_out],
+  //     hours: [this.attendances.hours],
+  //     status: [this.attendances.status],
+  //     details: [this.attendances.details],
+  //   });
+  // }
   submit() {
     // emppty stuff
   }

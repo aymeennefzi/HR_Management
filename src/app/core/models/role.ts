@@ -1,4 +1,6 @@
-export class  Role {
-name!:string;
-description!:string
+export enum Role {
+  All = "All",
+  Admin = "Admin",
+  Employee = "Employee",
+  Client = "Client",
 }

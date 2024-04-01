@@ -1,1 +1,25 @@
 /* You can add global styles to this file, and also import other style files */
+// @import "~bootstrap/dist/css/bootstrap.min.css";
+// styles.scss (ou tout autre fichier SCSS où vous définissez vos styles globaux)
+
+// .mat-cell {
+//     min-width: 200px; // Définir une largeur minimale pour les cellules
+//     overflow: hidden;
+//     text-overflow: ellipsis; // Tronquer le texte avec des points de suspension s'il est trop long
+//     white-space: nowrap; // Empêcher le texte de passer à la ligne
+//   }
+//   /* styles.scss */
+
+// .title-column {
+//     min-width: 180px; /* Définir une largeur minimale pour la colonne du titre */
+//   }
+  
+//   .description-column {
+//     min-width: 700px; /* Définir une largeur maximale pour la colonne de description */
+//     /* Permettre le retour à la ligne pour les mots longs */
+//   }
+  
+  
+  
+  /* Ajoutez des classes pour d'autres colonnes si nécessaire */
+  

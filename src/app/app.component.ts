@@ -2,6 +2,8 @@ import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { Event, Router, NavigationStart, NavigationEnd, RouterModule } from '@angular/router';
 import { PageLoaderComponent } from './layout/page-loader/page-loader.component';
+import { MatChipsModule } from '@angular/material/chips';
+MatChipsModule
 @Component({
   selector: 'app-root',
   standalone: true,

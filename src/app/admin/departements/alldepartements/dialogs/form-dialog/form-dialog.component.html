@@ -1,0 +1,200 @@
+<div class="addContainer">
+    <div class="modalHeader">
+      <div class="editRowModal">
+        <div class="modalHeader clearfix">
+          <!-- <img [src]='employees.img' alt="avatar"> -->
+          <div class="modal-about">
+            {{dialogTitle}}
+          </div>
+        </div>
+      </div>
+      <button mat-icon-button (click)="dialogRef.close()" class="modal-close-button" aria-label="Close dialog">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+    <div mat-dialog-content>
+      <!-- <form class="register-form m-4" [formGroup]="employeesForm" (ngSubmit)="submit">
+        <div class="row">
+          <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 mb-2">
+            <mat-form-field class="example-full-width" appearance="outline">
+              <mat-label>Name</mat-label>
+              <input matInput formControlName="name" required>
+              <mat-icon class="material-icons-outlined color-icon p-3" matSuffix>face</mat-icon>
+              @if (employeesForm.get('name')?.hasError('required')) {
+              <mat-error>
+                Name is required
+              </mat-error>
+              }
+            </mat-form-field>
+          </div>
+          <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 mb-2">
+            <mat-form-field class="example-full-width" appearance="outline">
+              <mat-label>department</mat-label>
+              <input matInput formControlName="department" required>
+              <mat-icon class="material-icons-outlined color-icon p-3" matSuffix>business_center</mat-icon>
+              @if (employeesForm.get('department')?.hasError('required')) {
+              <mat-error>
+                Department is required
+              </mat-error>
+              }
+            </mat-form-field>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 mb-2">
+            <mat-form-field class="example-full-width" appearance="outline">
+              <mat-label>role</mat-label>
+              <input matInput formControlName="role" required>
+              <mat-icon class="material-icons-outlined color-icon p-3" matSuffix>flag</mat-icon>
+              @if (employeesForm.get('role')?.hasError('required')) {
+              <mat-error>
+                role is required
+              </mat-error>
+              }
+            </mat-form-field>
+          </div>
+          <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 mb-2">
+            <mat-form-field class="example-full-width" appearance="outline">
+              <mat-label>Degree</mat-label>
+              <input matInput formControlName="degree" required>
+              <mat-icon class="material-icons-outlined color-icon p-3" matSuffix>school</mat-icon>
+              @if (employeesForm.get('degree')?.hasError('required')) {
+              <mat-error>
+                Department is required
+              </mat-error>
+              }
+            </mat-form-field>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 mb-2">
+            <mat-form-field class="example-full-width" appearance="outline">
+              <mat-label>Mobile</mat-label>
+              <input matInput formControlName="mobile" type="number">
+              <mat-icon class="material-icons-outlined color-icon p-3" matSuffix>phone</mat-icon>
+              @if (employeesForm.get('mobile')?.hasError('required')) {
+              <mat-error>
+                Mobile is required
+              </mat-error>
+              }
+            </mat-form-field>
+          </div>
+          <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 mb-2">
+            <mat-form-field class="example-full-width" appearance="outline">
+              <mat-label>Email</mat-label>
+              <input matInput formControlName="email" required>
+              <mat-icon class="material-icons-outlined color-icon p-3" matSuffix>email</mat-icon>
+              @if (employeesForm.get('email')?.hasError('required') || employeesForm.get('email')?.touched) {
+              <mat-error>
+                Please enter a valid email address
+              </mat-error>
+              }
+            </mat-form-field>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 mb-2">
+            <mat-form-field class="example-full-width" appearance="outline">
+              <mat-label>Joining date</mat-label>
+              <input matInput [matDatepicker]="picker" formControlName="date">
+              <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+              <mat-datepicker #picker></mat-datepicker>
+              @if (employeesForm.get('date')?.hasError('required')) {
+              <mat-error>
+                Please select date
+              </mat-error>
+              }
+            </mat-form-field>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-2">
+            <div class="example-button-row" align="end">
+              <button mat-raised-button color="primary" [disabled]="!employeesForm.valid" [mat-dialog-close]="1"
+                (click)="confirmAdd()">Save</button>
+              <button mat-raised-button color="warn" (click)="onNoClick()" tabindex="-1">Cancel</button>
+            </div>
+          </div>
+        </div>
+      </form> -->
+      <form class="register-form m-4" [formGroup]="employeesForm" (ngSubmit)="submit()">
+        <div class="row">
+          <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 mb-2">
+            <mat-form-field class="example-full-width" appearance="outline">
+              <mat-label>Name</mat-label>
+              <input matInput formControlName="name" required >
+              <mat-icon class="material-icons-outlined color-icon p-3" matSuffix>face</mat-icon>
+              <mat-error *ngIf="employeesForm.get('name')?.hasError('required')">
+                Name is required
+              </mat-error>
+            </mat-form-field>
+          </div>
+          <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 mb-2">
+            <mat-form-field class="example-full-width" appearance="outline">
+              <mat-label>Description</mat-label>
+              <input matInput formControlName="description">
+              <mat-icon class="material-icons-outlined color-icon p-3" matSuffix>description</mat-icon>
+            </mat-form-field>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 mb-2">
+            <mat-form-field class="example-full-width" appearance="outline">
+              <mat-label>Total Employees</mat-label>
+              <input matInput formControlName="totalEmployees">
+              <mat-icon class="material-icons-outlined color-icon p-3" matSuffix>people</mat-icon>
+            </mat-form-field>
+          </div>
+          <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 mb-2">
+            <mat-form-field class="example-full-width" appearance="outline">
+              <mat-label>Vacant Positions</mat-label>
+              <input matInput formControlName="vacantPositions">
+              <mat-icon class="material-icons-outlined color-icon p-3" matSuffix>work_off</mat-icon>
+            </mat-form-field>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 mb-2">
+            <mat-form-field class="example-full-width" appearance="outline">
+              <mat-label>Recruitment Needs</mat-label>
+              <input matInput formControlName="recruitmentNeeds">
+              <mat-icon class="material-icons-outlined color-icon p-3" matSuffix>how_to_reg</mat-icon>
+            </mat-form-field>
+          </div>
+          <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 mb-2">
+            <mat-form-field class="example-full-width" appearance="outline">
+              <mat-label>Budget Allocated</mat-label>
+              <input matInput formControlName="budgetAllocated">
+              <mat-icon class="material-icons-outlined color-icon p-3" matSuffix>attach_money</mat-icon>
+            </mat-form-field>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 mb-2">
+            <mat-form-field class="example-full-width" appearance="outline">
+              <mat-label>Salary Expenditure</mat-label>
+              <input matInput formControlName="salaryExpenditure">
+              <mat-icon class="material-icons-outlined color-icon p-3" matSuffix>account_balance_wallet</mat-icon>
+            </mat-form-field>
+          </div>
+          <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 mb-2">
+            <mat-form-field class="example-full-width" appearance="outline">
+              <mat-label>Training Expenditure</mat-label>
+              <input matInput formControlName="trainingExpenditure">
+              <mat-icon class="material-icons-outlined color-icon p-3" matSuffix>school</mat-icon>
+            </mat-form-field>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-2">
+            <div class="example-button-row" align="end">
+              <button mat-raised-button color="primary" [disabled]="!employeesForm.valid" type="submit">Save</button>
+              <button mat-raised-button color="warn" type="button" (click)="onNoClick()" tabindex="-1">Cancel</button>
+            </div>
+          </div>
+        </div>
+      </form>
+      
+      
+    </div>
+  </div>

@@ -4,7 +4,7 @@ import { MyLeavesService } from '../../my-leaves.service';
 import { MatButtonModule } from '@angular/material/button';
 
 export interface DialogData {
-  _id: string;
+  id: number;
   type: string;
   status: string;
   reason: string;
@@ -34,9 +34,6 @@ export class DeleteDialogComponent {
   }
   confirmDelete(): void {
     console.log(this.data);
-    const leave = this.data._id ; // Convertir _id en chaîne de caractères
-    this.myLeavesService.deleteMyLeaves(leave);
+    this.myLeavesService.deleteMyLeaves(this.data.id);
   }
-  
-  
 }

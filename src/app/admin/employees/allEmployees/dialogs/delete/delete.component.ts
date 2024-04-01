@@ -4,10 +4,10 @@ import { EmployeesService } from '../../employees.service';
 import { MatButtonModule } from '@angular/material/button';
 
 export interface DialogData {
-  id: number;
+  id: string;
   name: string;
-  department: string;
-  mobile: string;
+  description: string;
+ 
 }
 
 @Component({

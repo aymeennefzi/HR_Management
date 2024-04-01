@@ -47,7 +47,7 @@
                 </li>
                 <li>
                   <div class="export-button m-l-10" matTooltip="XLSX">
-                    <img src="assets/images/icons/xlsx.png" alt=""  />
+                    <img src="assets/images/icons/xlsx.png" alt="" (click)="exportExcel()" />
                   </div>
                 </li>
               </ul>
@@ -71,11 +71,11 @@
                   </mat-cell>
                 </ng-container>
                 <!-- ID Column -->
-              <!--   <ng-container matColumnDef="id">
+                <ng-container matColumnDef="id">
                   <mat-header-cell *matHeaderCellDef mat-sort-header>Id
                   </mat-header-cell>
                   <mat-cell *matCellDef="let row">{{row.id}}</mat-cell>
-                </ng-container> -->
+                </ng-container>
                 <ng-container matColumnDef="img">
                   <mat-header-cell mat-header-cell *matHeaderCellDef [ngClass]="'tbl-col-width-per-6'"> Image
                   </mat-header-cell>
@@ -84,77 +84,53 @@
                   </mat-cell>
                 </ng-container>
                 <ng-container matColumnDef="name">
-                  <mat-header-cell *matHeaderCellDef mat-sort-header>Name</mat-header-cell>
-                  <mat-cell *matCellDef="let leave">
-                    <span class="mobile-label">Name:</span> {{ leave.userName }}
+                  <mat-header-cell *matHeaderCellDef mat-sort-header>Name
+                  </mat-header-cell>
+                  <mat-cell *matCellDef="let row"> <span class="mobile-label">Name:</span> {{row.name}}
                   </mat-cell>
                 </ng-container>
                 <ng-container matColumnDef="from">
                   <mat-header-cell *matHeaderCellDef mat-sort-header>Leave From
                   </mat-header-cell>
                   <mat-cell *matCellDef="let row"> <span class="mobile-label">Leave From:</span>
-                    {{row.startDate | date: 'MM/dd/yyyy'}}
-                  </mat-cell>
-                </ng-container>
-                <ng-container matColumnDef="startTime">
-                  <mat-header-cell *matHeaderCellDef mat-sort-header>Time Of Day
-                  </mat-header-cell>
-                  <mat-cell *matCellDef="let row" class="column-nowrap"> <span class="mobile-label">Time Of
-                      Days:</span>{{row.startTime}}
+                    {{row.from | date: 'MM/dd/yyyy'}}
                   </mat-cell>
                 </ng-container>
                 <ng-container matColumnDef="type">
                   <mat-header-cell *matHeaderCellDef mat-sort-header>Leave Type
                   </mat-header-cell>
-                  <mat-cell *matCellDef="let row"> <span class="mobile-label">Leave Type:</span> {{row.leaveType}}
+                  <mat-cell *matCellDef="let row"> <span class="mobile-label">Leave Type:</span> {{row.type}}
                   </mat-cell>
                 </ng-container>
                 <ng-container matColumnDef="leaveTo">
                   <mat-header-cell *matHeaderCellDef mat-sort-header>Leave To
                   </mat-header-cell>
                   <mat-cell *matCellDef="let row">
-                    <span class="mobile-label">Leave To:</span>{{row.endDate | date: 'MM/dd/yyyy'}}</mat-cell>
+                    <span class="mobile-label">Leave To:</span>{{row.leaveTo | date: 'MM/dd/yyyy'}}</mat-cell>
                 </ng-container>
-                <ng-container matColumnDef="endTime">
-                  <mat-header-cell *matHeaderCellDef mat-sort-header>Time Of Day
+                <ng-container matColumnDef="noOfDays">
+                  <mat-header-cell *matHeaderCellDef mat-sort-header>No Of Days
                   </mat-header-cell>
-                  <mat-cell *matCellDef="let row" class="column-nowrap"> <span class="mobile-label">Time Of
-                      Days:</span>{{row.endTime}}
+                  <mat-cell *matCellDef="let row" class="column-nowrap"> <span class="mobile-label">No Of
+                      Days:</span>{{row.noOfDays}}
                   </mat-cell>
                 </ng-container>
-                
-                <ng-container matColumnDef="numOfDays">
-                  <mat-header-cell *matHeaderCellDef mat-sort-header>Days
-                  </mat-header-cell>
-                  <mat-cell *matCellDef="let row" class="column-nowrap"> <span class="mobile-label">
-                      Days:</span>{{row.numOfDays}}
-                  </mat-cell>
-                </ng-container>
-
-
-
                 <ng-container matColumnDef="status">
                   <mat-header-cell *matHeaderCellDef mat-sort-header> Status
                   </mat-header-cell>
                   <mat-cell mat-cell *matCellDef="let row">
                     <span class="mobile-label">Status:</span>
                     @if (row.status==='Approved') {
-                      <div>
-                        <span class="badge badge-pill badge-primary col-green">
+                    <div>
+                      <span class="badge badge-pill badge-primary col-green">
                         {{row.status}}</span>
-                      </div>
+                    </div>
                     }
-                    @if (row.status==='Declined') {
-                      <div>
-                        <span class="badge badge-pill badge-primary col-red">
+                    @if (row.status==='Rejected') {
+                    <div>
+                      <span class="badge badge-pill badge-primary col-red">
                         {{row.status}}</span>
-                      </div>
-                    }
-                    @if (row.status==='Pending') {
-                      <div>
-                        <span class="badge badge-pill badge-primary col-blue">
-                        {{row.status}}</span>
-                      </div>
+                    </div>
                     }
                   </mat-cell>
                 </ng-container>
@@ -165,12 +141,12 @@
                         class="mobile-label">Reason:</span>{{row.reason}}</span>
                   </mat-cell>
                 </ng-container>
-                <!-- <ng-container matColumnDef="note">
+                <ng-container matColumnDef="note">
                   <mat-header-cell *matHeaderCellDef mat-sort-header>Note
                   </mat-header-cell>
                   <mat-cell *matCellDef="let row"> <span class="mobile-label">Note:</span>{{row.note}}
                   </mat-cell>
-                </ng-container> -->
+                </ng-container>
                 <!-- actions -->
                 <ng-container matColumnDef="actions">
                   <mat-header-cell class="psl-3 tbl-col-width-per-10" *matHeaderCellDef>
@@ -181,13 +157,13 @@
                       <mat-icon>more_vert</mat-icon>
                     </button>
                     <mat-menu #menu="matMenu">
-                      <button mat-menu-item (click)="accepterDemande(row._id)">
+                      <button mat-menu-item (click)="editCall(row)">
                         <i class="material-icons-outlined align-middle msr-2">create</i>
-                        <span>Approved</span>
+                        <span>Edit Contact</span>
                       </button>
-                      <button mat-menu-item (click)="refuserDemandeConge(row._id)">
+                      <button mat-menu-item (click)="deleteItem(row)">
                         <i class="material-icons-outlined align-middle msr-2">delete_forever</i>
-                        <span>Declined</span>
+                        <span>Delete Contact</span>
                       </button>
                     </mat-menu>
                   </mat-cell>
@@ -199,6 +175,12 @@
                 </mat-row>
               </table>
               <!-- Loading spinner -->
+              @if (exampleDatabase?.isTblLoading) {
+              <div class="tbl-spinner">
+                <mat-progress-spinner color="primary" [diameter]="40" mode="indeterminate">
+                </mat-progress-spinner>
+              </div>
+              }
               @if (!exampleDatabase?.isTblLoading) {
               <div class="no-results" [style.display]="dataSource.renderedData.length === 0 ? '' : 'none'">
                 No results

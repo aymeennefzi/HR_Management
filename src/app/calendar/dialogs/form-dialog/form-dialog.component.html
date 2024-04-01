@@ -1,4 +1,4 @@
-<div class="addContainer">
+<!-- <div class="addContainer">
   <div class="modalHeader">
     <div class="editRowModal">
       <div class="modalHeader clearfix">
@@ -94,4 +94,42 @@
       </div>
     </form>
   </div>
+</div> -->
+<div class="addContainer">
+  <div class="modalHeader">
+    <div class="editRowModal">
+      <div class="modalHeader clearfix">
+        <div class="modal-about">
+          {{dialogTitle}}
+        </div>
+      </div>
+    </div>
+    <button mat-icon-button (click)="dialogRef.close()" class="modal-close-button" aria-label="Close dialog">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div> 
+  <div mat-dialog-content>
+<div class="form-dialog">
+  <form (ngSubmit)="onSubmit()">
+    <div class="form-group">
+      <label for="etat">État :</label>
+      <select class="form-control" id="etat" [(ngModel)]="etat">
+        <option value="option1">Option 1</option>
+        <option value="option2">Option 2</option>
+        <option value="option3">Option 3</option>
+        <!-- Ajoutez d'autres options selon vos besoins -->
+      </select>
+    </div>
+    <div class="form-group">
+      <label for="status">Status :</label>
+      <select class="form-control" id="status" [(ngModel)]="status">
+        <option value="option1">Option 1</option>
+        <option value="option2">Option 2</option>
+        <option value="option3">Option 3</option>
+        <!-- Ajoutez d'autres options selon vos besoins -->
+      </select>
+    </div>
+    <button type="submit" class="btn btn-primary">Submit</button>
+  </form>
 </div>
+  </div>

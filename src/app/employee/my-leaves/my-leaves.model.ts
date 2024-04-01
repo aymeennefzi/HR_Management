@@ -1,36 +1,28 @@
-export enum LeaveType {
-  SickLeave = 'Sick Leave',
-  PaidLeave = 'paid leave',
-  Unpaidleave = 'Unpaid leave',
-  Bereavement = 'Bereavement',
-  PersonalReasons = 'Personal Reasons',
-  Maternity = 'Maternity',
-  Paternity = 'Paternity',
-  RTT = 'RTT' ,
-  Other = 'Other',
-}
-export enum Status {
-  Pending= 'Pending',
-  Approved = 'Approved',
-  Declined = 'Declined'
-}
-
-export enum TimeOfDay {
-  Morning = 'Morning',
-  Afternoon = 'Afternoon',
-  noone = 'No One',
-}
-
 export class MyLeaves {
-  _id  !: string;
-  leaveType!: LeaveType;
-  startDate!: string;
-  endDate!: string;
-  reason!: string;
-  status!: Status;
-  startTime !: TimeOfDay ;
-  endTime !: TimeOfDay ;
-  personnelId!:String;
-
-
+  id: number;
+  halfDay: string;
+  applyDate: string;
+  fromDate: string;
+  toDate: string;
+  reason: string;
+  type: string;
+  status: string;
+  constructor(myLeaves: MyLeaves) {
+    {
+      this.id = myLeaves.id || this.getRandomID();
+      this.halfDay = myLeaves.halfDay || '';
+      this.applyDate = myLeaves.applyDate || '';
+      this.fromDate = myLeaves.fromDate || '';
+      this.toDate = myLeaves.toDate || '';
+      this.reason = myLeaves.reason || '';
+      this.type = myLeaves.type || '';
+      this.status = myLeaves.status || '';
+    }
+  }
+  public getRandomID(): number {
+    const S4 = () => {
+      return ((1 + Math.random()) * 0x10000) | 0;
+    };
+    return S4() + S4();
+  }
 }

@@ -8,7 +8,6 @@ import { MyLeavesComponent } from './my-leaves/my-leaves.component';
 import { MyProjectsComponent } from './my-projects/my-projects.component';
 import { MyTasksComponent } from './my-tasks/my-tasks.component';
 import { ChatComponent } from './chat/chat.component';
-import { EmployeeProfileComponent } from 'app/admin/employees/employee-profile/employee-profile.component';
 export const EMPLOYEE_ROUTE: Route[] = [
   {
     path: 'dashboard',
@@ -42,8 +41,6 @@ export const EMPLOYEE_ROUTE: Route[] = [
     path: 'settings',
     component: SettingsComponent,
   },
-  {path : 'profile' , component:EmployeeProfileComponent},
-  
   { path: '**', component: Page404Component },
 ];
 

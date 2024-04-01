@@ -1,17 +1,20 @@
 import { MAT_DIALOG_DATA, MatDialogRef, MatDialogContent, MatDialogClose } from '@angular/material/dialog';
-import { Component, Inject } from '@angular/core';
+import { Component, Inject, OnInit } from '@angular/core';
 import { EmployeesService } from '../../employees.service';
 import { UntypedFormControl, Validators, UntypedFormGroup, UntypedFormBuilder, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { Employees } from '../../employees.model';
+import { CommonModule, formatDate } from '@angular/common';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
+import { Departement } from 'app/admin/employees/add-employee/entreprise.model';
 export interface DialogData {
-  id: number;
+  id: string;
   action: string;
-  employees: Employees;
+  employees: Departement;
+  selectedItem?: any;
 }
 @Component({
     selector: 'app-form-dialog:not(c)',
@@ -28,29 +31,111 @@ export interface DialogData {
         MatInputModule,
         MatDatepickerModule,
         MatDialogClose,
+        CommonModule
     ],
 })
-export class FormDialogComponent {
+export class FormDialogComponent implements OnInit{
   action: string;
-  dialogTitle: string;
+  dialogTitle!: string;
   employeesForm: UntypedFormGroup;
-  employees: Employees;
+  heros!:Departement[];
+  employees!: Departement;
+  selectedItem: any;
   constructor(
     public dialogRef: MatDialogRef<FormDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: DialogData,
     public employeesService: EmployeesService,
     private fb: UntypedFormBuilder
   ) {
+    
+    this.employeesForm = new UntypedFormGroup({});
+    console.log('Employee ID:', data.id);
     // Set the defaults
     this.action = data.action;
-    if (this.action === 'edit') {
-      this.dialogTitle = data.employees.firstName;
-      this.employees = data.employees;
-    } else {
-      this.dialogTitle = 'New Employees';
-      this.employees = new Employees(); // Utiliser le constructeur sans argument
+    // if (this.action === 'edit' && data.employees && data.employees.name) {
+
+    //   this.dialogTitle = data.employees.name;
+    //   this.employees = data.employees;
+    //   console.log(this.data.employees.name); 
+    // } 
+    if (this.action === 'edit' && this.data.id) {
+      this.employeesService.getDepartementById(data.id).subscribe(employee => {
+        console.log(employee);
+        employee.name = employee.name.toUpperCase();
+        this.dialogTitle = employee.name;
+        this.employees = employee;
+        this.initEmployeeForm();
+          // Assigner les valeurs du formulaire avec les données de l'employé récupéré
+      this.employeesForm.patchValue({
+        _id: this.employees._id,
+        name: this.employees.name,
+        description: this.employees.description,
+        totalEmployees: this.employees.totalEmployees,
+        vacantPositions: this.employees.vacantPositions,
+        recruitmentNeeds: this.employees.recruitmentNeeds,
+        budgetAllocated: this.employees.budgetAllocated,
+        salaryExpenditure: this.employees.salaryExpenditure,
+        trainingExpenditure: this.employees.trainingExpenditure,
+      });
+      //  this.employeesForm = this.createContactForm();
+      });
     }
-    this.employeesForm = this.createContactForm();
+    
+    else {
+      this.dialogTitle = 'New Employees';
+      // const blankObject = {} as Departement;
+      // Au lieu de passer un argument à la classe Departement, instanciez-la simplement sans argument
+      const blankObject = new Departement();
+
+      this.employees = blankObject;
+      this.initEmployeeForm();
+      // this.employeesForm = this.createContactForm();
+    }
+    // this.employeesForm = this.createContactForm();
+  }
+  ngOnInit(): void {
+  this.fb.group({
+    name:[''],
+    description:[''],
+    totalEmployees: [''],
+    vacantPositions: [''],
+    recruitmentNeeds:[''],
+    budgetAllocated: [''],
+    salaryExpenditure:[''],
+    trainingExpenditure:['']
+  })
+  if (this.action === 'edit' && this.data.id) {
+    this.employeesService.getDepartementById(this.data.id).subscribe(employee => {
+      console.log(employee);
+      employee.name = employee.name.toUpperCase();
+      this.dialogTitle = employee.name;
+      this.employees = employee;
+      this.initEmployeeForm();
+        // Assigner les valeurs du formulaire avec les données de l'employé récupéré
+    this.employeesForm.patchValue({
+      _id: this.employees._id,
+      name: this.employees.name,
+      description: this.employees.description,
+      totalEmployees: this.employees.totalEmployees,
+      vacantPositions: this.employees.vacantPositions,
+      recruitmentNeeds: this.employees.recruitmentNeeds,
+      budgetAllocated: this.employees.budgetAllocated,
+      salaryExpenditure: this.employees.salaryExpenditure,
+      trainingExpenditure: this.employees.trainingExpenditure,
+    });
+     this.employeesForm = this.createContactForm();
+    });
+  }
+  else {
+    this.dialogTitle = 'New Employees';
+    // const blankObject = {} as Departement;
+    // Au lieu de passer un argument à la classe Departement, instanciez-la simplement sans argument
+    const blankObject = new Departement();
+
+    this.employees = blankObject;
+    this.initEmployeeForm();
+    // this.employeesForm = this.createContactForm();
+  }
   }
   formControl = new UntypedFormControl('', [
     Validators.required,
@@ -65,31 +150,62 @@ export class FormDialogComponent {
   }
   createContactForm(): UntypedFormGroup {
     return this.fb.group({
-      id: [this.employees._id],
-      img: [this.employees.img],
-      firstName: [this.employees.firstName],
-      lastName: [this.employees.lastName],
-      etablissement: [this.employees.etablissement],
-      dateEntree: [this.employees.dateEntree],
-      fonction: [this.employees.fonction],
-      password: [this.employees.password],
-      TelSecondaire: [this.employees.TelSecondaire],
-      EmailSecondaire: [this.employees.EmailSecondaire],
-      Matricule: [this.employees.Matricule],
-      email: [this.employees.email],
-      roleName: [this.employees.roleName],
-      Tel: [this.employees.Tel],
-      soldeConges: [this.employees.soldeConges],
-      soldeMaladie: [this.employees.soldeMaladie],
+      _id: [this.employees._id],
+      name: [this.employees.name],
+      description: [this.employees.description],
+      totalEmployees: [this.employees.totalEmployees],
+      vacantPositions: [this.employees.vacantPositions],
+      recruitmentNeeds: [this.employees.recruitmentNeeds],
+      budgetAllocated: [this.employees.budgetAllocated],
+      salaryExpenditure: [this.employees.salaryExpenditure],
+      trainingExpenditure: [this.employees.trainingExpenditure],
     });
+  }
+  initEmployeeForm(): void {
+    this.employeesForm = this.createContactForm();
+   
   }
   submit() {
     // emppty stuff
+    if (this.action === 'edit') {
+      console.log("sss",this.employeesForm.value)
+      const updatedEmployeeData = this.employeesForm.getRawValue(); // Récupérer les données du formulaire modifié
+
+      // Appeler la méthode update du service EmployeeService pour mettre à jour les données de l'employé
+      this.employeesService.updateEmployees(updatedEmployeeData).subscribe(
+          (response) => {
+             
+              console.log('Employee updated successfully', response);
+              this.dialogRef.close(); 
+              alert('Updated successfully');// Fermer le dialogue après la mise à jour réussie
+          },
+          (error) => {
+              // Gérer les erreurs de la requête de mise à jour si nécessaire
+              console.error('Error updating employee', error);
+          }
+      );
+  }
   }
   onNoClick(): void {
     this.dialogRef.close();
   }
+  // public confirmAdd(): void {
+  //   this.employeesService.addDepartement(this.employeesForm.getRawValue());
+  // }
   public confirmAdd(): void {
-    this.employeesService.addEmployees(this.employeesForm.getRawValue());
+    const departmentData = this.employeesForm.getRawValue(); // Récupérer les données du formulaire
+  
+    this.employeesService.addDepartement(departmentData).subscribe(
+      (response) => {
+        // Gérer la réponse de la méthode addDepartement si nécessaire
+        console.log('Department added successfully', response);
+        this.dialogRef.close();
+        alert('Department added successfully');
+      },
+      (error) => {
+        // Gérer les erreurs de la méthode addDepartement si nécessaire
+        console.error('Error adding department', error);
+      }
+    );
   }
 }

@@ -25,8 +25,8 @@
                 <ul class="tbl-export-btn">
                   <li class="tbl-header-btn">
                     <div class="m-l-10" matTooltip="ADD">
-                      <button mat-mini-fab color="primary" (click)="addNew()">
-                        <mat-icon class="col-white">add</mat-icon>
+                      <button mat-mini-fab color="primary" (click)="addNew">
+                        <mat-icon class="col-white">addhu</mat-icon>
                       </button>
                     </div>
                   </li>
@@ -47,6 +47,7 @@
                   </li>
                   <li>
                     <div class="export-button m-l-10" matTooltip="XLSX">
+                      <img src="assets/images/icons/xlsx.png" alt="" (click)="exportExcel()" />
                     </div>
                   </li>
                 </ul>
@@ -72,36 +73,36 @@
                   <!-- ID Column -->
                   <ng-container matColumnDef="id">
                     <mat-header-cell *matHeaderCellDef mat-sort-header>Id</mat-header-cell>
-                    <mat-cell *matCellDef="let row">{{row._id}}</mat-cell>
+                    <mat-cell *matCellDef="let row">{{row.id}}</mat-cell>
                   </ng-container>
-                  <ng-container matColumnDef="startDate">
+                  <ng-container matColumnDef="applyDate">
+                    <mat-header-cell *matHeaderCellDef mat-sort-header>Apply Date</mat-header-cell>
+                    <mat-cell *matCellDef="let row" (contextmenu)="onContextMenu($event, row)">
+                      <span class="mobile-label">Apply Date:</span> {{row.applyDate | date: 'MM/dd/yyyy'}}
+                    </mat-cell>
+                  </ng-container>
+                  <ng-container matColumnDef="fromDate">
                     <mat-header-cell *matHeaderCellDef mat-sort-header>From Date</mat-header-cell>
                     <mat-cell *matCellDef="let row" (contextmenu)="onContextMenu($event, row)">
-                      <span class="mobile-label">From Date:</span> {{row.startDate | date: 'dd/MM/yyyy'}}
+                      <span class="mobile-label">From Date:</span> {{row.fromDate | date: 'MM/dd/yyyy'}}
                     </mat-cell>
                   </ng-container>
-                  <ng-container matColumnDef="startTime">
-                    <mat-header-cell *matHeaderCellDef mat-sort-header>Time Of day</mat-header-cell>
-                    <mat-cell *matCellDef="let row" (contextmenu)="onContextMenu($event, row)">
-                      <span class="mobile-label">Time Of day</span> {{row.startTime}}
-                    </mat-cell>
-                  </ng-container>
-                  <ng-container matColumnDef="endDate">
+                  <ng-container matColumnDef="toDate">
                     <mat-header-cell *matHeaderCellDef mat-sort-header>To Date</mat-header-cell>
                     <mat-cell *matCellDef="let row" (contextmenu)="onContextMenu($event, row)">
-                      <span class="mobile-label">To Date:</span>{{row.endDate | date: 'dd/MM/yyyy'}}
+                      <span class="mobile-label">To Date:</span>{{row.toDate | date: 'MM/dd/yyyy'}}
                     </mat-cell>
                   </ng-container>
-                  <ng-container matColumnDef="endTime">
-                    <mat-header-cell *matHeaderCellDef mat-sort-header>Time of day</mat-header-cell>
+                  <ng-container matColumnDef="halfDay">
+                    <mat-header-cell *matHeaderCellDef mat-sort-header>Half Day</mat-header-cell>
                     <mat-cell *matCellDef="let row" (contextmenu)="onContextMenu($event, row)">
-                      <span class="mobile-label">Half Day:</span> {{row.endTime}}</mat-cell>
+                      <span class="mobile-label">Half Day:</span> {{row.halfDay}}</mat-cell>
                     </ng-container>
-                    <ng-container matColumnDef="leaveType">
+                    <ng-container matColumnDef="type">
                       <mat-header-cell *matHeaderCellDef mat-sort-header>Type
                       </mat-header-cell>
                       <mat-cell *matCellDef="let row" (contextmenu)="onContextMenu($event, row)">
-                        <span class="mobile-label">Leave type:</span> {{row.leaveType}}</mat-cell>
+                        <span class="mobile-label">Type:</span> {{row.type}}</mat-cell>
                       </ng-container>
                       <ng-container matColumnDef="status">
                         <mat-header-cell *matHeaderCellDef mat-sort-header> Status
@@ -114,7 +115,7 @@
                               {{row.status}}</span>
                             </div>
                           }
-                          @if (row.status==='Declined') {
+                          @if (row.status==='Rejected') {
                             <div>
                               <span class="badge badge-pill badge-primary col-red">
                               {{row.status}}</span>
@@ -156,7 +157,13 @@
                         [style.cursor]="'pointer'" matRipple>
                       </mat-row>
                     </table>
-                    
+                    <!-- Loading spinner -->
+                    @if (exampleDatabase?.isTblLoading) {
+                      <div class="tbl-spinner">
+                        <mat-progress-spinner color="primary" [diameter]="40" mode="indeterminate">
+                        </mat-progress-spinner>
+                      </div>
+                    }
                     <!-- context menu start -->
                     <div style="visibility: hidden; position: fixed" [style.left]="contextMenuPosition.x"
                       [style.top]="contextMenuPosition.y" [matMenuTriggerFor]="contextMenu">

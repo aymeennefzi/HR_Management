@@ -1,29 +1,21 @@
-import { formatDate } from '@angular/common';
+// job.model.ts
+
 export class JobsList {
-  id: number;
-  title: string;
-  status: string;
-  date: string;
-  role: string;
-  vacancies: string;
-  department: string;
-  jobType: string;
-  constructor(jobsList: JobsList) {
-    {
-      this.id = jobsList.id || this.getRandomID();
-      this.title = jobsList.title || '';
-      this.status = jobsList.status || '';
-      this.date = formatDate(new Date(), 'yyyy-MM-dd', 'en') || '';
-      this.role = jobsList.role || '';
-      this.vacancies = jobsList.vacancies || '';
-      this.department = jobsList.department || '';
-      this.jobType = jobsList.jobType || '';
-    }
-  }
-  public getRandomID(): number {
-    const S4 = () => {
-      return ((1 + Math.random()) * 0x10000) | 0;
-    };
-    return S4() + S4();
-  }
+  _id!: string; // Facultatif si vous prévoyez d'utiliser l'identifiant de l'offre d'emploi dans l'application frontend
+  title!: string;
+  description!: string;
+  requiredSkills!: string[];
+  location!: string;
+  contractType!: string;
+  salary!: number;
+  applicationDeadline!: Date;
+  status!: string;
+  publicationDate!: Date;
+  recruitingManager!: string;
+  applicants!: string[];
+}
+export class Skill {
+  
+  name: string = '';
+
 }

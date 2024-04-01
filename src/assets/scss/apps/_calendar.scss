@@ -120,8 +120,8 @@
 
   &:disabled {
     color: #fff !important;
-    background-color: #1527b6 !important;
-    border-color: #1527b6 !important;
+    background-color: #6777ef !important;
+    border-color: #6777ef !important;
   }
 
   &:hover {
@@ -202,13 +202,11 @@
 
 .fc-view {
   color: #666;
-  text-align: center;
-  padding: 20px;
+  text-align: right;
 
   > table td {
-    color: #069eeb;
-    text-align: center;
-    margin: 50px;
+    color: #666;
+    text-align: right;
   }
 }
 
@@ -225,7 +223,7 @@
 
 .fc .fc-daygrid-event {
   padding: 0px 10px;
-  box-shadow: 0 4px 25px 0 rgba(33, 12, 169, 0.1);
+  box-shadow: 0 4px 25px 0 rgba(0, 0, 0, 0.1);
   color: #ffffff;
   text-align: left;
 }

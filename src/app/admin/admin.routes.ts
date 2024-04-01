@@ -37,6 +37,11 @@ export const ADMIN_ROUTE: Route[] = [
       import('./holidays/holidays.routes').then((m) => m.HOLIDAY_ROUTE),
   },
   {
+    path: 'departements',
+    loadChildren: () =>
+      import('./departements/departements.routes').then((m) => m.ADMIN_DEPARTEMENT_ROUTE),
+  },
+  {
     path: 'attendance',
     loadChildren: () =>
       import('./attendance/attendance.routes').then((m) => m.ATTENDANCE_ROUTE),
@@ -50,6 +55,11 @@ export const ADMIN_ROUTE: Route[] = [
     path: 'leads',
     loadChildren: () =>
       import('./leads/leads.routes').then((m) => m.LEADS_ROUTE),
+  },
+  {
+    path: 'candad',
+    loadChildren: () =>
+      import('./candad/candad.routes').then((m) => m.CANDAD_ROUTE),
   },
   {
     path: 'jobs',

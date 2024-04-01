@@ -4,7 +4,7 @@ import { HttpClient } from '@angular/common/http';
 import { MatDialog } from '@angular/material/dialog';
 import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
 import { MatSort, MatSortModule } from '@angular/material/sort';
-import { Employees } from './employees.model';
+// import { Employees } from './employees.model';
 import { DataSource } from '@angular/cdk/collections';
 import {
   MatSnackBar,
@@ -30,6 +30,10 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { BreadcrumbComponent } from '@shared/components/breadcrumb/breadcrumb.component';
+import { Departement } from '../add-employee/entreprise.model';
+import { FormsModule } from '@angular/forms';
+// import { Ng2SearchPipeModule } from 'ng2-search-filter';
+
 
 @Component({
   selector: 'app-allemployees',
@@ -50,7 +54,11 @@ import { BreadcrumbComponent } from '@shared/components/breadcrumb/breadcrumb.co
     MatProgressSpinnerModule,
     MatMenuModule,
     MatPaginatorModule,
-    DatePipe,CommonModule
+    DatePipe,
+    FormsModule,
+    CommonModule
+    // Ng2SearchPipeModule
+    
   ],
 })
 export class AllemployeesComponent
@@ -59,26 +67,25 @@ export class AllemployeesComponent
 {
   displayedColumns = [
     'select',
-    'img',
-    'firstName',
-    'lastName' , 
-    'email',
-    'etablissement',
-    'dateEntree',
-    'fonction',
-    'Tel',
-    'Matricule',
-    'roleName',
-    'soldeConges',
-    'soldeMaladie',
-    'actions',
+    
+    'name',
+    'description',
+    'totalEmployees',
+    'vacantPositions',
+    'recruitmentNeeds',
+    'budgetAllocated',
+    'salaryExpenditure',
+    'trainingExpenditure',
+    'actions'
   ];
+  searchName!: string;
   exampleDatabase?: EmployeesService;
   dataSource!: ExampleDataSource;
-  selection = new SelectionModel<Employees>(true, []);
+  selection = new SelectionModel<Departement>(true, []);
   index?: number;
   id?: string;
-  employees?: Employees;
+  employees?: Departement;
+  heros?: Departement[];
   constructor(
     public httpClient: HttpClient,
     public dialog: MatDialog,
@@ -98,30 +105,6 @@ export class AllemployeesComponent
   }
   refresh() {
     this.loadData();
-  }
-  activateUser(userId: string): void {
-    this.employeesService.activateUser(userId).subscribe(
-      user => {
-        console.log('Utilisateur activé :', user);
-        
-      },
-      error => {
-        console.error("Une erreur s'est produite lors de l'activation de l'utilisateur :", error);
-      }
-    );
-    this.ngOnInit ;
-  }
-  desactivatedUser(userId: string): void {
-    this.employeesService.desactivatedUser(userId).subscribe(
-      user => {
-        this.ngOnInit ;
-
-        console.log('Utilisateur activé :', user);
-      },
-      error => {
-        console.error("Une erreur s'est produite lors de l'activation de l'utilisateur :", error);
-      }
-    );
   }
   addNew() {
     let tempDirection: Direction;
@@ -154,7 +137,7 @@ export class AllemployeesComponent
       }
     });
   }
-  editCall(row: Employees) {
+  editCall(row: Departement) {
     this.id = row._id;
     let tempDirection: Direction;
     if (localStorage.getItem('isRtl') === 'true') {
@@ -164,13 +147,16 @@ export class AllemployeesComponent
     }
     const dialogRef = this.dialog.open(FormDialogComponent, {
       data: {
-        employees: row,
+        // departement: row,
+        id: row._id,
         action: 'edit',
+        
       },
       direction: tempDirection,
     });
     this.subs.sink = dialogRef.afterClosed().subscribe((result) => {
       if (result === 1) {
+        
         // When using an edit things are little different, firstly we find record inside DataService by id
         const foundIndex = this.exampleDatabase?.dataChange.value.findIndex(
           (x) => x._id === this.id
@@ -191,9 +177,10 @@ export class AllemployeesComponent
       }
     });
   }
-  deleteItem(i: number, row: Employees) {
+  deleteItem(i: number, row: Departement) {
     this.index = i;
     this.id = row._id;
+    console.log('ID du département :', this.id);
     let tempDirection: Direction;
     if (localStorage.getItem('isRtl') === 'true') {
       tempDirection = 'rtl';
@@ -204,7 +191,14 @@ export class AllemployeesComponent
     const dialogRef = this.dialog.open(DeleteDialogComponent, {
       height: '270px',
       width: '300px',
-      data: row,
+      // data: row,
+     data: {
+        // departement: row,
+        id: row._id,
+        name: row.name, // Ajoutez cette ligne pour passer le nom du département
+    description: row.description,
+        action: 'trash-2',
+      },
       direction: tempDirection,
     });
     this.subs.sink = dialogRef.afterClosed().subscribe((result) => {
@@ -247,6 +241,7 @@ export class AllemployeesComponent
   removeSelectedRows() {
     const totalSelect = this.selection.selected.length;
     this.selection.selected.forEach((item) => {
+    
       const index: number = this.dataSource.renderedData.findIndex(
         (d) => d === item
       );
@@ -254,7 +249,7 @@ export class AllemployeesComponent
       this.exampleDatabase?.dataChange.value.splice(index, 1);
 
       this.refreshTable();
-      this.selection = new SelectionModel<Employees>(true, []);
+      this.selection = new SelectionModel<Departement>(true, []);
     });
     this.showNotification(
       'snackbar-danger',
@@ -263,6 +258,8 @@ export class AllemployeesComponent
       'center'
     );
   }
+ 
+  
   public loadData() {
     this.exampleDatabase = new EmployeesService(this.httpClient);
     this.dataSource = new ExampleDataSource(
@@ -280,21 +277,24 @@ export class AllemployeesComponent
     );
   }
   // export table data in excel file
-  // exportExcel() {
-  //   // key name with space add in brackets
-  //   const exportData: Partial<TableElement>[] =
-  //     this.dataSource.filteredData.map((x) => ({
-  //       Name: x.name,
-  //       Department: x.department,
-  //       Role: x.role,
-  //       'Joining Date': formatDate(new Date(x.date), 'yyyy-MM-dd', 'en') || '',
-  //       Degree: x.degree,
-  //       Mobile: x.mobile,
-  //       Email: x.email,
-  //     }));
+  exportExcel() {
+    // key name with space add in brackets
+    const exportData: Partial<TableElement>[] =
+      this.dataSource.filteredData.map((x) => ({
+        Name: x.name,
+        Description: x.description,
+        totalEmployees: x.totalEmployees,
+      
+        vacantPositions: x.vacantPositions,
+        recruitmentNeeds: x.recruitmentNeeds,
+        budgetAllocated: x.budgetAllocated,
+        salaryExpenditure: x.salaryExpenditure,
+        trainingExpenditure: x.trainingExpenditure
 
-  //   TableExportUtil.exportToExcel(exportData, 'excel');
-  // }
+      }));
+
+    TableExportUtil.exportToExcel(exportData, 'excel');
+  }
   showNotification(
     colorName: string,
     text: string,
@@ -309,7 +309,7 @@ export class AllemployeesComponent
     });
   }
   // context menu
-  onContextMenu(event: MouseEvent, item: Employees) {
+  onContextMenu(event: MouseEvent, item: Departement) {
     event.preventDefault();
     this.contextMenuPosition.x = event.clientX + 'px';
     this.contextMenuPosition.y = event.clientY + 'px';
@@ -320,7 +320,7 @@ export class AllemployeesComponent
     }
   }
 }
-export class ExampleDataSource extends DataSource<Employees> {
+export class ExampleDataSource extends DataSource<Departement> {
   filterChange = new BehaviorSubject('');
   get filter(): string {
     return this.filterChange.value;
@@ -328,8 +328,8 @@ export class ExampleDataSource extends DataSource<Employees> {
   set filter(filter: string) {
     this.filterChange.next(filter);
   }
-  filteredData: Employees[] = [];
-  renderedData: Employees[] = [];
+  filteredData: Departement[] = [];
+  renderedData: Departement[] = [];
   constructor(
     public exampleDatabase: EmployeesService,
     public paginator: MatPaginator,
@@ -340,7 +340,7 @@ export class ExampleDataSource extends DataSource<Employees> {
     this.filterChange.subscribe(() => (this.paginator.pageIndex = 0));
   }
   /** Connect function called by the table to retrieve one stream containing the data to render. */
-  connect(): Observable<Employees[]> {
+  connect(): Observable<Departement[]> {
     // Listen for any changes in the base data, sorting, filtering, or pagination
     const displayDataChanges = [
       this.exampleDatabase.dataChange,
@@ -348,42 +348,34 @@ export class ExampleDataSource extends DataSource<Employees> {
       this.filterChange,
       this.paginator.page,
     ];
-  
-    const test$ = this.exampleDatabase.getAllUsers();
-    console.log(test$)
-    return merge(test$, ...displayDataChanges).pipe(
-      map((data) => {
-        if (Array.isArray(data)) {
-          // Filter data
-          this.filteredData = data
-            .filter((employees: Employees) => {
-              const searchStr = (
-                employees.firstName +
-                employees.firstName +
-                employees.fonction +
-                employees.Matricule +
-                employees.etablissement +
-                employees.email +
-                employees.roleName +
-                employees.dateEntree +  
-                employees.soldeConges + 
-                employees.soldeMaladie
-              ).toLowerCase();
-              return searchStr.indexOf(this.filter.toLowerCase()) !== -1;
-            });
-          // Sort filtered data
-          const sortedData = this.sortData(this.filteredData);
-          // Grab the page's slice of the filtered sorted data.
-          const startIndex = this.paginator.pageIndex * this.paginator.pageSize;
-          this.renderedData = sortedData.slice(
-            startIndex,
-            startIndex + this.paginator.pageSize
-          ); 
-          console.log(this.renderedData);
-          return this.renderedData;
-        } else {
-          return [];
-        }
+    this.exampleDatabase.getAllEmployeess();
+    return merge(...displayDataChanges).pipe(
+      map(() => {
+        // Filter data
+        this.filteredData = this.exampleDatabase.data
+          .slice()
+          .filter((employees: Departement) => {
+            const searchStr = (
+              employees.name +
+              employees.description +
+              employees.totalEmployees +
+              employees.vacantPositions +
+              employees.recruitmentNeeds +
+              employees.budgetAllocated +
+              employees.salaryExpenditure +
+              employees.trainingExpenditure
+            ).toLowerCase();
+            return searchStr.indexOf(this.filter.toLowerCase()) !== -1;
+          });
+        // Sort filtered data
+        const sortedData = this.sortData(this.filteredData.slice());
+        // Grab the page's slice of the filtered sorted data.
+        const startIndex = this.paginator.pageIndex * this.paginator.pageSize;
+        this.renderedData = sortedData.splice(
+          startIndex,
+          this.paginator.pageSize
+        );
+        return this.renderedData;
       })
     );
   }
@@ -391,7 +383,7 @@ export class ExampleDataSource extends DataSource<Employees> {
     // disconnect
   }
   /** Returns a sorted copy of the database data. */
-  sortData(data: Employees[]): Employees[] {
+  sortData(data: Departement[]): Departement[] {
     if (!this._sort.active || this._sort.direction === '') {
       return data;
     }
@@ -403,19 +395,28 @@ export class ExampleDataSource extends DataSource<Employees> {
           [propertyA, propertyB] = [a._id, b._id];
           break;
         case 'name':
-          [propertyA, propertyB] = [a.firstName, b.firstName];
+          [propertyA, propertyB] = [a.name, b.name];
           break;
-        case 'email':
-          [propertyA, propertyB] = [a.email, b.email];
+        case 'description':
+          [propertyA, propertyB] = [a.description, b.description];
           break;
-        case 'date':
-          [propertyA, propertyB] = [a.fonction, b.fonction];
+        case 'totalEmployees':
+          [propertyA, propertyB] = [a.totalEmployees, b.totalEmployees];
           break;
-        case 'time':
-          [propertyA, propertyB] = [a.etablissement, b.etablissement];
+        case 'vacantPositions':
+          [propertyA, propertyB] = [a.vacantPositions, b.vacantPositions];
           break;
-        case 'mobile':
-          [propertyA, propertyB] = [a.soldeConges, b.soldeConges];
+          case 'recruitmentNeeds':
+            [propertyA, propertyB] = [a.recruitmentNeeds, b.recruitmentNeeds];
+            break;
+        case 'budgetAllocated':
+          [propertyA, propertyB] = [a.budgetAllocated, b.budgetAllocated];
+          break;
+          case 'salaryExpenditure':
+          [propertyA, propertyB] = [a.salaryExpenditure, b.salaryExpenditure];
+          break;
+          case 'trainingExpenditure':
+          [propertyA, propertyB] = [a.trainingExpenditure, b.trainingExpenditure];
           break;
       }
       const valueA = isNaN(+propertyA) ? propertyA : +propertyA;
