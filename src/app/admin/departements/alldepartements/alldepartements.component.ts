@@ -1,43 +1,32 @@
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
-import { CandidatesService } from './candidates.service';
+import { TableElement, TableExportUtil, UnsubscribeOnDestroyAdapter } from '@shared';
+import { EmployeesService } from './departement.service';
+import { DataSource, SelectionModel } from '@angular/cdk/collections';
+import { Departement } from './departement.model';
 import { HttpClient } from '@angular/common/http';
 import { MatDialog } from '@angular/material/dialog';
+import { MatSnackBar, MatSnackBarHorizontalPosition, MatSnackBarVerticalPosition } from '@angular/material/snack-bar';
 import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
 import { MatSort, MatSortModule } from '@angular/material/sort';
-import { Candidates } from './candidates.model';
-import { DataSource } from '@angular/cdk/collections';
-import {
-  MatSnackBar,
-  MatSnackBarHorizontalPosition,
-  MatSnackBarVerticalPosition,
-} from '@angular/material/snack-bar';
-import { MatMenuTrigger, MatMenuModule } from '@angular/material/menu';
-import { BehaviorSubject, fromEvent, merge, Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { MatMenuModule, MatMenuTrigger } from '@angular/material/menu';
 import { FormDialogComponent } from './dialogs/form-dialog/form-dialog.component';
-import { DeleteDialogComponent } from './dialogs/delete/delete.component';
-import { SelectionModel } from '@angular/cdk/collections';
-import { UnsubscribeOnDestroyAdapter } from '@shared';
 import { Direction } from '@angular/cdk/bidi';
-import { TableExportUtil, TableElement } from '@shared';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { MatRippleModule } from '@angular/material/core';
-import { FeatherIconsComponent } from '@shared/components/feather-icons/feather-icons.component';
-import { MatCheckboxModule } from '@angular/material/checkbox';
-import { NgClass } from '@angular/common';
-import { MatTableModule } from '@angular/material/table';
-import { MatIconModule } from '@angular/material/icon';
-import { MatButtonModule } from '@angular/material/button';
-import { MatTooltipModule } from '@angular/material/tooltip';
+import { BehaviorSubject, Observable, fromEvent, map, merge } from 'rxjs';
+import { DeleteDialogComponent } from 'app/admin/leads/dialogs/delete/delete.component';
 import { BreadcrumbComponent } from '@shared/components/breadcrumb/breadcrumb.component';
-import { JobsListService } from '../jobs-list/jobs-list.service';
-import Swal from 'sweetalert2';
-
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
+import { MatTableModule } from '@angular/material/table';
+import { CommonModule, DatePipe, NgClass } from '@angular/common';
+import { MatCheckboxModule } from '@angular/material/checkbox';
+import { FeatherIconsComponent } from '@shared/components/feather-icons/feather-icons.component';
+import { MatRippleModule } from '@angular/material/core';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { FormsModule } from '@angular/forms';
 
 @Component({
-  selector: 'app-candidates',
-  templateUrl: './candidates.component.html',
-  styleUrls: ['./candidates.component.scss'],
+  selector: 'app-alldepartements',
   standalone: true,
   imports: [
     BreadcrumbComponent,
@@ -53,41 +42,48 @@ import Swal from 'sweetalert2';
     MatProgressSpinnerModule,
     MatMenuModule,
     MatPaginatorModule,
+    DatePipe,
+    FormsModule,
+    CommonModule
   ],
+  templateUrl: './alldepartements.component.html',
+  styleUrl: './alldepartements.component.scss'
 })
-export class CandidatesComponent
+// export class AlldepartementsComponent {
+
+// }
+export class AlldepartementsComponent
   extends UnsubscribeOnDestroyAdapter
   implements OnInit
 {
   displayedColumns = [
     'select',
-    'candidateName',
-    'email',
-    'cv',
-    'jobId',
     
-    'actions',
+    'name',
+    'description',
+    'totalEmployees',
+    'vacantPositions',
+    'recruitmentNeeds',
+    'budgetAllocated',
+    'salaryExpenditure',
+    'trainingExpenditure',
+    'actions'
   ];
-  exampleDatabase?: CandidatesService;
+  searchName!: string;
+  exampleDatabase?: EmployeesService;
   dataSource!: ExampleDataSource;
-  selection = new SelectionModel<Candidates>(true, []);
+  selection = new SelectionModel<Departement>(true, []);
   index?: number;
   id?: string;
-  candidates?: Candidates;
-  jobTitles: { [key: string]: string } = {}; 
-  baseUrl: string = 'http://localhost:3000/files'; // URL de base de votre serveur
-  c!: number; // Déclaration de la variable i
-  rol!: Candidates; 
+  employees?: Departement;
+  heros?: Departement[];
   constructor(
     public httpClient: HttpClient,
     public dialog: MatDialog,
-    public candidatesService: CandidatesService,
-    private snackBar: MatSnackBar,
-    public JobsListService  : JobsListService,
-
+    public employeesService: EmployeesService,
+    private snackBar: MatSnackBar
   ) {
     super();
-    this.baseUrl;
   }
   @ViewChild(MatPaginator, { static: true }) paginator!: MatPaginator;
   @ViewChild(MatSort, { static: true }) sort!: MatSort;
@@ -97,25 +93,6 @@ export class CandidatesComponent
   contextMenuPosition = { x: '0px', y: '0px' };
   ngOnInit() {
     this.loadData();
-    this.loadJobTitles();
-
-  }
-  loadJobTitles(): void {
-    this.JobsListService.getJobs().subscribe(
-      (jobs: any[]) => {
-        // Stockez les noms des emplois dans l'objet jobTitles
-        jobs.forEach(job => {
-          this.jobTitles[job._id] = job.title;
-        });
-      },
-      (error) => {
-        console.error('Error fetching job titles:', error);
-      }
-    );
-  }
-  getJobTitle(jobId: string): string {
-    // Obtenez le nom de l'emploi à partir de l'objet jobTitles
-    return this.jobTitles[jobId] || '';
   }
   refresh() {
     this.loadData();
@@ -129,7 +106,7 @@ export class CandidatesComponent
     }
     const dialogRef = this.dialog.open(FormDialogComponent, {
       data: {
-        candidates: this.candidates,
+        employees: this.employees,
         action: 'add',
       },
       direction: tempDirection,
@@ -139,7 +116,7 @@ export class CandidatesComponent
         // After dialog is closed we're doing frontend updates
         // For add we're just pushing a new row inside DataServicex
         this.exampleDatabase?.dataChange.value.unshift(
-          this.candidatesService.getDialogData()
+          this.employeesService.getDialogData()
         );
         this.refreshTable();
         this.showNotification(
@@ -151,7 +128,7 @@ export class CandidatesComponent
       }
     });
   }
-  editCall(row: Candidates) {
+  editCall(row: Departement) {
     this.id = row._id;
     let tempDirection: Direction;
     if (localStorage.getItem('isRtl') === 'true') {
@@ -161,28 +138,24 @@ export class CandidatesComponent
     }
     const dialogRef = this.dialog.open(FormDialogComponent, {
       data: {
+        // departement: row,
         id: row._id,
-        candidates: row,
         action: 'edit',
+        
       },
       direction: tempDirection,
-      // data: {
-      //   id: row._id,
-      //   jobsList: row,
-      //   action: 'edit',
-      // },
-      // direction: tempDirection,
     });
     this.subs.sink = dialogRef.afterClosed().subscribe((result) => {
       if (result === 1) {
+        
         // When using an edit things are little different, firstly we find record inside DataService by id
         const foundIndex = this.exampleDatabase?.dataChange.value.findIndex(
           (x) => x._id === this.id
         );
         // Then you update that record using data from dialogData (values you enetered)
-        if (foundIndex != null && this.exampleDatabase) {
+        if (foundIndex !== undefined && this.exampleDatabase !== undefined) {
           this.exampleDatabase.dataChange.value[foundIndex] =
-            this.candidatesService.getDialogData();
+            this.employeesService.getDialogData();
           // And lastly refresh table
           this.refreshTable();
           this.showNotification(
@@ -195,20 +168,31 @@ export class CandidatesComponent
       }
     });
   }
-  deleteItem(i: number, row: Candidates) {
+ 
+
+
+  deleteItem(i: number, row: Departement) {
     this.index = i;
     this.id = row._id;
+    console.log('ID du département :', this.id);
     let tempDirection: Direction;
     if (localStorage.getItem('isRtl') === 'true') {
       tempDirection = 'rtl';
     } else {
       tempDirection = 'ltr';
     }
+
     const dialogRef = this.dialog.open(DeleteDialogComponent, {
-      height: '280px',
-      width: '380px',
+      height: '270px',
+      width: '300px',
       // data: row,
-      data: { jobId: row._id },
+     data: {
+        // departement: row,
+        id: row._id,
+        name: row.name, // Ajoutez cette ligne pour passer le nom du département
+    description: row.description,
+        action: 'trash-2',
+      },
       direction: tempDirection,
     });
     this.subs.sink = dialogRef.afterClosed().subscribe((result) => {
@@ -217,7 +201,7 @@ export class CandidatesComponent
           (x) => x._id === this.id
         );
         // for delete we use splice in order to remove single object from DataService
-        if (foundIndex != null && this.exampleDatabase) {
+        if (foundIndex !== undefined && this.exampleDatabase !== undefined) {
           this.exampleDatabase.dataChange.value.splice(foundIndex, 1);
           this.refreshTable();
           this.showNotification(
@@ -230,47 +214,13 @@ export class CandidatesComponent
       }
     });
   }
-  // deleteItem(c: number, rol: Candidates): void {
-  //   if (!rol) {
-  //     console.error('Invalid row:', rol);
-  //     return;
-  //   }
-  //   Swal.fire({
-  //     title: 'Êtes-vous sûr?',
-  //     text: 'Vous ne pourrez pas récupérer cette candidature!',
-  //     icon: 'warning',
-  //     showCancelButton: true,
-  //     confirmButtonColor: '#3085d6',
-  //     cancelButtonColor: '#d33',
-  //     confirmButtonText: 'Oui, supprimer!',
-  //     cancelButtonText: 'Annuler'
-  //   }).then((result) => {
-  //     if (result.isConfirmed) {
-  //       // Appeler la fonction de suppression une fois que l'utilisateur a confirmé
-  //       this.candidatesService.deleteCandidate(rol._id).subscribe(
-  //         () => {
-  //           // Afficher une alerte de suppression réussie
-  //           Swal.fire('Supprimé!', 'La candidature a été supprimée avec succès.', 'success');
-  //           // Mettre à jour la liste des candidats après la suppression
-  //           this.exampleDatabase?.getAllCandidatess(); // Mettre à jour les données
-  //         },
-  //         (error) => {
-  //           // Afficher une alerte en cas d'erreur lors de la suppression
-  //           Swal.fire('Erreur!', 'Une erreur est survenue lors de la suppression de la candidature.', 'error');
-  //         }
-  //       );
-  //     }
-  //   });
-  // }
-  
-  
   private refreshTable() {
     this.paginator._changePageSize(this.paginator.pageSize);
   }
   /** Whether the number of selected elements matches the total number of rows. */
   isAllSelected() {
     const numSelected = this.selection.selected.length;
-    const numRows = this.dataSource?.renderedData.length;
+    const numRows = this.dataSource.renderedData.length;
     return numSelected === numRows;
   }
 
@@ -278,19 +228,22 @@ export class CandidatesComponent
   masterToggle() {
     this.isAllSelected()
       ? this.selection.clear()
-      : this.dataSource?.renderedData.forEach((row) =>
+      : this.dataSource.renderedData.forEach((row) =>
           this.selection.select(row)
         );
   }
   removeSelectedRows() {
     const totalSelect = this.selection.selected.length;
     this.selection.selected.forEach((item) => {
-      const index = this.dataSource?.renderedData.findIndex((d) => d === item);
+    
+      const index: number = this.dataSource.renderedData.findIndex(
+        (d) => d === item
+      );
       // console.log(this.dataSource.renderedData.findIndex((d) => d === item));
       this.exampleDatabase?.dataChange.value.splice(index, 1);
 
       this.refreshTable();
-      this.selection = new SelectionModel<Candidates>(true, []);
+      this.selection = new SelectionModel<Departement>(true, []);
     });
     this.showNotification(
       'snackbar-danger',
@@ -299,13 +252,14 @@ export class CandidatesComponent
       'center'
     );
   }
+ 
+  
   public loadData() {
-    this.exampleDatabase = new CandidatesService(this.httpClient);
+    this.exampleDatabase = new EmployeesService(this.httpClient);
     this.dataSource = new ExampleDataSource(
       this.exampleDatabase,
       this.paginator,
-      this.sort,
-      this.baseUrl, 
+      this.sort
     );
     this.subs.sink = fromEvent(this.filter.nativeElement, 'keyup').subscribe(
       () => {
@@ -316,18 +270,49 @@ export class CandidatesComponent
       }
     );
   }
- 
+  // public loadData() {
+  //   this.exampleDatabase = new EmployeesService(this.httpClient);
+  //   this.dataSource = new ExampleDataSource(
+  //     this.exampleDatabase,
+  //     this.paginator,
+  //     this.sort
+  //   );
+  
+  //   // Rafraîchir les données après une suppression réussie
+  //   this.subs.sink = this.exampleDatabase.deleteSuccess.subscribe(() => {
+  //     // Recharger les données
+  //     this.dataSource = new ExampleDataSource(
+  //       this.exampleDatabase,
+  //       this.paginator,
+  //       this.sort
+  //     );
+  //   });
+  
+  //   this.subs.sink = fromEvent(this.filter.nativeElement, 'keyup').subscribe(
+  //     () => {
+  //       if (!this.dataSource) {
+  //         return;
+  //       }
+  //       this.dataSource.filter = this.filter.nativeElement.value;
+  //     }
+  //   );
+  // }
   
   // export table data in excel file
   exportExcel() {
     // key name with space add in brackets
     const exportData: Partial<TableElement>[] =
       this.dataSource.filteredData.map((x) => ({
-        Name: x.jobId,
-        Email: x.candidateName,
-        Mobile: x.email,
-        cv: x.cv,
-       
+        Name: x.name,
+        Description: x.description,
+        totalEmployees: x.totalEmployees,
+      
+        vacantPositions: x.vacantPositions,
+        recruitmentNeeds: x.recruitmentNeeds,
+        budgetAllocated: x.budgetAllocated,
+        salaryExpenditure: x.salaryExpenditure,
+        trainingExpenditure: x.trainingExpenditure
+
       }));
 
     TableExportUtil.exportToExcel(exportData, 'excel');
@@ -346,7 +331,7 @@ export class CandidatesComponent
     });
   }
   // context menu
-  onContextMenu(event: MouseEvent, item: Candidates) {
+  onContextMenu(event: MouseEvent, item: Departement) {
     event.preventDefault();
     this.contextMenuPosition.x = event.clientX + 'px';
     this.contextMenuPosition.y = event.clientY + 'px';
@@ -357,8 +342,7 @@ export class CandidatesComponent
     }
   }
 }
-export class ExampleDataSource extends DataSource<Candidates> {
-  baseUrl: string;
+export class ExampleDataSource extends DataSource<Departement> {
   filterChange = new BehaviorSubject('');
   get filter(): string {
     return this.filterChange.value;
@@ -366,22 +350,19 @@ export class ExampleDataSource extends DataSource<Candidates> {
   set filter(filter: string) {
     this.filterChange.next(filter);
   }
-  filteredData: Candidates[] = [];
-  renderedData: Candidates[] = [];
+  filteredData: Departement[] = [];
+  renderedData: Departement[] = [];
   constructor(
-    public exampleDatabase: CandidatesService,
+    public exampleDatabase: EmployeesService,
     public paginator: MatPaginator,
-    public _sort: MatSort,
-    baseUrl: string 
+    public _sort: MatSort
   ) {
     super();
-    this.baseUrl = baseUrl;
     // Reset to the first page when the user changes the filter.
     this.filterChange.subscribe(() => (this.paginator.pageIndex = 0));
-    
   }
   /** Connect function called by the table to retrieve one stream containing the data to render. */
-  connect(): Observable<Candidates[]> {
+  connect(): Observable<Departement[]> {
     // Listen for any changes in the base data, sorting, filtering, or pagination
     const displayDataChanges = [
       this.exampleDatabase.dataChange,
@@ -389,30 +370,25 @@ export class ExampleDataSource extends DataSource<Candidates> {
       this.filterChange,
       this.paginator.page,
     ];
-    this.exampleDatabase.getAllCandidatess();
+    this.exampleDatabase.getAllEmployeess();
     return merge(...displayDataChanges).pipe(
       map(() => {
         // Filter data
         this.filteredData = this.exampleDatabase.data
           .slice()
-          .filter((candidates: Candidates) => {
+          .filter((employees: Departement) => {
             const searchStr = (
-              candidates.jobId +
-              candidates.candidateName +
-              candidates.email +
-              candidates.cv
-              
-              
-            
+              employees.name +
+              employees.description +
+              employees.totalEmployees +
+              employees.vacantPositions +
+              employees.recruitmentNeeds +
+              employees.budgetAllocated +
+              employees.salaryExpenditure +
+              employees.trainingExpenditure
             ).toLowerCase();
             return searchStr.indexOf(this.filter.toLowerCase()) !== -1;
           });
-          this.filteredData.forEach(candidate => {
-            if (!candidate.cv.startsWith('http://localhost:3000/files/uploads')) {
-              candidate.cv = `http://localhost:3000/files/${candidate.cv}`;
-            }
-          });
-         
         // Sort filtered data
         const sortedData = this.sortData(this.filteredData.slice());
         // Grab the page's slice of the filtered sorted data.
@@ -426,10 +402,10 @@ export class ExampleDataSource extends DataSource<Candidates> {
     );
   }
   disconnect() {
-    //disconnect
+    // disconnect
   }
   /** Returns a sorted copy of the database data. */
-  sortData(data: Candidates[]): Candidates[] {
+  sortData(data: Departement[]): Departement[] {
     if (!this._sort.active || this._sort.direction === '') {
       return data;
     }
@@ -440,16 +416,30 @@ export class ExampleDataSource extends DataSource<Candidates> {
         case 'id':
           [propertyA, propertyB] = [a._id, b._id];
           break;
-        case 'job':
-          [propertyA, propertyB] = [a.jobId, b.jobId];
+        case 'name':
+          [propertyA, propertyB] = [a.name, b.name];
           break;
-        case 'candidatename':
-          [propertyA, propertyB] = [a.candidateName, b.candidateName];
+        case 'description':
+          [propertyA, propertyB] = [a.description, b.description];
           break;
-        case 'time':
-          [propertyA, propertyB] = [a.email, b.email];
+        case 'totalEmployees':
+          [propertyA, propertyB] = [a.totalEmployees, b.totalEmployees];
           break;
-       
+        case 'vacantPositions':
+          [propertyA, propertyB] = [a.vacantPositions, b.vacantPositions];
+          break;
+          case 'recruitmentNeeds':
+            [propertyA, propertyB] = [a.recruitmentNeeds, b.recruitmentNeeds];
+            break;
+        case 'budgetAllocated':
+          [propertyA, propertyB] = [a.budgetAllocated, b.budgetAllocated];
+          break;
+          case 'salaryExpenditure':
+          [propertyA, propertyB] = [a.salaryExpenditure, b.salaryExpenditure];
+          break;
+          case 'trainingExpenditure':
+          [propertyA, propertyB] = [a.trainingExpenditure, b.trainingExpenditure];
+          break;
       }
       const valueA = isNaN(+propertyA) ? propertyA : +propertyA;
       const valueB = isNaN(+propertyB) ? propertyB : +propertyB;
@@ -459,3 +449,4 @@ export class ExampleDataSource extends DataSource<Candidates> {
     });
   }
 }
+

@@ -6,17 +6,17 @@
         <p><span class="font-weight-bold"> Job Title: </span>{{data.title}}</p>
       </li>
       <li>
-        <p><span class="font-weight-bold"> Department: </span>{{ data.department }}</p>
+        <p><span class="font-weight-bold"> status: </span>{{ data.status }}</p>
       </li>
       <li>
         <p>
-          <span class="font-weight-bold">Vacancies: </span>{{data.vacancies}}
+          <span class="font-weight-bold">Vacancies: </span>{{data.description}}
         </p>
       </li>
     </ul>
   </div>
   <div mat-dialog-actions class="mb-1">
-    <button mat-flat-button color="warn" [mat-dialog-close]="1" (click)="confirmDelete()">
+    <button mat-flat-button color="warn" [mat-dialog-close]="1" (click)="onDeleteJob(jobId)">
       Delete
     </button>
     <button mat-flat-button (click)="onNoClick()" tabindex="-1">Cancel</button>

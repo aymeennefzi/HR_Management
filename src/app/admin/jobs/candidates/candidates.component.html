@@ -75,81 +75,50 @@
                     <mat-header-cell *matHeaderCellDef mat-sort-header>Id</mat-header-cell>
                     <mat-cell *matCellDef="let row">{{row.id}}</mat-cell>
                   </ng-container>
-                  <ng-container matColumnDef="img">
-                    <mat-header-cell mat-header-cell *matHeaderCellDef [ngClass]="'tbl-col-width-per-5'"> Image
-                    </mat-header-cell>
-                    <mat-cell mat-cell *matCellDef="let row" class="table-img tbl-col-width-per-5"> <span
-                    class="mobile-label">Image:</span><img [src]="row.img" />
-                  </mat-cell>
-                </ng-container>
-                <ng-container matColumnDef="name">
-                  <mat-header-cell *matHeaderCellDef mat-sort-header>Name</mat-header-cell>
-                  <mat-cell *matCellDef="let row" (contextmenu)="onContextMenu($event, row)">
-                    <span class="truncate-text"> <span class="mobile-label">Name:</span>{{row.name}}</span></mat-cell>
+                  <ng-container matColumnDef="candidateName">
+                    <mat-header-cell *matHeaderCellDef mat-sort-header>Candidate Name</mat-header-cell>
+                    <mat-cell *matCellDef="let row">{{ row.candidateName }}</mat-cell>
                   </ng-container>
+                  
                   <ng-container matColumnDef="email">
                     <mat-header-cell *matHeaderCellDef mat-sort-header>Email</mat-header-cell>
-                    <mat-cell *matCellDef="let row" (contextmenu)="onContextMenu($event, row)">
-                      <span class="truncate-text"> <span class="mobile-label">Email:</span>{{row.email}}</span>
-                    </mat-cell>
+                    <mat-cell *matCellDef="let row">{{ row.email }}</mat-cell>
                   </ng-container>
-                  <ng-container matColumnDef="mobile">
-                    <mat-header-cell *matHeaderCellDef mat-sort-header>Mobile</mat-header-cell>
-                    <mat-cell *matCellDef="let row" (contextmenu)="onContextMenu($event, row)">
-                      <span class="truncate-text"> <span class="mobile-label">Mobile:</span>{{row.mobile}}</span>
-                    </mat-cell>
-                  </ng-container>
-                  <ng-container matColumnDef="title">
+                  
+                  <!-- <ng-container matColumnDef="cv">
+                    <mat-header-cell *matHeaderCellDef mat-sort-header>CV</mat-header-cell>
+                    <mat-cell *matCellDef="let row">{{ row.cv }}</mat-cell>
+                  </ng-container> -->
+                  
+                  <ng-container matColumnDef="jobId">
                     <mat-header-cell *matHeaderCellDef mat-sort-header>Job Title</mat-header-cell>
-                    <mat-cell *matCellDef="let row" (contextmenu)="onContextMenu($event, row)" matTooltip={{row.title}}>
-                      <span class="truncate-text"> <span class="mobile-label">Job Title:</span>{{row.title}}</span>
-                    </mat-cell>
+                    <mat-cell *matCellDef="let row">{{ getJobTitle(row.jobId) }}</mat-cell>
+                   
                   </ng-container>
-                  <ng-container matColumnDef="role">
-                    <mat-header-cell *matHeaderCellDef mat-sort-header>Role</mat-header-cell>
-                    <mat-cell *matCellDef="let row" (contextmenu)="onContextMenu($event, row)">
-                      <span class="truncate-text"> <span class="mobile-label">Role:</span>{{row.role}}</span>
+
+                  <!-- <ng-container matColumnDef="cv">
+                    <mat-header-cell *matHeaderCellDef>CV</mat-header-cell>
+                    <mat-cell *matCellDef="let row">
+                      <a [href]="row.cv" target="_blank" matTooltip="Download CV">
+                        CV
+                      </a>
+                      <app-feather-icons [icon]="'download'" [class]="'col-green'" matTooltip="Download Resume">
+                      </app-feather-icons>
                     </mat-cell>
-                  </ng-container>
-                  <ng-container matColumnDef="jobType">
-                    <mat-header-cell *matHeaderCellDef mat-sort-header> Job Type
-                    </mat-header-cell>
-                    <mat-cell mat-cell *matCellDef="let row">
-                      <span class="mobile-label">Job Type:</span>
-                      @if (row.jobType==='Full Time') {
-                        <div>
-                          <span class="badge badge-solid-green">
-                          {{row.jobType}}</span>
-                        </div>
-                      }
-                      @if (row.jobType==='Part Time') {
-                        <div>
-                          <span class="badge badge-solid-red">
-                          {{row.jobType}}</span>
-                        </div>
-                      }
-                      @if (row.jobType==='Internship') {
-                        <div>
-                          <span class="badge badge-solid-purple">
-                          {{row.jobType}}</span>
-                        </div>
-                      }
-                      @if (row.jobType==='Other') {
-                        <div>
-                          <span class="badge badge-solid-blue">
-                          {{row.jobType}}</span>
-                        </div>
-                      }
-                    </mat-cell>
-                  </ng-container>
-                  <ng-container matColumnDef="download">
-                    <mat-header-cell *matHeaderCellDef mat-sort-header>Download</mat-header-cell>
+                  </ng-container> -->
+                  
+            
+                  <ng-container matColumnDef="cv">
+                    <mat-header-cell *matHeaderCellDef mat-sort-header>Curriculum vitae</mat-header-cell>
                     <mat-cell *matCellDef="let row" (contextmenu)="onContextMenu($event, row)">
                       <span class="mobile-label">Download:</span>
-                      <button mat-icon-button color="accent" class="tbl-action-btn" (click)="$event.stopPropagation()">
+                      <!-- <button mat-icon-button color="accent" class="tbl-action-btn" (click)="$event.stopPropagation()">
                         <app-feather-icons [icon]="'download'" [class]="'col-green'" matTooltip="Download Resume">
                         </app-feather-icons>
-                      </button>
+                      </button> -->
+                      <a [href]="row.cv" mat-icon-button color="accent" class="tbl-action-btn" download (click)="$event.stopPropagation()">
+                        <app-feather-icons [icon]="'download'" [class]="'col-green'" matTooltip="Download Resume"></app-feather-icons>
+                    </a>
                     </mat-cell>
                   </ng-container>
                   <!-- actions -->
@@ -160,12 +129,16 @@
                         class="tbl-action-btn" matTooltip="Edit">
                         <app-feather-icons [icon]="'edit'" [class]="'tbl-fav-edit'">
                         </app-feather-icons>
-                      </button>
+                      </button> 
                       <button mat-icon-button color="accent" (click)="$event.stopPropagation()"
                         (click)="deleteItem(i, row)" class="tbl-action-btn" matTooltip="Delete">
                         <app-feather-icons [icon]="'trash-2'" [class]="'tbl-fav-delete'">
                         </app-feather-icons>
                       </button>
+                      <!-- <button mat-icon-button color="accent" (click)="deleteItem(c, rol)" class="tbl-action-btn" matTooltip="Delete">
+                        <app-feather-icons [icon]="'trash-2'" [class]="'tbl-fav-delete'"></app-feather-icons>
+                      </button> -->
+                      
                     </mat-cell>
                   </ng-container>
                   <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>

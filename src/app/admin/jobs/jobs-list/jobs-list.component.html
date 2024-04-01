@@ -26,10 +26,29 @@
                   <li class="tbl-header-btn">
                     <div class="m-l-10" matTooltip="ADD">
                       <button mat-mini-fab color="primary" (click)="addNew()">
-                        <mat-icon class="col-white">add</mat-icon>
+                        <mat-icon class="col-white">adds</mat-icon>
                       </button>
                     </div>
                   </li>
+                  <li class="tbl-header-btn">
+                    <div class="m-l-10" matTooltip="Skill">
+                      <button mat-mini-fab color="primary" (click)="openAddSkillDialog()">
+                        <mat-icon class="col-white">adds</mat-icon>
+                      </button>
+                    </div>
+                  </li>
+                  <ng-template #addSkillDialogContent>
+                    <h2 mat-dialog-title>Add New Skill</h2>
+                    <mat-dialog-content>
+                      <mat-form-field>
+                        <input matInput placeholder="New Skill" [(ngModel)]="newSkill.name" name="name" required>
+                      </mat-form-field>
+                    </mat-dialog-content>
+                    <mat-dialog-actions>
+                      <button mat-button (click)="closeAddSkillDialog()">Cancel</button>
+                      <button mat-button (click)="addSkill()">Add</button>
+                    </mat-dialog-actions>
+                  </ng-template>
                   <li class="tbl-header-btn">
                     <div class="m-l-10" matTooltip="REFRESH">
                       <button mat-mini-fab color="primary" (click)="refresh()">
@@ -58,129 +77,201 @@
                 <table mat-table [dataSource]="dataSource" matSort class="mat-cell advance-table">
                   <!-- Checkbox Column -->
                   <ng-container matColumnDef="select">
-                    <mat-header-cell *matHeaderCellDef [ngClass]="'tbl-col-width-per-6'">
+                    <mat-header-cell *matHeaderCellDef class="tbl-col-width-per-6">
                       <mat-checkbox (change)="$event ? masterToggle() : null"
-                        [checked]="selection.hasValue() && isAllSelected()"
-                        [indeterminate]="selection.hasValue() && !isAllSelected()" [ngClass]="'tbl-checkbox'">
+                                     [checked]="selection.hasValue() && isAllSelected()"
+                                     [indeterminate]="selection.hasValue() && !isAllSelected()" class="tbl-checkbox">
                       </mat-checkbox>
                     </mat-header-cell>
-                    <mat-cell *matCellDef="let row" [ngClass]="'tbl-col-width-per-6'">
+                    <mat-cell *matCellDef="let row" class="tbl-col-width-per-6">
                       <mat-checkbox (click)="$event.stopPropagation()" (change)="$event ? selection.toggle(row) : null"
-                        [checked]="selection.isSelected(row)" [ngClass]="'tbl-checkbox'">
+                                     [checked]="selection.isSelected(row)" class="tbl-checkbox">
                       </mat-checkbox>
                     </mat-cell>
                   </ng-container>
-                  <!-- ID Column -->
-                  <ng-container matColumnDef="id">
-                    <mat-header-cell *matHeaderCellDef mat-sort-header>Id</mat-header-cell>
-                    <mat-cell *matCellDef="let row">{{row.id}}</mat-cell>
-                  </ng-container>
+                
                   <ng-container matColumnDef="title">
                     <mat-header-cell *matHeaderCellDef mat-sort-header>Job Title</mat-header-cell>
-                    <mat-cell *matCellDef="let row" (contextmenu)="onContextMenu($event, row)" matTooltip={{row.title}}>
-                      <span class="truncate-text"> <span class="mobile-label">Job Title:</span>{{row.title}}</span>
+                    <mat-cell *matCellDef="let row"  (contextmenu)="onContextMenu($event, row)">
+                      <span class="truncate-text"> <span class="mobile-label">Job Title:</span>{{ row.title }}</span>
                     </mat-cell>
                   </ng-container>
-                  <ng-container matColumnDef="department">
-                    <mat-header-cell *matHeaderCellDef mat-sort-header>Department</mat-header-cell>
+                  <!-- <ng-container matColumnDef="title">
+                    <mat-header-cell *matHeaderCellDef mat-sort-header class="title-column">Job Title</mat-header-cell>
+                    <mat-cell *matCellDef="let row" class="title-column">{{ row.title }}</mat-cell>
+                  </ng-container> -->
+                
+                  <ng-container matColumnDef="description">
+                    <mat-header-cell *matHeaderCellDef mat-sort-header>Description</mat-header-cell>
                     <mat-cell *matCellDef="let row" (contextmenu)="onContextMenu($event, row)">
-                      <span class="truncate-text"> <span class="mobile-label">Department:</span> {{row.department}}</span>
+                        <div class="description-tooltip" [title]="row.description"> 
+                            <span class="mobile-label">Description:</span> {{ row.description }}
+                        </div>
                     </mat-cell>
-                  </ng-container>
-                  <ng-container matColumnDef="role">
-                    <mat-header-cell *matHeaderCellDef mat-sort-header>Role</mat-header-cell>
+                </ng-container>
+                
+                
+                
+                
+                
+                
+                  <ng-container matColumnDef="requiredSkills">
+                    <mat-header-cell *matHeaderCellDef mat-sort-header>Required Skills</mat-header-cell>
                     <mat-cell *matCellDef="let row" (contextmenu)="onContextMenu($event, row)">
-                      <span class="truncate-text"> <span class="mobile-label">Role:</span>{{row.role}}</span>
+                      <div class="tag-container">
+
+                      <span class="tag" *ngIf="row.requiredSkills"> <span class="mobile-label">Required Skills:</span> {{ row.requiredSkills.join(', ') }}</span>
+                      </div>
                     </mat-cell>
                   </ng-container>
-                  <ng-container matColumnDef="jobType">
-                    <mat-header-cell *matHeaderCellDef mat-sort-header> Job Type
-                    </mat-header-cell>
-                    <mat-cell mat-cell *matCellDef="let row">
-                      <span class="mobile-label">Job Type:</span>
-                      @if (row.jobType==='Full Time') {
+                
+                  <ng-container matColumnDef="location">
+                    <mat-header-cell *matHeaderCellDef mat-sort-header>Location</mat-header-cell>
+                    <mat-cell *matCellDef="let row" (contextmenu)="onContextMenu($event, row)">
+                      <span class="truncate-text"> <span class="mobile-label">Location:</span> {{ row.location }}</span>
+                    </mat-cell>
+                  </ng-container>
+                
+                  <ng-container matColumnDef="contractType">
+                    <mat-header-cell *matHeaderCellDef mat-sort-header>Contract Type</mat-header-cell>
+                    <mat-cell *matCellDef="let row" (contextmenu)="onContextMenu($event, row)">
+                      <span class="truncate-text"> <span class="mobile-label">Contract Type:</span> {{ row.contractType }}</span>
+                    </mat-cell>
+                  </ng-container>
+                
+                  <ng-container matColumnDef="salary">
+                    <mat-header-cell *matHeaderCellDef mat-sort-header>Salary</mat-header-cell>
+                    <mat-cell *matCellDef="let row" (contextmenu)="onContextMenu($event, row)">
+                      <span class="truncate-text"> <span class="mobile-label">Salary:</span> {{ row.salary }}</span>
+                    </mat-cell>
+                  </ng-container>
+                
+                  <ng-container matColumnDef="applicationDeadline">
+                    <mat-header-cell *matHeaderCellDef mat-sort-header>Application Deadline</mat-header-cell>
+                    <mat-cell *matCellDef="let row" (contextmenu)="onContextMenu($event, row)">
+                      <span class="truncate-text">
+                        <span class="mobile-label">Application Deadline:</span> 
+                        <span *ngIf="row.applicationDeadline">{{ row.applicationDeadline | date: 'MM/dd/yyyy' }}</span>
+                      </span>
+                    </mat-cell>
+                  </ng-container>
+                
+                  <!-- <ng-container matColumnDef="status">
+                    <mat-header-cell *matHeaderCellDef mat-sort-header>Status</mat-header-cell>
+                    <mat-cell *matCellDef="let row" (contextmenu)="onContextMenu($event, row)">
+                      <span class="truncate-text"> <span class="mobile-label">Status:</span> {{ row.status }}</span>
+                      @if (row.status==='Open') {
                         <div>
                           <span class="badge badge-pill badge-primary col-green">
-                          {{row.jobType}}</span>
+                          {{row.status}}</span>
                         </div>
                       }
-                      @if (row.jobType==='Part Time') {
+                      @if (row.status==='Closed') {
                         <div>
                           <span class="badge badge-pill badge-primary col-red">
-                          {{row.jobType}}</span>
+                          {{row.status}}</span>
                         </div>
                       }
-                      @if (row.jobType==='Internship') {
+                      @if (row.status==='Cancelled') {
                         <div>
-                          <span class="badge badge-pill badge-primary col-purple">
-                          {{row.jobType}}</span>
+                          <span class="badge badge-pill badge-primary col-black">
+                          {{row.status}}</span>
                         </div>
                       }
-                      @if (row.jobType==='Other') {
+                    </mat-cell>
+                  </ng-container> -->
+                  <!-- <ng-container matColumnDef="status">
+                    <mat-header-cell *matHeaderCellDef mat-sort-header>Status</mat-header-cell>
+                    <mat-cell *matCellDef="let row" (contextmenu)="onContextMenu($event, row)">
+                      <span class="truncate-text"> <span class="mobile-label">Status:</span> {{ row.status }}</span>
+                      <ng-container *ngIf="row.status==='Open'">
+                        <span class="badge badge-pill badge-primary col-green">{{ row.status }}</span>
+                      </ng-container>
+                      <ng-container *ngIf="row.status==='Closed'">
+                        <span class="badge badge-pill badge-primary col-red">{{ row.status }}</span>
+                      </ng-container>
+                      <ng-container *ngIf="row.status==='Cancelled'">
+                        <span class="badge badge-pill badge-primary col-black">{{ row.status }}</span>
+                      </ng-container>
+                    </mat-cell>
+                  </ng-container> -->
+                  <ng-container matColumnDef="status">
+                    <mat-header-cell *matHeaderCellDef mat-sort-header> Status
+                    </mat-header-cell>
+                    <mat-cell mat-cell *matCellDef="let row">
+                      <span class="mobile-label">Status:</span>
+                      @if (row.status==='Open') {
                         <div>
-                          <span class="badge badge-pill badge-primary col-blue">
-                          {{row.jobType}}</span>
+                          <span class="badge badge-pill badge-primary col-green">
+                          {{row.status}}</span>
+                        </div>
+                      }
+                      @if (row.status==='Closed') {
+                        <div>
+                          <span class="badge badge-pill badge-primary col-red">
+                          {{row.status}}</span>
+                        </div>
+                      }
+                      @if (row.status==='Cancelled') {
+                        <div>
+                          <span class="badge badge-pill badge-primary col-black">
+                          {{row.status}}</span>
                         </div>
                       }
                     </mat-cell>
                   </ng-container>
-                  <ng-container matColumnDef="vacancies">
-                    <mat-header-cell *matHeaderCellDef mat-sort-header>Vacancies</mat-header-cell>
+                  
+                  <ng-container matColumnDef="publicationDate">
+                    <mat-header-cell *matHeaderCellDef mat-sort-header>Publication Date</mat-header-cell>
                     <mat-cell *matCellDef="let row" (contextmenu)="onContextMenu($event, row)">
-                      <span class="mobile-label">Vacancies:</span>{{row.vacancies}}</mat-cell>
-                    </ng-container>
-                    <ng-container matColumnDef="status">
-                      <mat-header-cell *matHeaderCellDef mat-sort-header> Status
-                      </mat-header-cell>
-                      <mat-cell mat-cell *matCellDef="let row">
-                        <span class="mobile-label">Status:</span>
-                        @if (row.status==='Open') {
-                          <div>
-                            <span class="badge badge-pill badge-primary col-green">
-                            {{row.status}}</span>
-                          </div>
-                        }
-                        @if (row.status==='Closed') {
-                          <div>
-                            <span class="badge badge-pill badge-primary col-red">
-                            {{row.status}}</span>
-                          </div>
-                        }
-                        @if (row.status==='Cancelled') {
-                          <div>
-                            <span class="badge badge-pill badge-primary col-purple">
-                            {{row.status}}</span>
-                          </div>
-                        }
-                      </mat-cell>
-                    </ng-container>
-                    <ng-container matColumnDef="date">
-                      <mat-header-cell *matHeaderCellDef mat-sort-header>Expire Date</mat-header-cell>
-                      <mat-cell *matCellDef="let row" (contextmenu)="onContextMenu($event, row)">
-                        <span class="mobile-label">Expire Date:</span> {{row.date | date: 'MM/dd/yyyy'}}</mat-cell>
-                      </ng-container>
-                      <!-- actions -->
-                      <ng-container matColumnDef="actions">
-                        <mat-header-cell class="pr-0" *matHeaderCellDef>Actions</mat-header-cell>
-                        <mat-cell *matCellDef="let row; let i=index;" class="pr-0">
-                          <button mat-icon-button color="accent" (click)="$event.stopPropagation()" (click)="editCall(row)"
-                            class="tbl-action-btn" matTooltip="Edit">
-                            <app-feather-icons [icon]="'edit'" [class]="'tbl-fav-edit'">
-                            </app-feather-icons>
-                          </button>
-                          <button mat-icon-button color="accent" (click)="$event.stopPropagation()"
-                            (click)="deleteItem(i, row)" class="tbl-action-btn" matTooltip="Delete">
-                            <app-feather-icons [icon]="'trash-2'" [class]="'tbl-fav-delete'">
-                            </app-feather-icons>
-                          </button>
-                        </mat-cell>
-                      </ng-container>
-                      <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
-                    <!-- <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row> -->
-                    <mat-row *matRowDef="let row; columns: displayedColumns;" (click)="editCall(row)"
-                      [style.cursor]="'pointer'" matRipple>
-                    </mat-row>
-                  </table>
+                      <span class="truncate-text">
+                        <span class="mobile-label">Publication Date:</span> 
+                        <span *ngIf="row.publicationDate">{{ row.publicationDate | date: 'MM/dd/yyyy' }}</span>
+                      </span>
+                    </mat-cell>
+                  </ng-container>
+                
+                  <ng-container matColumnDef="recruitingManager">
+                    <mat-header-cell *matHeaderCellDef mat-sort-header>Recruiting Manager</mat-header-cell>
+                    <mat-cell *matCellDef="let row" (contextmenu)="onContextMenu($event, row)">
+                      <span class="truncate-text"> <span class="mobile-label">Recruiting Manager:</span> {{ row.recruitingManager }}</span>
+                    </mat-cell>
+                  </ng-container>
+                  <ng-container matColumnDef="applicants">
+                    <mat-header-cell *matHeaderCellDef mat-sort-header>Applicants</mat-header-cell>
+                    <mat-cell *matCellDef="let row" (click)="$event.stopPropagation();">
+                      <mat-form-field appearance="fill">
+                        <mat-label>Candidates</mat-label>
+                        <mat-select>
+                          <mat-option *ngFor="let applicant of row.applicants" [value]="applicant">
+                            {{ applicant }}
+                          </mat-option>
+                        </mat-select>
+                      </mat-form-field>
+                    </mat-cell>
+                  </ng-container>
+                  
+                
+                  <!-- actions -->
+                  <ng-container matColumnDef="actions">
+                    <mat-header-cell class="pr-0" *matHeaderCellDef>Actions</mat-header-cell>
+                    <mat-cell *matCellDef="let row; let i=index;" class="pr-0">
+                      <button mat-icon-button color="accent" (click)="$event.stopPropagation();editCall(row)"
+                              class="tbl-action-btn" matTooltip="Edit">
+                        <app-feather-icons [icon]="'edit'" [class]="'tbl-fav-edit'"></app-feather-icons>
+                      </button>
+                      <button mat-icon-button color="accent" (click)="$event.stopPropagation()"
+                              (click)="deleteItem(i, row)" class="tbl-action-btn" matTooltip="Delete">
+                        <app-feather-icons [icon]="'trash-2'" [class]="'tbl-fav-delete'"></app-feather-icons>
+                      </button>
+                    </mat-cell>
+                  </ng-container>
+                
+                  <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+                  <mat-row *matRowDef="let row; columns: displayedColumns;" (click)="editCall(row)"
+                           [style.cursor]="'pointer'" matRipple></mat-row>
+                </table>
+                
                   <!-- Loading spinner -->
                   @if (exampleDatabase?.isTblLoading) {
                     <div class="tbl-spinner">
