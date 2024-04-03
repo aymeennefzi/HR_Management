@@ -14,6 +14,7 @@ import { NgScrollbar } from 'ngx-scrollbar';
 import { MatMenuModule } from '@angular/material/menu';
 import { FeatherIconsComponent } from '@shared/components/feather-icons/feather-icons.component';
 import { MatButtonModule } from '@angular/material/button';
+import { CookieService } from 'ngx-cookie-service';
 
 interface Notifications {
   message: string;
@@ -60,7 +61,9 @@ export class HeaderComponent
     private configService: ConfigService,
     private authService: AuthService,
     private router: Router,
-    public languageService: LanguageService
+    public languageService: LanguageService,
+    private cookieService: CookieService
+
   ) {
     super();
   }
@@ -120,41 +123,24 @@ export class HeaderComponent
       status: 'msg-read',
     },
   ];
+  userData: any; 
   ngOnInit() {
-    this.config = this.configService.configData;
-    const userRole = this.authService.currentUserValue.role;
-    this.userImg = this.authService.currentUserValue.img;
-    this.docElement = document.documentElement;
-
-    if (userRole === 'Admin') {
-      this.homePage = 'admin/dashboard/main';
-    } else if (userRole === 'Client') {
-      this.homePage = 'client/dashboard';
-    } else if (userRole === 'Employee') {
-      this.homePage = 'employee/dashboard';
-    } else {
-      this.homePage = 'admin/dashboard/main';
-    }
-
-    this.langStoreValue = localStorage.getItem('lang') as string;
-    const val = this.listLang.filter((x) => x.lang === this.langStoreValue);
-    this.countryName = val.map((element) => element.text);
-    if (val.length === 0) {
-      if (this.flagvalue === undefined) {
-        this.defaultFlag = 'assets/images/flags/us.jpg';
-      }
-    } else {
-      this.flagvalue = val.map((element) => element.flag);
+    const cookieData = this.cookieService.get('user_data');
+    if (cookieData) {
+      this.userData = JSON.parse(cookieData);
     }
   }
 
   callFullscreen() {
     if (!this.isFullScreen) {
-      if (this.docElement?.requestFullscreen != null) {
-        this.docElement?.requestFullscreen();
+      const docElement = document.documentElement;
+      if (docElement?.requestFullscreen != null) {
+        docElement?.requestFullscreen();
       }
     } else {
-      document.exitFullscreen();
+      if (document.exitFullscreen != null) {
+        document.exitFullscreen();
+      }
     }
     this.isFullScreen = !this.isFullScreen;
   }
@@ -187,10 +173,8 @@ export class HeaderComponent
     }
   }
   logout() {
-    this.subs.sink = this.authService.logout().subscribe((res) => {
-      if (!res.success) {
-        this.router.navigate(['/authentication/signin']);
-      }
-    });
+   this.authService.logout();
   }
+
+
 }

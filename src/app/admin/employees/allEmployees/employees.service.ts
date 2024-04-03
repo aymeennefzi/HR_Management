@@ -1,25 +1,27 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable, catchError, tap, throwError } from 'rxjs';
+import { BehaviorSubject, Observable } from 'rxjs';
 import { Employees } from './employees.model';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { UnsubscribeOnDestroyAdapter } from '@shared';
-import { Departement } from '../add-employee/entreprise.model';
 
 @Injectable({
   providedIn: 'root',
 })
 export class EmployeesService extends UnsubscribeOnDestroyAdapter {
-  private readonly API_URL = 'http://localhost:6200/departements';
+  
+  private apiUrl = 'http://localhost:3000/auth'; // Remplacez cette URL par l'URL de votre backend
+
+  //private readonly API_URL = 'assets/data/employees.json';
   isTblLoading = true;
-  dataChange: BehaviorSubject<Departement[]> = new BehaviorSubject<Departement[]>(
+  dataChange: BehaviorSubject<Employees[]> = new BehaviorSubject<Employees[]>(
     []
   );
   // Temporarily stores data from dialogs
-  dialogData!: Departement;
+  dialogData!: Employees;
   constructor(private httpClient: HttpClient) {
     super();
   }
-  get data(): Departement[] {
+  get data(): Employees[] {
     return this.dataChange.value;
   }
   getDialogData() {
@@ -27,7 +29,7 @@ export class EmployeesService extends UnsubscribeOnDestroyAdapter {
   }
   /** CRUD METHODS */
   getAllEmployeess(): void {
-    this.subs.sink = this.httpClient.get<Departement[]>(this.API_URL).subscribe({
+    this.subs.sink = this.httpClient.get<Employees[]>(this.apiUrl).subscribe({
       next: (data) => {
         this.isTblLoading = false;
         this.dataChange.next(data);
@@ -38,91 +40,72 @@ export class EmployeesService extends UnsubscribeOnDestroyAdapter {
       },
     });
   }
-  addDepartement(departement: Departement): Observable<any> {
-    return this.httpClient.post(this.API_URL, departement).pipe(
-      catchError((error: HttpErrorResponse) => {
-        // Gérer les erreurs lors de l'ajout d'une entreprise
-        console.error('Error adding company:', error);
-        return throwError(error);
-      })
-    );
+
+  getAllUsers(): Observable<Employees[]> {
+    return this.httpClient.get<Employees[]>(this.apiUrl + "/allusers"); 
   }
-  addEmployees(employees: Departement): void {
+  
+
+  addEmployees(employees: Employees): void {
+    this.dialogData = employees;
+    this.httpClient.post(this.apiUrl, employees)
+      .subscribe({
+        next: (data) => {
+          this.dialogData = employees;
+        },
+        error: (error: HttpErrorResponse) => {
+           // error code here
+        },
+      });
+  }
+  updateEmployees(employees: Employees): void {
     this.dialogData = employees;
 
-    // this.httpClient.post(this.API_URL, employees)
-    //   .subscribe({
-    //     next: (data) => {
-    //       this.dialogData = employees;
-    //     },
-    //     error: (error: HttpErrorResponse) => {
-    //        // error code here
-    //     },
-    //   });
+    // this.httpClient.put(this.API_URL + employees.id, employees)
+    //     .subscribe({
+    //       next: (data) => {
+    //         this.dialogData = employees;
+    //       },
+    //       error: (error: HttpErrorResponse) => {
+    //          // error code here
+    //       },
+    //     });
   }
-  getDepartementById(id: string): Observable<Departement> {
-    return this.httpClient.get<Departement>(`${this.API_URL}/${id}`);
-  }
-  // updateEmployees(employees: Departement): Observable<Departement> {
-  //   this.dialogData = employees;
-
-  //   return this.httpClient.put<Departement>(this.API_URL + employees._id, employees)
-  //       .subscribe({
-  //         next: (data) => {
-  //           this.dialogData = employees;
-  //         },
-  //         error: (error: HttpErrorResponse) => {
-  //            // error code here
-  //         },
-  //       });
-        
-  // }
-//   updateEmployees(employees: Departement): Observable<Departement> {
-//     const url = `${this.API_URL}/${employees._id}`;
-
-//     return this.httpClient.put<Departement>(url, employees).pipe(
-//         tap((updatedEmployee:Departement) => {
-//             this.dialogData = updatedEmployee; // Mettre à jour les données du dialogue avec les données mises à jour
-//         }),
-//         catchError((error: HttpErrorResponse) => {
-//             // Gérer les erreurs ici
-//             console.error('Error updating employee', error);
-//             throw error; // Renvoyer l'erreur pour la gérer dans le composant appelant si nécessaire
-//         })
-//     );
-// }
-updateEmployees(employees: Departement): Observable<Departement> {
-  const url = `${this.API_URL}/${employees._id}`;
-
-  return this.httpClient.put<Departement>(url, employees).pipe(
-      tap((updatedEmployee: Departement) => {
-          console.log('Updated employee:', updatedEmployee);
-          this.dialogData = updatedEmployee; // Mettre à jour les données du dialogue avec les données mises à jour
-      }),
-      catchError((error: HttpErrorResponse) => {
-          // Gérer les erreurs ici
-          console.error('Error updating employee', error);
-          throw error; // Renvoyer l'erreur pour la gérer dans le composant appelant si nécessaire
-      })
-  );
-}
-
-  // updateEmployee(employeeData: Departement): Observable<Departement> {
-  //   const url = `${this.API_URL}/${employeeData._id}`; // Assurez-vous d'adapter l'URL de l'API à votre structure
-
-  //   return this.httpClient.put<Departement>(url, employeeData);
-  // }
-  deleteEmployees(id: string): void {
+  deleteEmployees(id: number): void {
     console.log(id);
 
-    this.httpClient.delete(this.API_URL + id)
-        .subscribe({
-          next: (data) => {
-            console.log(id);
-          },
-          error: (error: HttpErrorResponse) => {
-             // error code here
-          },
-        });
+    // this.httpClient.delete(this.API_URL + id)
+    //     .subscribe({
+    //       next: (data) => {
+    //         console.log(id);
+    //       },
+    //       error: (error: HttpErrorResponse) => {
+    //          // error code here
+    //       },
+    //     });
+  }
+  getImageById(_id: string): Observable<Blob> {
+    return this.httpClient.get('http://localhost:3000/auth/uplo/' + _id, { responseType: 'blob' });
+  }
+
+  getImage(imageId: string): Observable<Blob> {
+    return this.httpClient.get<Blob>(`http://localhost:3000/auth/${imageId}`, { responseType: 'blob' as 'json' });
+  }
+  activateUser(userId: string): Observable<Employees> {
+    const body = { userId }; // Créez un objet contenant l'ID de l'utilisateur
+    return this.httpClient.post<Employees>(this.apiUrl + "/activate", body);
+  }
+  desactivatedUser(userId: string): Observable<Employees> {
+    const body = { userId }; // Créez un objet contenant l'ID de l'utilisateur
+    return this.httpClient.post<Employees>(this.apiUrl + "/deactivate", body);
+  }
+  signUp(employees: Employees): Observable<{ token: string }> {
+    return this.httpClient.post<{ token: string }>(this.apiUrl + "/signup", employees);
+  }
+  getUserById(userId: string): Observable<Employees> {
+    return this.httpClient.get<Employees>(this.apiUrl +"/finduser/"+ userId );
+  }
+  updateUser(userId: string, updateDto: Employees): Observable<Employees> {
+    return this.httpClient.patch<Employees>(this.apiUrl + "/updateProfile/" + userId , updateDto);
   }
 }

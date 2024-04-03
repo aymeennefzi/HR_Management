@@ -15,7 +15,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { BreadcrumbComponent } from '@shared/components/breadcrumb/breadcrumb.component';
 import { EmployeesService } from '../allEmployees/employees.service';
-import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
 @Component({
   selector: 'app-add-employee',
   templateUrl: './add-employee.component.html',
@@ -32,57 +32,45 @@ import { CommonModule } from '@angular/common';
     MatDatepickerModule,
     FileUploadComponent,
     MatButtonModule,
-    CommonModule,
-    FormsModule,
   ],
 })
 export class AddEmployeeComponent {
   docForm: UntypedFormGroup;
   hide3 = true;
   agree3 = false;
-  constructor(private fb: UntypedFormBuilder, private companyService: EmployeesService) {
+  constructor(private fb: UntypedFormBuilder , private employeS : EmployeesService , private router: Router) {
     this.docForm = this.fb.group({
-      name: ['', [Validators.required, Validators.pattern('[a-zA-Z]+')]],
-      description: [''],
-      totalEmployees: ['', [Validators.required]],
-      vacantPositions: ['', [Validators.required]],
-      recruitmentNeeds: ['', [Validators.required]],
-      budgetAllocated: ['', [Validators.required]],
-      salaryExpenditure: ['', [Validators.required]],
-      trainingExpenditure: ['', [Validators.required]],
-
+      firstName: ['', [Validators.required, Validators.pattern('[a-zA-Z]+')]],
+      lastName: [''],
+      email: [''],
+      etablissement: ['', [Validators.required]],
+      EmailSecondaire: ['', ],
+      TelSecondaire: ['', [Validators.required]],
+      dateEntree: [''],
+      fonction: [''],
+      Tel: [''],
+      Matricule: ['',],
+      password: ['', [Validators.required]],
+      roleName: [''],
+      soldeConges: [''],
+      soldeMaladie: [''],
     });
   }
-  cancel() {
-    // Code à exécuter lorsque le bouton "Cancel" est cliqué
-  }
-  formatCurrency(input: HTMLInputElement) {
-    const numericValue = input.value.replace(/\D/g, '');
-    const formattedValue = '$' + numericValue;
-    input.value = formattedValue;
-  }
-  
-  onSubmit() {
+  onSubmit(): void {
     if (this.docForm.valid) {
-      const companyData = this.docForm.value;
-      this.companyService.addDepartement(companyData).subscribe(
-        response => {
-          // Gérer la réponse du backend après l'ajout de l'entreprise
-          console.log('Company added successfully!', response);
-          // Réinitialisez le formulaire après l'ajout réussi
-          this.docForm.reset();
-          alert('L\'entreprise a été ajoutée avec succès !');
+      console.log('Form Value', this.docForm.value);
+      this.employeS.signUp(this.docForm.value).subscribe({
+        next: (response) => {
+          console.log('Inscription réussie. Token reçu :', response.token);
+          // Naviguer vers la route 'allEmployees' après l'inscription réussie
+          this.router.navigate(['/admin/employees/allEmployees']);
         },
-        error => {
-          // Gérer les erreurs de l'ajout d'entreprise
-          console.error('Error adding company:', error);
+        error: (error) => {
+          console.error("Une erreur s'est produite lors de l'inscription :", error);
         }
-      );
+      });
     } else {
-      // Affichez les erreurs de validation du formulaire
-      console.log('Invalid form data');
+      console.log('Formulaire invalide. Veuillez corriger les erreurs.');
     }
   }
-    // console.log('Form Value', this.docForm.value);
-  }
-
+}

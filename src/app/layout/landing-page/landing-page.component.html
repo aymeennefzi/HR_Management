@@ -606,8 +606,9 @@
             <p><strong><mat-icon class="custom-icon">event</mat-icon> Application Deadline:</strong> {{ job.applicationDeadline | date }}</p>
             
            
-            <a class="text-uppercase" href="">Read More <i class="bi bi-arrow-right"></i></a>
-          
+            <!-- <a class="text-uppercase" href="">Read More <i class="bi bi-arrow-right"></i></a> -->
+            <a class="text-uppercase" (click)="openDialog(job._id,job.title, $event)">Read More <i class="bi bi-arrow-right"></i></a>
+
           </div>
         </div>
       </div>

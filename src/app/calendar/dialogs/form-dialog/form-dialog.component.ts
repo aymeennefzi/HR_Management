@@ -10,7 +10,6 @@ import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
-import { AttendanceStatus, Etat } from 'app/calendar/att.model';
 
 export interface DialogData {
   id: number;
@@ -38,8 +37,6 @@ export interface DialogData {
   ],
 })
 export class FormDialogComponent {
-  etat!: Etat; // Déclarer la propriété etat
-  status!: AttendanceStatus;
   action: string;
   dialogTitle: string;
   calendarForm: UntypedFormGroup;
@@ -100,10 +97,5 @@ export class FormDialogComponent {
   public confirmAdd(): void {
     this.calendarService.addUpdateCalendar(this.calendarForm.getRawValue());
     this.dialogRef.close('submit');
-  }
-  onSubmit(): void {
-    // Traitement des données du formulaire
-    // Vous pouvez les enregistrer où vous le souhaitez
-    this.dialogRef.close();
   }
 }

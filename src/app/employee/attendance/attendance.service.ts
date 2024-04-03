@@ -39,12 +39,6 @@ export class AttendancesService extends UnsubscribeOnDestroyAdapter {
         },
       });
   }
-  getAttendance() {
-    let id_user="65f195dd0f04705fe41b3838";
-
-  // return this.httpClient.get(`http://localhost:3000/auth/${id_user}/attendances`);
-  return this.httpClient.get(`http://localhost:6200/auth/${id_user}/attendances`);
-  }
   addAttendances(attendances: Attendances): void {
     this.dialogData = attendances;
 
@@ -83,10 +77,5 @@ export class AttendancesService extends UnsubscribeOnDestroyAdapter {
     //          // error code here
     //       },
     //     });
-  }
-
-  Pointer(payload:any){
-    let personnelId="65f195dd0f04705fe41b3838"
-   return this.httpClient.put(`http://localhost:6100/attendance/${personnelId}/validate-presence`,payload);
   }
 }

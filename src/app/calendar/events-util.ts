@@ -5,8 +5,8 @@ const day = d.getDate();
 const month = d.getMonth();
 const year = d.getFullYear();
 
-export const INITIAL_EVENTS: EventInput[] = [
-  {
+export const INITIAL_EVENTS: EventInput[] = []
+  /*{
     id: "event1",
     title: "All Day Event",
     start: new Date(year, month, 1, 0, 0),
@@ -115,4 +115,4 @@ export const INITIAL_EVENTS: EventInput[] = [
     details:
       "Her extensive perceived may any sincerity extremity. Indeed add rather may pretty see.",
   },
-];
+*/

@@ -15,8 +15,7 @@ import { FormDialogComponent } from './dialogs/form-dialog/form-dialog.component
 import { DeleteComponent } from './dialogs/delete/delete.component';
 import { SelectionModel } from '@angular/cdk/collections';
 import { UnsubscribeOnDestroyAdapter } from '@shared';
-import { MyTasksService } from './my-tasks.service';
-import { MyTasks } from './my-tasks.model';
+
 import { Direction } from '@angular/cdk/bidi';
 import { TableExportUtil, TableElement } from '@shared';
 import { formatDate, NgClass, DatePipe } from '@angular/common';
@@ -29,6 +28,13 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { BreadcrumbComponent } from '@shared/components/breadcrumb/breadcrumb.component';
+import { CookieService } from 'ngx-cookie-service';
+import { TasksModel } from './my-tasks.model';
+import { EstimatesService } from 'app/admin/projects/estimates/estimates.service';
+import { ActivatedRoute } from '@angular/router';
+import { ProjectService } from 'app/admin/projects/all-projects/core/project.service';
+import Swal from 'sweetalert2';
+import { AuthService } from '@core';
 
 @Component({
   selector: 'app-my-tasks',
@@ -55,31 +61,26 @@ export class MyTasksComponent
   extends UnsubscribeOnDestroyAdapter
   implements OnInit
 {
-  displayedColumns = [
-    'select',
-    'taskNo',
-    'project',
-    'client',
-    'status',
-    'type',
-    'priority',
-    'executor',
-    'date',
-    'details',
-    'actions',
-  ];
-
-  exampleDatabase?: MyTasksService | null;
+  tasks: TasksModel[] = [];
+  columns: string[] = ['NomTask', 'description', 'statut', 'priority','FinishDate','startDate','actions'];
+  exampleDatabase?: EstimatesService;
   dataSource!: ExampleDataSource;
-  selection = new SelectionModel<MyTasks>(true, []);
+  selection = new SelectionModel<TasksModel>(true, []);
   index?: number;
-  id?: number;
-  myTasks?: MyTasks | null;
+  id?: string;
+  p!:any
+  user!:any
+userfinded!:any
+  t!:any
   constructor(
+    private actR : ActivatedRoute,
     public httpClient: HttpClient,
+    private projectService: ProjectService,
     public dialog: MatDialog,
-    public myTasksService: MyTasksService,
-    private snackBar: MatSnackBar
+    public estimatesService: EstimatesService,
+    private snackBar: MatSnackBar,
+    private cookieService: CookieService ,
+    private auth:AuthService
   ) {
     super();
   }
@@ -87,12 +88,40 @@ export class MyTasksComponent
   @ViewChild(MatSort, { static: true }) sort!: MatSort;
   @ViewChild('filter', { static: true }) filter!: ElementRef;
   ngOnInit() {
-    this.loadData();
+  
+    this.estimatesService.getTasks().subscribe({
+      next: (data: any) => {
+        this.tasks = data;
+      
+      },
+      error: (error) => {
+        console.error('Il y a eu une erreur lors de la récupération des tâches :', error);
+      }
+    });
+    this.retrieveUserData()
+
+  }
+  retrieveUserData() {
+    const cookieData = this.cookieService.get('user_data');
+    if (cookieData) {
+      try {
+        const userData = JSON.parse(cookieData);
+        this.user = userData.user; // Store user data in the component's variable
+        console.log(this.user.id); // You can now access user data within this component
+        this.auth.getUserById(this.user.id).subscribe((data)=>{this.userfinded=data;
+          console.log('dd',this.userfinded.tasks)
+        });
+      } catch (error) {
+        console.error('Error decoding cookie:', error);
+      }
+    } else {
+      console.error('Cookie "user_data" is not set');
+    }
   }
   refresh() {
-    this.loadData();
+this.ngOnInit()
   }
-  addNew() {
+  addNew(idProject:string) {
     let tempDirection: Direction;
     if (localStorage.getItem('isRtl') === 'true') {
       tempDirection = 'rtl';
@@ -101,30 +130,24 @@ export class MyTasksComponent
     }
     const dialogRef = this.dialog.open(FormDialogComponent, {
       data: {
-        myTasks: this.myTasks,
-        action: 'add',
+   
+       action: 'add',
+         idProject:idProject ,
+         tasks :this.tasks   ,
+         task:this.t      
       },
       direction: tempDirection,
     });
-    this.subs.sink = dialogRef.afterClosed().subscribe((result) => {
-      if (result === 1) {
-        // After dialog is closed we're doing frontend updates
-        // For add we're just pushing a new row inside DataServicex
-        this.exampleDatabase?.dataChange.value.unshift(
-          this.myTasksService.getDialogData()
-        );
-        this.refreshTable();
-        this.showNotification(
-          'snackbar-success',
-          'Add Record Successfully...!!!',
-          'bottom',
-          'center'
-        );
+    this.subs.sink =  dialogRef.afterClosed().subscribe(result => {
+      console.log('Le dialogue a été fermé.', result);
+      if (result) {
+       
+        this.tasks=result
       }
     });
   }
-  editCall(row: MyTasks) {
-    this.id = row.id;
+  editCall(row: TasksModel) {
+    this.id = row._id;
     let tempDirection: Direction;
     if (localStorage.getItem('isRtl') === 'true') {
       tempDirection = 'rtl';
@@ -133,23 +156,27 @@ export class MyTasksComponent
     }
     const dialogRef = this.dialog.open(FormDialogComponent, {
       data: {
-        myTasks: row,
+        // estimates: row,
+        taskId:row._id,
         action: 'edit',
-      },
+        task:row,
+      tasks :this.tasks    },
       direction: tempDirection,
     });
     this.subs.sink = dialogRef.afterClosed().subscribe((result) => {
       if (result === 1) {
         // When using an edit things are little different, firstly we find record inside DataService by id
         const foundIndex = this.exampleDatabase?.dataChange.value.findIndex(
-          (x) => x.id === this.id
+          (x) => x._id === this.id
         );
         // Then you update that record using data from dialogData (values you enetered)
-        if (foundIndex != null && this.exampleDatabase) {
-          this.exampleDatabase.dataChange.value[foundIndex] =
-            this.myTasksService.getDialogData();
+        if (foundIndex !== undefined) {
+          if (this.exampleDatabase) {
+            this.exampleDatabase.dataChange.value[foundIndex] =
+              this.estimatesService.getDialogData();
+          }
           // And lastly refresh table
-          this.refreshTable();
+     
           this.showNotification(
             'black',
             'Edit Record Successfully...!!!',
@@ -160,46 +187,37 @@ export class MyTasksComponent
       }
     });
   }
-
-  deleteItem(i: number, row: MyTasks) {
-    this.index = i;
-    this.id = row.id;
-    let tempDirection: Direction;
-    if (localStorage.getItem('isRtl') === 'true') {
-      tempDirection = 'rtl';
-    } else {
-      tempDirection = 'ltr';
-    }
-
-    const dialogRef = this.dialog.open(DeleteComponent, {
-      height: '270px',
-      width: '300px',
-      data: row,
-      direction: tempDirection,
-    });
-    this.subs.sink = dialogRef.afterClosed().subscribe((result) => {
-      if (result === 1) {
-        const foundIndex = this.exampleDatabase?.dataChange.value.findIndex(
-          (x) => x.id === this.id
-        );
-        // for delete we use splice in order to remove single object from DataService
-        if (foundIndex !== undefined && this.exampleDatabase !== undefined) {
-          this.exampleDatabase?.dataChange.value.splice(foundIndex, 1);
-          this.refreshTable();
-          this.showNotification(
-            'snackbar-danger',
-            'Delete Record Successfully...!!!',
-            'bottom',
-            'center'
+  public deleteItem(row: any): void {
+    Swal.fire({
+      title: 'Êtes-vous sûr?',
+      text: "Vous ne pourrez pas revenir en arrière!",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Oui, supprimez-le!'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.estimatesService.deleteTask(row._id).subscribe(() => {
+          Swal.fire(
+            'Supprimé!',
+            'Votre projet a été supprimé.',
+            'success'
           );
-        }
+          this.ngOnInit(); // Ou une autre méthode pour actualiser la liste des projets
+        }, (error) => {
+          // Gérer l'erreur ici, par exemple :
+          Swal.fire(
+            'Erreur!',
+            'La suppression du projet a échoué.',
+            'error'
+          );
+        });
       }
     });
   }
-  private refreshTable() {
-    this.paginator._changePageSize(this.paginator.pageSize);
-  }
-  /** Whether the number of selected elements matches the total number of rows. */
+
+  /** Whether the number of selected elements matches the details number of rows. */
   isAllSelected() {
     const numSelected = this.selection.selected.length;
     const numRows = this.dataSource.renderedData.length;
@@ -215,26 +233,25 @@ export class MyTasksComponent
         );
   }
   removeSelectedRows() {
-    const totalSelect = this.selection.selected.length;
+    const detailsSelect = this.selection.selected.length;
     this.selection.selected.forEach((item) => {
       const index: number = this.dataSource.renderedData.findIndex(
         (d) => d === item
       );
       // console.log(this.dataSource.renderedData.findIndex((d) => d === item));
       this.exampleDatabase?.dataChange.value.splice(index, 1);
-
-      this.refreshTable();
-      this.selection = new SelectionModel<MyTasks>(true, []);
+     
+      this.selection = new SelectionModel<TasksModel>(true, []);
     });
     this.showNotification(
       'snackbar-danger',
-      totalSelect + ' Record Delete Successfully...!!!',
+      detailsSelect + ' Record Delete Successfully...!!!',
       'bottom',
       'center'
     );
   }
   public loadData() {
-    this.exampleDatabase = new MyTasksService(this.httpClient);
+    this.exampleDatabase = new EstimatesService(this.httpClient);
     this.dataSource = new ExampleDataSource(
       this.exampleDatabase,
       this.paginator,
@@ -254,15 +271,13 @@ export class MyTasksComponent
     // key name with space add in brackets
     const exportData: Partial<TableElement>[] =
       this.dataSource.filteredData.map((x) => ({
-        'Task No': x.taskNo,
-        Project: x.project,
-        Client: x.client,
-        Status: x.status,
-        Priority: x.priority,
-        Type: x.type,
-        Executor: x.executor,
-        'Joining Date': formatDate(new Date(x.date), 'yyyy-MM-dd', 'en') || '',
-        Details: x.details,
+        NomTask: x.NomTask,
+        description: x.description,
+        startDate: x.startDate?.toISOString(), // Convert Date to string
+        FinishDate: x.FinishDate?.toISOString(), 
+        priority: x.priority,
+        statut: x.statut,
+  
       }));
 
     TableExportUtil.exportToExcel(exportData, 'excel');
@@ -282,7 +297,7 @@ export class MyTasksComponent
     });
   }
 }
-export class ExampleDataSource extends DataSource<MyTasks> {
+export class ExampleDataSource extends DataSource<any> {
   filterChange = new BehaviorSubject('');
   get filter(): string {
     return this.filterChange.value;
@@ -290,10 +305,10 @@ export class ExampleDataSource extends DataSource<MyTasks> {
   set filter(filter: string) {
     this.filterChange.next(filter);
   }
-  filteredData: MyTasks[] = [];
-  renderedData: MyTasks[] = [];
+  filteredData: TasksModel[] = [];
+  renderedData: TasksModel[] = [];
   constructor(
-    public exampleDatabase: MyTasksService,
+    public exampleDatabase: EstimatesService,
     public paginator: MatPaginator,
     public _sort: MatSort
   ) {
@@ -302,7 +317,7 @@ export class ExampleDataSource extends DataSource<MyTasks> {
     this.filterChange.subscribe(() => (this.paginator.pageIndex = 0));
   }
   /** Connect function called by the table to retrieve one stream containing the data to render. */
-  connect(): Observable<MyTasks[]> {
+  connect(): Observable<any[]> {
     // Listen for any changes in the base data, sorting, filtering, or pagination
     const displayDataChanges = [
       this.exampleDatabase.dataChange,
@@ -310,23 +325,18 @@ export class ExampleDataSource extends DataSource<MyTasks> {
       this.filterChange,
       this.paginator.page,
     ];
-    this.exampleDatabase.getAllMyTaskss();
+    this.exampleDatabase.getTasks();
     return merge(...displayDataChanges).pipe(
       map(() => {
         // Filter data
         this.filteredData = this.exampleDatabase.data
           .slice()
-          .filter((myTasks: MyTasks) => {
+          .filter((estimates: TasksModel) => {
             const searchStr = (
-              myTasks.taskNo +
-              myTasks.project +
-              myTasks.client +
-              myTasks.status +
-              myTasks.priority +
-              myTasks.type +
-              myTasks.executor +
-              myTasks.date +
-              myTasks.details
+              estimates.NomTask+
+              estimates.description+
+              estimates.startDate+
+              estimates.FinishDate 
             ).toLowerCase();
             return searchStr.indexOf(this.filter.toLowerCase()) !== -1;
           });
@@ -346,7 +356,7 @@ export class ExampleDataSource extends DataSource<MyTasks> {
     //disconnect
   }
   /** Returns a sorted copy of the database data. */
-  sortData(data: MyTasks[]): MyTasks[] {
+  sortData(data: any[]): any[] {
     if (!this._sort.active || this._sort.direction === '') {
       return data;
     }
@@ -357,23 +367,20 @@ export class ExampleDataSource extends DataSource<MyTasks> {
         case 'id':
           [propertyA, propertyB] = [a.id, b.id];
           break;
-        case 'taskNo':
-          [propertyA, propertyB] = [a.taskNo, b.taskNo];
+        case 'cName':
+          [propertyA, propertyB] = [a.cName, b.cName];
           break;
-        case 'project':
-          [propertyA, propertyB] = [a.project, b.project];
+        case 'estDate':
+          [propertyA, propertyB] = [a.estDate, b.estDate];
           break;
-        case 'client':
-          [propertyA, propertyB] = [a.client, b.client];
+        case 'country':
+          [propertyA, propertyB] = [a.country, b.country];
+          break;
+        case 'expDate':
+          [propertyA, propertyB] = [a.expDate, b.expDate];
           break;
         case 'status':
           [propertyA, propertyB] = [a.status, b.status];
-          break;
-        case 'priority':
-          [propertyA, propertyB] = [a.priority, b.priority];
-          break;
-        case 'type':
-          [propertyA, propertyB] = [a.type, b.type];
           break;
       }
       const valueA = isNaN(+propertyA) ? propertyA : +propertyA;
@@ -383,4 +390,7 @@ export class ExampleDataSource extends DataSource<MyTasks> {
       );
     });
   }
+
+
 }
+

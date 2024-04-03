@@ -10,7 +10,7 @@ import {
   MatSnackBarVerticalPosition,
 } from '@angular/material/snack-bar';
 import { BehaviorSubject, fromEvent, merge, Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { map, switchMap } from 'rxjs/operators';
 import { FormDialogComponent } from './dialogs/form-dialog/form-dialog.component';
 import { DeleteDialogComponent } from './dialogs/delete/delete.component';
 import { MatMenuTrigger, MatMenuModule } from '@angular/material/menu';
@@ -30,6 +30,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { BreadcrumbComponent } from '@shared/components/breadcrumb/breadcrumb.component';
+import { CookieService } from 'ngx-cookie-service';
 
 @Component({
   selector: 'app-my-leaves',
@@ -59,11 +60,11 @@ export class MyLeavesComponent
 {
   displayedColumns = [
     'select',
-    'applyDate',
-    'fromDate',
-    'toDate',
-    'halfDay',
-    'type',
+    'startDate',
+    'startTime',
+    'endDate',
+    'endTime',
+    'leaveType',
     'status',
     'reason',
     'actions',
@@ -72,14 +73,15 @@ export class MyLeavesComponent
   exampleDatabase?: MyLeavesService | null;
   dataSource!: ExampleDataSource;
   selection = new SelectionModel<MyLeaves>(true, []);
-  id?: number;
+  id?: string;
   index?: number;
   myLeaves?: MyLeaves | null;
   constructor(
     public httpClient: HttpClient,
     public dialog: MatDialog,
     public myLeavesService: MyLeavesService,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
+    private cookieService : CookieService 
   ) {
     super();
   }
@@ -128,7 +130,7 @@ export class MyLeavesComponent
     });
   }
   editCall(row: MyLeaves) {
-    this.id = row.id;
+    this.id = row._id;
     let tempDirection: Direction;
     if (localStorage.getItem('isRtl') === 'true') {
       tempDirection = 'rtl';
@@ -146,7 +148,7 @@ export class MyLeavesComponent
       if (result === 1) {
         // When using an edit things are little different, firstly we find record inside DataService by id
         const foundIndex = this.exampleDatabase?.dataChange.value.findIndex(
-          (x) => x.id === this.id
+          (x) => x._id === this.id
         );
         // Then you update that record using data from dialogData (values you enetered)
         if (foundIndex != null && this.exampleDatabase) {
@@ -164,44 +166,10 @@ export class MyLeavesComponent
       }
     });
   }
-  // deleteItem(i: number, row: any) {
-  //   this.index = i;
-  //   this.id = row.id;
-  //   let tempDirection: Direction;
-  //   if (localStorage.getItem('isRtl') === 'true') {
-  //     tempDirection = 'rtl';
-  //   } else {
-  //     tempDirection = 'ltr';
-  //   }
-  //   const dialogRef = this.dialog.open(DeleteDialogComponent, {
-  //     height: '270px',
-  //     width: '400px',
-  //     data: row,
-  //     direction: tempDirection,
-  //   });
-  //   this.subs.sink = dialogRef.afterClosed().subscribe((result) => {
-  //     if (result === 1) {
-  //       const foundIndex = this.exampleDatabase?.dataChange.value.findIndex(
-  //         (x) => x.id === this.id
-  //       );
-  //       // for delete we use splice in order to remove single object from DataService
-  //       if (foundIndex != null && this.exampleDatabase) {
-  //         this.exampleDatabase.dataChange.value.splice(foundIndex, 1);
-  //         this.refreshTable();
-  //         this.showNotification(
-  //           'snackbar-danger',
-  //           'Delete Record Successfully...!!!',
-  //           'bottom',
-  //           'center'
-  //         );
-  //       }
-  //     }
-  //   });
-  // }
-
-  deleteItem(i: number, row: MyLeaves) {
+ 
+ deleteItem(i: number, row: MyLeaves) {
     this.index = i;
-    this.id = row.id;
+    this.id = row._id;
     let tempDirection: Direction;
     if (localStorage.getItem('isRtl') === 'true') {
       tempDirection = 'rtl';
@@ -218,7 +186,7 @@ export class MyLeavesComponent
     this.subs.sink = dialogRef.afterClosed().subscribe((result) => {
       if (result === 1) {
         const foundIndex = this.exampleDatabase?.dataChange.value.findIndex(
-          (x) => x.id === this.id
+          (x) => x._id === this.id
         );
         // for delete we use splice in order to remove single object from DataService
         if (foundIndex !== undefined && this.exampleDatabase !== undefined) {
@@ -275,7 +243,8 @@ export class MyLeavesComponent
     this.dataSource = new ExampleDataSource(
       this.exampleDatabase,
       this.paginator,
-      this.sort
+      this.sort,
+      this.cookieService
     );
     this.subs.sink = fromEvent(this.filter.nativeElement, 'keyup').subscribe(
       () => {
@@ -285,23 +254,6 @@ export class MyLeavesComponent
         this.dataSource.filter = this.filter.nativeElement.value;
       }
     );
-  }
-  // export table data in excel file
-  exportExcel() {
-    // key name with space add in brackets
-    const exportData: Partial<TableElement>[] =
-      this.dataSource.filteredData.map((x) => ({
-        'Apply Date':
-          formatDate(new Date(x.applyDate), 'yyyy-MM-dd', 'en') || '',
-        'From Date': formatDate(new Date(x.fromDate), 'yyyy-MM-dd', 'en') || '',
-        'To Date': formatDate(new Date(x.toDate), 'yyyy-MM-dd', 'en') || '',
-        'Half Day': x.halfDay,
-        Type: x.type,
-        Status: x.status,
-        Reason: x.reason,
-      }));
-
-    TableExportUtil.exportToExcel(exportData, 'excel');
   }
 
   showNotification(
@@ -342,48 +294,57 @@ export class ExampleDataSource extends DataSource<MyLeaves> {
   constructor(
     public exampleDatabase: MyLeavesService,
     public paginator: MatPaginator,
-    public _sort: MatSort
+    public _sort: MatSort,
+    private cookieService: CookieService 
   ) {
     super();
     // Reset to the first page when the user changes the filter.
     this.filterChange.subscribe(() => (this.paginator.pageIndex = 0));
   }
-  /** Connect function called by the table to retrieve one stream containing the data to render. */
   connect(): Observable<MyLeaves[]> {
-    // Listen for any changes in the base data, sorting, filtering, or pagination
+    // Écouter les changements de données de base, de tri, de filtrage ou de pagination
     const displayDataChanges = [
       this.exampleDatabase.dataChange,
       this._sort.sortChange,
       this.filterChange,
       this.paginator.page,
     ];
-    this.exampleDatabase.getAllMyLeaves();
+    
+    // Récupérer l'ID de l'utilisateur à partir du cookie
+    const cookieData = this.cookieService.get('user_data');
+    const userData = JSON.parse(cookieData);
+    const userId = userData.user.id;
+    
     return merge(...displayDataChanges).pipe(
-      map(() => {
+      switchMap(() => {
+        // Appeler la méthode pour obtenir les congés de l'utilisateur par son ID
+        return this.exampleDatabase.getleavesByemployeeId(userId);
+      }),
+      map((leaves: MyLeaves[]) => {
         // Filter data
-        this.filteredData = this.exampleDatabase.data
-          .slice()
-          .filter((myLeaves: MyLeaves) => {
-            const searchStr = (
-              myLeaves.type +
-              myLeaves.halfDay +
-              myLeaves.applyDate +
-              myLeaves.reason
-            ).toLowerCase();
-            return searchStr.indexOf(this.filter.toLowerCase()) !== -1;
-          });
+        const filteredData = leaves.filter((myLeaves: MyLeaves) => {
+          const searchStr = (
+            myLeaves.leaveType +
+            myLeaves.startDate +
+            myLeaves.startTime +
+            myLeaves.endDate +
+            myLeaves.endTime +
+            myLeaves.reason
+          ).toLowerCase();
+          return searchStr.indexOf(this.filter.toLowerCase()) !== -1;
+        });
         // Sort filtered data
-        const sortedData = this.sortData(this.filteredData.slice());
-        // Grab the page's slice of the filtered sorted data.
+        const sortedData = this.sortData(filteredData);
+        // Paginate sorted data
         const startIndex = this.paginator.pageIndex * this.paginator.pageSize;
-        this.renderedData = sortedData.splice(
-          startIndex,
-          this.paginator.pageSize
-        );
-        return this.renderedData;
+        const endIndex = startIndex + this.paginator.pageSize;
+        const renderedData = sortedData.slice(startIndex, endIndex);
+        return renderedData;
       })
     );
   }
+  
+  
   disconnect() {
     //disconnect
   }
@@ -397,19 +358,19 @@ export class ExampleDataSource extends DataSource<MyLeaves> {
       let propertyB: number | string = '';
       switch (this._sort.active) {
         case 'id':
-          [propertyA, propertyB] = [a.id, b.id];
+          [propertyA, propertyB] = [a._id, b._id];
           break;
-        case 'type':
-          [propertyA, propertyB] = [a.type, b.type];
+        case 'leavetype':
+          [propertyA, propertyB] = [a.leaveType, b.leaveType];
           break;
         case 'status':
           [propertyA, propertyB] = [a.status, b.status];
           break;
-        case 'applyDate':
-          [propertyA, propertyB] = [a.applyDate, b.applyDate];
+        case 'startdate':
+          [propertyA, propertyB] = [a.startDate, b.startDate];
           break;
-        case 'fromDate':
-          [propertyA, propertyB] = [a.fromDate, b.fromDate];
+        case 'endDate':
+          [propertyA, propertyB] = [a.endDate, b.endDate];
           break;
       }
       const valueA = isNaN(+propertyA) ? propertyA : +propertyA;
@@ -420,3 +381,4 @@ export class ExampleDataSource extends DataSource<MyLeaves> {
     });
   }
 }
+

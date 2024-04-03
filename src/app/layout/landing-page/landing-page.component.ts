@@ -7,6 +7,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
+import { FormdialogComponentComponent } from './formdialog-component/formdialog-component.component';
 
 const routes: Routes = [
  
@@ -28,7 +29,9 @@ const routes: Routes = [
 
 
 export class LandingPageComponent {
-  
+  job!:JobsList;
+  jobId!: string;
+
   jobsList: JobsList[] = [];
 
   constructor(private router: Router,private jobservice:JobsListService,public dialog: MatDialog) { }
@@ -42,6 +45,27 @@ export class LandingPageComponent {
         console.error('Error fetching jobs:', error);
       }
     );
+  }
+  openDialog(jobId: string, jobTitle: string,event: MouseEvent): void {
+    // Empêcher la redirection vers l'authentification si le clic provient du bouton "Read More"
+    event.preventDefault();
+    console.log('ID du job:', jobId);
+    console.log('Titre du job:', jobTitle);
+    // Ouvrir le dialogue
+    const dialogRef = this.dialog.open(FormdialogComponentComponent, {
+      width: '750px', // Largeur spécifique du dialog
+      height: '400px', // Hauteur spécifique du dialog
+      panelClass: 'dialog-container',
+       // Définissez la largeur du dialogue selon vos besoins
+      data: { jobId: jobId ,jobTitle: jobTitle} // Passez l'ID de l'emploi au dialogue
+      
+      
+    });
+  
+    dialogRef.afterClosed().subscribe(result => {
+      console.log('Dialogue fermé');
+      // Traitez ici toute logique après la fermeture du dialogue si nécessaire
+    });
   }
   
   

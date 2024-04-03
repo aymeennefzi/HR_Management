@@ -506,18 +506,6 @@ export const ROUTES: RouteInfo[] = [
     submenu: [],
   },
   {
-    path: '/admin/candad',
-    title: 'MENUITEMS.CANDAD.TEXT',
-    iconType: 'feather',
-    icon: 'users',
-    class: '',
-    groupTitle: false,
-    badge: '',
-    badgeClass: '',
-    role: ['Admin'],
-    submenu: [],
-  },
-  {
     path: '',
     title: 'MENUITEMS.JOBS.TEXT',
     iconType: 'feather',
@@ -803,7 +791,7 @@ export const ROUTES: RouteInfo[] = [
 
   {
     path: '/client/billing',
-    title: 'MENUITEMS.CLIENT.BILLING',
+    title: 'Attendance',
     iconType: 'feather',
     icon: 'file-text',
     class: '',

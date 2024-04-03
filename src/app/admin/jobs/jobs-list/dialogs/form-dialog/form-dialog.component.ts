@@ -13,7 +13,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatChipGrid, MatChipInput, MatChipInputEvent, MatChipSelectionChange, MatChipsModule } from '@angular/material/chips';
 import { COMMA, ENTER } from '@angular/cdk/keycodes';
-import { SharedModule } from 'shared.module';
+
 import { JobsListComponent } from '../../jobs-list.component';
 
 export interface DialogData {
@@ -48,7 +48,7 @@ export interface DialogData {
         MatChipGrid,
         CommonModule,
         MatChipInput,
-        SharedModule
+        
        
     ],
 })

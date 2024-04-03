@@ -4,7 +4,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
 import { MatSort, MatSortModule } from '@angular/material/sort';
 import { DataSource } from '@angular/cdk/collections';
-import { MatSnackBar, MatSnackBarHorizontalPosition, MatSnackBarVerticalPosition } from '@angular/material/snack-bar';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { BehaviorSubject, fromEvent, merge, Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { MatMenuTrigger } from '@angular/material/menu';
@@ -15,32 +15,25 @@ import { Attendances } from './attendance.model';
 import { AttendancesService } from './attendance.service';
 import { Direction } from '@angular/cdk/bidi';
 import { DatePipe } from '@angular/common';
-import { CommonModule } from '@angular/common';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatRippleModule } from '@angular/material/core';
 import { MatTableModule } from '@angular/material/table';
 import { BreadcrumbComponent } from '@shared/components/breadcrumb/breadcrumb.component';
-import { TestComponent } from "../test/test.component";
-import { MatIconModule } from '@angular/material/icon';
-import { FormDialogComponent } from '../my-leaves/dialogs/form-dialog/form-dialog.component';
-import { MyLeavesService } from '../my-leaves/my-leaves.service';
 
 @Component({
-    selector: 'app-attendances',
-    templateUrl: './attendance.component.html',
-    styleUrls: ['./attendance.component.scss'],
-    standalone: true,
-    imports: [
-        BreadcrumbComponent,
-        MatTableModule,
-        MatSortModule,
-        MatRippleModule,
-        MatProgressSpinnerModule,
-        MatPaginatorModule,
-        DatePipe,
-        TestComponent,
-        MatIconModule
-    ]
+  selector: 'app-attendances',
+  templateUrl: './attendance.component.html',
+  styleUrls: ['./attendance.component.scss'],
+  standalone: true,
+  imports: [
+    BreadcrumbComponent,
+    MatTableModule,
+    MatSortModule,
+    MatRippleModule,
+    MatProgressSpinnerModule,
+    MatPaginatorModule,
+    DatePipe,
+  ],
 })
 export class AttendancesComponent
   extends UnsubscribeOnDestroyAdapter
@@ -48,15 +41,12 @@ export class AttendancesComponent
   filterToggle = false;
   displayedColumns = [
     'date',
-    // 'check_in',
+    'check_in',
+    'break',
+    'check_out',
+    'hours',
     'status',
-    "etat",
-    // 'break',
-    // 'check_out',
-    // 'hours',
-    // 'status',
   ];
-  attendanceListe:Attendances[]=[];
   exampleDatabase?: AttendancesService | null;
   dataSource!: ExampleDataSource;
   selection = new SelectionModel<Attendances>(true, []);
@@ -66,7 +56,6 @@ export class AttendancesComponent
     public httpClient: HttpClient,
     public dialog: MatDialog,
     public attendancesService: AttendancesService,
-    public myLeavesService: MyLeavesService,
     private snackBar: MatSnackBar
   ) {
     super();
@@ -79,82 +68,10 @@ export class AttendancesComponent
   contextMenuPosition = { x: '0px', y: '0px' };
 
   ngOnInit() {
-    // this.loadData();
-    this.getattendance();
-  }
-  addNew() {
-    let tempDirection: Direction;
-    if (localStorage.getItem('isRtl') === 'true') {
-      tempDirection = 'rtl';
-    } else {
-      tempDirection = 'ltr';
-    }
-    const dialogRef = this.dialog.open(FormComponent, {
-      data: {
-        myLeaves: this.attendances,
-        action: 'add',
-      },
-      direction: tempDirection,
-    });
-    this.subs.sink = dialogRef.afterClosed().subscribe((result) => {
-      if (result === 1) {
-        // After dialog is closed we're doing frontend updates
-        // For add we're just pushing a new row inside DataService
-        this.exampleDatabase?.dataChange.value.unshift(
-          this.attendancesService.getDialogData()
-        );
-        this.refresh();
-        this.showNotification(
-          'snackbar-success',
-          'Add Record Successfully...!!!',
-          'bottom',
-          'center'
-        );
-      }
-    });
-    // let tempDirection: Direction;
-    // if (localStorage.getItem('isRtl') === 'true') {
-    //   tempDirection = 'rtl';
-    // } else {
-    //   tempDirection = 'ltr';
-    // }
-    // const dialogRef = this.dialog.open(FormComponent, {
-    //   data: {
-    //     myLeaves: this.attendances,
-    //     action: 'add',
-    //   },
-    //   direction: tempDirection,
-    // });
-  }
-  showNotification(
-    colorName: string,
-    text: string,
-    placementFrom: MatSnackBarVerticalPosition,
-    placementAlign: MatSnackBarHorizontalPosition
-  ) {
-    this.snackBar.open(text, '', {
-      duration: 2000,
-      verticalPosition: placementFrom,
-      horizontalPosition: placementAlign,
-      panelClass: colorName,
-    });
-  }
-  private refreshTable() {
-    this.paginator._changePageSize(this.paginator.pageSize);
+    this.loadData();
   }
   refresh() {
-    // this.loadData();
-  }
-  getattendance(){
-    this.attendancesService.getAttendance().subscribe({
-      next:(data )=>{
-        this.attendanceListe=data as Attendances[] ;
-        console.log(this.attendanceListe)
-      },
-      error:()=>{
-
-      }
-    })
+    this.loadData();
   }
   detailsCall(row: Attendances) {
     let tempDirection: Direction;
@@ -174,22 +91,22 @@ export class AttendancesComponent
     });
   }
 
-  // public loadData() {
-  //   this.exampleDatabase = new AttendancesService(this.httpClient);
-  //   this.dataSource = new ExampleDataSource(
-  //     this.exampleDatabase,
-  //     this.paginator,
-  //     this.sort
-  //   );
-  //   this.subs.sink = fromEvent(this.filter.nativeElement, 'keyup').subscribe(
-  //     () => {
-  //       if (!this.dataSource) {
-  //         return;
-  //       }
-  //       this.dataSource.filter = this.filter.nativeElement.value;
-  //     }
-  //   );
-  // }
+  public loadData() {
+    this.exampleDatabase = new AttendancesService(this.httpClient);
+    this.dataSource = new ExampleDataSource(
+      this.exampleDatabase,
+      this.paginator,
+      this.sort
+    );
+    this.subs.sink = fromEvent(this.filter.nativeElement, 'keyup').subscribe(
+      () => {
+        if (!this.dataSource) {
+          return;
+        }
+        this.dataSource.filter = this.filter.nativeElement.value;
+      }
+    );
+  }
 }
 export class ExampleDataSource extends DataSource<Attendances> {
   filterChange = new BehaviorSubject('');
@@ -228,10 +145,10 @@ export class ExampleDataSource extends DataSource<Attendances> {
           .filter((attendances: Attendances) => {
             const searchStr = (
               attendances.date +
-              // attendances.check_in +
-              // attendances.break +
-              // attendances.check_out +
-              // attendances.hours +
+              attendances.check_in +
+              attendances.break +
+              attendances.check_out +
+              attendances.hours +
               attendances.status
             ).toLowerCase();
             return searchStr.indexOf(this.filter.toLowerCase()) !== -1;
@@ -251,7 +168,6 @@ export class ExampleDataSource extends DataSource<Attendances> {
   disconnect() {
     //disconnect
   }
- 
   /** Returns a sorted copy of the database data. */
   sortData(data: Attendances[]): Attendances[] {
     if (!this._sort.active || this._sort.direction === '') {
@@ -265,17 +181,17 @@ export class ExampleDataSource extends DataSource<Attendances> {
           [propertyA, propertyB] = [a.id, b.id];
           break;
         case 'date':
-          // [propertyA, propertyB] = [a.date, b.date];
+          [propertyA, propertyB] = [a.date, b.date];
           break;
-        // case 'check_in':
-        //   [propertyA, propertyB] = [a.check_in, b.check_in];
-        //   break;
-        // case 'break':
-        //   [propertyA, propertyB] = [a.break, b.break];
-        //   break;
-        // case 'check_out':
-        //   [propertyA, propertyB] = [a.check_out, b.check_out];
-        //   break;
+        case 'check_in':
+          [propertyA, propertyB] = [a.check_in, b.check_in];
+          break;
+        case 'break':
+          [propertyA, propertyB] = [a.break, b.break];
+          break;
+        case 'check_out':
+          [propertyA, propertyB] = [a.check_out, b.check_out];
+          break;
       }
       const valueA = isNaN(+propertyA) ? propertyA : +propertyA;
       const valueB = isNaN(+propertyB) ? propertyB : +propertyB;

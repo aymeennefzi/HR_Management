@@ -6,7 +6,7 @@
       <a href="#" onClick="return false;" class="bars" (click)="mobileMenuSidebarOpen($event,'overlay-open')"></a>
       <a class="navbar-brand" routerLink={{homePage}}>
         <img src="assets/images/logo.png" alt="" />
-        <span class="logo-name">Kuber</span>
+        <span class="logo-name">HR 360°</span>
       </a>
     </div>
     <div class="collapse navbar-collapse" [ngClass]="isNavbarCollapsed ? '' : 'show'">
@@ -91,16 +91,16 @@
         <li class="nav-item user_profile">
           <button mat-button [matMenuTriggerFor]="profilemenu">
             <div class="chip dropdown-toggle" ngbDropdownToggle class="">
-              <span>Ella Jones</span>
-              <img src="{{userImg}}" class="user_img" width="32" height="32" alt="User">
+              <span>{{ userData?.user?.firstname }} {{ userData?.user?.lastname }}</span>
             </div>
           </button>
+          
           <mat-menu #profilemenu="matMenu" class="profile-menu">
             <div class="noti-list">
               <div class="menu ">
                 <div class="user_dw_menu">
-                  <button mat-menu-item class="user-item-list">
-                    <app-feather-icons [icon]="'user'" [class]="'user-menu-icons'"></app-feather-icons>Account
+                  <button mat-menu-item class="user-item-list" routerLink="/employee/profile">
+                    <app-feather-icons [icon]="'user'" [class]="'user-menu-icons'" ></app-feather-icons>Account
                   </button>
                   <button mat-menu-item class="user-item-list">
                     <app-feather-icons [icon]="'mail'" [class]="'user-menu-icons'"></app-feather-icons>Inbox

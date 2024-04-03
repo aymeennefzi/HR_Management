@@ -2,10 +2,12 @@ import { Route } from '@angular/router';
 import { MainLayoutComponent } from './layout/app-layout/main-layout/main-layout.component';
 import { AuthGuard } from '@core/guard/auth.guard';
 import { AuthLayoutComponent } from './layout/app-layout/auth-layout/auth-layout.component';
-import { Role } from '@core';
 import {LandingPageComponent} from "./layout/landing-page/landing-page.component";
+import { Page404Component } from './authentication/page404/page404.component';
 
 export const APP_ROUTE: Route[] = [
+  //{ path: '', redirectTo: '/home', pathMatch: 'full' }, // Redirection vers '/home' par défaut
+
   {
     path: '',
     component: MainLayoutComponent,
@@ -16,27 +18,18 @@ export const APP_ROUTE: Route[] = [
       {
         path: 'admin',
         canActivate: [AuthGuard],
-        data: {
-          role: Role.Admin,
-        },
         loadChildren: () =>
           import('./admin/admin.routes').then((m) => m.ADMIN_ROUTE),
       },
       {
         path: 'employee',
         canActivate: [AuthGuard],
-        data: {
-          role: Role.Employee,
-        },
         loadChildren: () =>
           import('./employee/employee.routes').then((m) => m.EMPLOYEE_ROUTE),
       },
       {
         path: 'client',
         canActivate: [AuthGuard],
-        data: {
-          role: Role.Client,
-        },
         loadChildren: () =>
           import('./client/client.routes').then((m) => m.CLIENT_ROUTE),
       },
@@ -126,7 +119,7 @@ export const APP_ROUTE: Route[] = [
     loadChildren: () =>
       import('./authentication/auth.routes').then((m) => m.AUTH_ROUTE),
   },
-  {path : 'home' , component : LandingPageComponent}
+  {path : 'home' , component : LandingPageComponent},
 
-  //{ path: '**', component: Page404Component },
+  { path: '**', component: Page404Component },
 ];

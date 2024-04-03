@@ -57,11 +57,6 @@ export const ADMIN_ROUTE: Route[] = [
       import('./leads/leads.routes').then((m) => m.LEADS_ROUTE),
   },
   {
-    path: 'candad',
-    loadChildren: () =>
-      import('./candad/candad.routes').then((m) => m.CANDAD_ROUTE),
-  },
-  {
     path: 'jobs',
     loadChildren: () => import('./jobs/jobs.routes').then((m) => m.JOBS_ROUTE),
   },

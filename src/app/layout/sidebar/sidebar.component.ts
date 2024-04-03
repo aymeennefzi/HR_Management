@@ -22,6 +22,8 @@ import { TranslateModule } from '@ngx-translate/core';
 import { FeatherModule } from 'angular-feather';
 import { NgScrollbar } from 'ngx-scrollbar';
 import { UnsubscribeOnDestroyAdapter } from '@shared';
+import { CookieService } from 'ngx-cookie-service';
+import { EmployeesService } from 'app/admin/employees/allEmployees/employees.service';
 @Component({
   selector: 'app-sidebar',
   templateUrl: './sidebar.component.html',
@@ -55,13 +57,14 @@ export class SidebarComponent
     private renderer: Renderer2,
     public elementRef: ElementRef,
     private authService: AuthService,
-    private router: Router
+    private router: Router,
+    private cookieS : CookieService,
+    private employeS : EmployeesService
   ) {
     super();
     this.elementRef.nativeElement.closest('body');
     this.subs.sink = this.router.events.subscribe((event) => {
       if (event instanceof NavigationEnd) {
-        // close sidebar on mobile screen after menu select
         this.renderer.removeClass(this.document.body, 'overlay-open');
       }
     });
@@ -89,30 +92,42 @@ export class SidebarComponent
       }
     }
   }
+  userData: any; // Variable pour stocker les données utilisateur
+
   ngOnInit() {
-    if (this.authService.currentUserValue) {
-      const userRole = this.authService.currentUserValue.role;
-      this.userFullName =
-        this.authService.currentUserValue.firstName +
-        ' ' +
-        this.authService.currentUserValue.lastName;
-      this.userImg = this.authService.currentUserValue.img;
-
-      this.sidebarItems = ROUTES.filter(
-        (x) => x.role.indexOf(userRole) !== -1 || x.role.indexOf('All') !== -1
-      );
-      if (userRole === Role.Admin) {
-        this.userType = Role.Admin;
-      } else if (userRole === Role.Client) {
-        this.userType = Role.Client;
-      } else if (userRole === Role.Employee) {
-        this.userType = Role.Employee;
-      } else {
-        this.userType = Role.Admin;
+    const cookieData = this.cookieS.get('user_data'); // Obtenez le contenu du cookie
+  
+    if (cookieData) {
+      try {
+        const userData = JSON.parse(cookieData); // Décoder le contenu du cookie     
+        const userRole = userData.user.role;
+        const firstName = userData?.user?.firstname || '';
+        const lastName =  userData?.user?.lastname || '';
+        console.log(lastName);
+        this.userFullName = `${firstName} ${lastName}`;
+        this.userImg =userData?.user.profileImage;
+        if (userRole.includes('Admin')) {
+          this.sidebarItems = ROUTES.filter((item) => item.role.includes('Admin'));
+          this.userType = 'Admin';
+        } else if (userRole.includes('Client')) {
+          this.sidebarItems = ROUTES.filter((item) => item.role.includes('Client'));
+          this.userType = 'Client';
+        } else if (userRole.includes('Employe')) {
+          this.sidebarItems = ROUTES.filter((item) => item.role.includes('Employee'));
+          this.userType = 'Employe';
+        } else {
+          this.sidebarItems = [];
+          this.userType = 'Unknown';
+        }
+      } catch (error) {
+        console.error('Erreur lors du décodage du cookie:', error);
+        // Gérez les erreurs de décodage du cookie
       }
+    } else {
+      console.error('Le cookie "user_data" n\'est pas défini');
+      // Gérez le cas où le cookie n'est pas défini
     }
-
-    // this.sidebarItems = ROUTES.filter((sidebarItem) => sidebarItem);
+  
     this.initLeftSidebar();
     this.bodyTag = this.document.body;
   }
@@ -154,10 +169,8 @@ export class SidebarComponent
     }
   }
   logout() {
-    this.subs.sink = this.authService.logout().subscribe((res) => {
-      if (!res.success) {
-        this.router.navigate(['/authentication/signin']);
-      }
-    });
-  }
+this.authService.logout();}
+imageUrl!: string;
+
+
 }

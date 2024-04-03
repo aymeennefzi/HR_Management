@@ -1,7 +1,6 @@
 <section class="content">
   <div class="content-block">
     <div class="block-header">
-      <!-- breadcrumb -->
       <app-breadcrumb [title]="'All Holiday'" [items]="['Holidays']" [active_item]="'All Holiday'">
       </app-breadcrumb>
     </div>
@@ -56,7 +55,6 @@
             <div class="body overflow-auto">
               <div class="responsive_table">
                 <table mat-table [dataSource]="dataSource" matSort class="mat-cell advance-table">
-                  <!-- Checkbox Column -->
                   <ng-container matColumnDef="select">
                     <mat-header-cell *matHeaderCellDef [ngClass]="'tbl-col-width-per-7'">
                       <mat-checkbox (change)="$event ? masterToggle() : null"
@@ -70,7 +68,6 @@
                       </mat-checkbox>
                     </mat-cell>
                   </ng-container>
-                  <!-- ID Column -->
                   <ng-container matColumnDef="id">
                     <mat-header-cell *matHeaderCellDef mat-sort-header>Id</mat-header-cell>
                     <mat-cell *matCellDef="let row">{{row.id}}</mat-cell>
@@ -100,7 +97,6 @@
               <mat-cell *matCellDef="let row"> <span class="truncate-text"> <span
               class="mobile-label">Details:</span>{{row.details}}</span></mat-cell>
             </ng-container>
-            <!-- actions -->
             <ng-container matColumnDef="actions">
               <mat-header-cell *matHeaderCellDef class="pr-0">Actions</mat-header-cell>
               <mat-cell *matCellDef="let row; let i=index;" class="pr-0">
@@ -119,7 +115,6 @@
               [style.cursor]="'pointer'" matRipple>
             </mat-row>
           </table>
-          <!-- Loading spinner -->
           @if (exampleDatabase?.isTblLoading) {
             <div class="tbl-spinner">
               <mat-progress-spinner color="primary" [diameter]="40" mode="indeterminate">

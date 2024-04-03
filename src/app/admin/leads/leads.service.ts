@@ -8,7 +8,7 @@ import { UnsubscribeOnDestroyAdapter } from '@shared';
   providedIn: 'root',
 })
 export class LeadsService extends UnsubscribeOnDestroyAdapter {
-  private readonly API_URL = 'assets/data/leads.jso';
+  private readonly API_URL = 'assets/data/leads.json';
   isTblLoading = true;
   dataChange: BehaviorSubject<Leads[]> = new BehaviorSubject<Leads[]>([]);
   // Temporarily stores data from dialogs
