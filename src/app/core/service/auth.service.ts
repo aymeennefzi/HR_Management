@@ -128,11 +128,11 @@ getUserByTaskId(taskId: string): Observable<any> {
   // Construct the request body
   const requestBody = { taskId: taskId };
   // Make a POST request with the task ID in the body
-  return this.http.post(`${this.apiUrl}/user-by-task`, requestBody);
+  return this.http.post(`${this.apiUrl}/user-by-task/ahmed`, requestBody);
 }
 getUserById(id: string): Observable<any> {
 
-  return this.http.get<any>(`${this.apiUrl}/${id}`);
+  return this.http.get<any>(`${this.apiUrl}/${id}/ahmed`);
 }
 getUserByEmail(email: string): Observable<any> {
   return this.http.get(`${this.apiUrl}/email/${email}`);
