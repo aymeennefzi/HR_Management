@@ -16,6 +16,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { BreadcrumbComponent } from '@shared/components/breadcrumb/breadcrumb.component';
 import { EmployeesService } from '../allEmployees/employees.service';
 import { Router } from '@angular/router';
+import { CookieService } from 'ngx-cookie-service';
 @Component({
   selector: 'app-add-employee',
   templateUrl: './add-employee.component.html',
@@ -36,9 +37,11 @@ import { Router } from '@angular/router';
 })
 export class AddEmployeeComponent {
   docForm: UntypedFormGroup;
+
   hide3 = true;
   agree3 = false;
-  constructor(private fb: UntypedFormBuilder , private employeS : EmployeesService , private router: Router) {
+  constructor(private fb: UntypedFormBuilder , private employeS : EmployeesService , private router: Router,private cookieService:CookieService) {
+
     this.docForm = this.fb.group({
       firstName: ['', [Validators.required, Validators.pattern('[a-zA-Z]+')]],
       lastName: [''],
@@ -54,8 +57,10 @@ export class AddEmployeeComponent {
       roleName: [''],
       soldeConges: [''],
       soldeMaladie: [''],
+
     });
   }
+ 
   onSubmit(): void {
     if (this.docForm.valid) {
       console.log('Form Value', this.docForm.value);

@@ -54,6 +54,7 @@ taskAdd!:any
   user!:any
   users:any[]=[]
   p!:any
+  idEmployee!:string
   constructor(
     public dialogRef: MatDialogRef<FormDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: DialogData,
@@ -88,11 +89,22 @@ taskAdd!:any
        description: ['', [Validators.required]],
        employeeAffected:['', [Validators.required]],
        projectId: [this.data.idProject],
+     
        
     
 
   
     });
+ // Ensure taskForm is initialized and employeeAffected control exists before subscribing to valueChanges
+if (this.taskForm && this.taskForm.get('employeeAffected')) {
+  this.taskForm.get('employeeAffected')?.valueChanges.subscribe((email: string) => {
+    this.authService.getUserByEmail(email).subscribe((data) => {
+      this.idEmployee = data._id;
+      // Now `this.idEmployee` is set reactively based on form changes.
+    });
+  });
+}
+
     this.action =this.data.action;
     if (this.action === 'edit' && this.data.taskId) {
       this.authService.getUserByTaskId( this.data.taskId).subscribe((datauser) => {
@@ -111,7 +123,7 @@ this.user=datauser
           FinishDate : this.task.FinishDate,
           statut : this.task.statut ,
           priority : this.task.priority  ,
-          employeeAffected : this.user._id ,
+          employeeAffected : this.user.email ,
     
         };
 /*     console.log(TSansU) */
@@ -135,11 +147,15 @@ this.user=datauser
     this.dialogRef.close();
   }
   public confirmAdd(): void {
+   
   if(this.data.taskId){
     this.updateT()
     Object.assign(this.data.task, this.taskForm.value);
   }else{
-    this.estimatesService.createTask2(this.taskForm.getRawValue()).subscribe((newTask) => {
+    this.estimatesService.createTask2({
+      ...this.taskForm.value,
+      employeeAffected: this.idEmployee, // Replace the email with the userId
+    }).subscribe((newTask) => {
 
 this.data.tasks.push(newTask)
 
@@ -156,7 +172,7 @@ this.dialogRef.close(this.data.tasks);
       FinishDate:  this.taskForm.value.FinishDate,
       statut: this.taskForm.value.statut,
       priority: this.taskForm.value.priority,
-      employeeAffected:this.taskForm.value.employeeAffected
+      employeeAffected:this.idEmployee
     
   
       // Incluez 'f' si vous ne le mettez pas à jour ici

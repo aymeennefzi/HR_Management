@@ -98,8 +98,8 @@
             <mat-label>employeeAffected</mat-label>
             <mat-select formControlName="employeeAffected" >
               @for (u of users ; track u) {
-              <mat-option  [value]="u._id">
-              {{u._id}}
+              <mat-option  [value]="u.email">
+              {{u.email}}
               </mat-option>
             }
             
