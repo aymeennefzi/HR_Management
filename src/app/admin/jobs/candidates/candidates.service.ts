@@ -9,6 +9,7 @@ import { UnsubscribeOnDestroyAdapter } from '@shared';
 })
 export class CandidatesService extends UnsubscribeOnDestroyAdapter {
   private readonly API_URL = 'http://localhost:3000/application';
+  downloadExcelUrl = `${this.API_URL}/download`;
   isTblLoading = true;
   dataChange: BehaviorSubject<Candidates[]> = new BehaviorSubject<Candidates[]>(
     []
@@ -17,6 +18,12 @@ export class CandidatesService extends UnsubscribeOnDestroyAdapter {
   dialogData!: Candidates;
   constructor(private httpClient: HttpClient) {
     super();
+  }
+  downloadExcel(): Observable<Blob> {
+    // Spécifiez le type de réponse attendue comme Blob
+    return this.httpClient.get(this.downloadExcelUrl, {
+      responseType: 'blob'
+    });
   }
   getcandidates(): Observable<string[]> {
     return this.httpClient.get<string[]>(this.API_URL);
@@ -31,10 +38,11 @@ export class CandidatesService extends UnsubscribeOnDestroyAdapter {
 applyforjob(applicationData: FormData): Observable<any> {
   return this.httpClient.post<any>(this.API_URL, applicationData);;
 }
-deleteCandidate(id: string): Observable<void> {
+deleteCandidate(id: string): Observable<any> {
   const url = `${this.API_URL}/${id}`; // Assurez-vous que c'est le bon endpoint de votre API
-  return this.httpClient.delete<void>(url);
+  return this.httpClient.delete(url);
 }
+
 updateCandidate(id: string, updateCandidateDto: any): Observable<any> {
   const url = `${this.API_URL}/${id}`; // Assurez-vous que l'URL correspond à votre endpoint backend
   return this.httpClient.put(url, updateCandidateDto).pipe(

@@ -317,7 +317,13 @@ export class CandidatesComponent
     );
   }
  
-  
+  downloadExcel(): void {
+    this.candidatesService.downloadExcel().subscribe((data: Blob) => {
+      const blob = new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+      const url = window.URL.createObjectURL(blob);
+      window.open(url);
+    });
+  }
   // export table data in excel file
   exportExcel() {
     // key name with space add in brackets
@@ -326,12 +332,21 @@ export class CandidatesComponent
         Name: x.jobId,
         Email: x.candidateName,
         Mobile: x.email,
-        cv: x.cv,
+        // cv: x.cv,
+        cv: this.extractFileName(x.cv),
        
       }));
 
     TableExportUtil.exportToExcel(exportData, 'excel');
   }
+  extractFileName(filePath: string): string {
+    // Séparer le chemin par les barres obliques pour obtenir les différentes parties du chemin
+    const parts = filePath.split('/');
+    // Prendre la dernière partie qui est le nom du fichier
+    const fileName = parts[parts.length - 1];
+    // Retourner le nom du fichier
+    return fileName;
+}
   showNotification(
     colorName: string,
     text: string,

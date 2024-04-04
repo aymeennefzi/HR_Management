@@ -8,6 +8,7 @@ export interface DialogData {
   title: string;
   email: string;
   name: string;
+  jobId:string
 }
 
 @Component({
@@ -24,15 +25,31 @@ export interface DialogData {
     ],
 })
 export class DeleteDialogComponent {
+  jobId!:string
   constructor(
     public dialogRef: MatDialogRef<DeleteDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: DialogData,
     public candidatesService: CandidatesService
-  ) {}
+  ) {
+    this.jobId = data.jobId;
+  }
   onNoClick(): void {
     this.dialogRef.close();
   }
-  confirmDelete(): void {
-    this.candidatesService.deleteCandidates(this.data.id);
+  // confirmDelete(): void {
+  //   this.candidatesService.deleteCandidates(this.data.id);
+  // }
+  confirmDelete(jobId: string): void {
+    this.candidatesService.deleteCandidate(jobId).subscribe(
+      () => {
+        // Gérer la suppression réussie
+        console.log('Job deleted successfully');
+        // Rafraîchir la liste des jobs si nécessaire
+      },
+      (error) => {
+        // Gérer les erreurs de suppression
+        console.error('Error deleting job:', error);
+      }
+    );
   }
 }
