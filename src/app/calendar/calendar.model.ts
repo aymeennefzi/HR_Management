@@ -1,4 +1,3 @@
-import { formatDate } from '@angular/common';
 export class Calendar {
   _id?: string;
   date !: string; // Ou un autre type de date approprié

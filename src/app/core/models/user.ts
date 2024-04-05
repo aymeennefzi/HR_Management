@@ -1,5 +1,7 @@
 import { Calendar } from 'app/calendar/calendar.model';
 import { Role } from './role';
+import { Message } from 'app/employee/chat/Models/message';
+import { Room } from 'app/employee/chat/Models/room';
 
 export class User {
   _id!: string;
@@ -21,6 +23,9 @@ export class User {
   token !: string ;
   profileImage ?:string ;
   attendances!: Calendar[] ;
+  clientId?: string;
+  messages?: Message[];
+  joinedRooms?: Room[];
 }
 
 export interface UserData {

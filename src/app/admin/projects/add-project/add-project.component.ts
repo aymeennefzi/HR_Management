@@ -17,6 +17,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { BreadcrumbComponent } from '@shared/components/breadcrumb/breadcrumb.component';
+import { NotifcationServiceService } from 'app/layout/header/Notifcation.service';
 @Component({
   selector: 'app-add-project',
   templateUrl: './add-project.component.html',
@@ -48,7 +49,7 @@ export class AddprojectsComponent {
     'Pankaj Patel',
     'Pooja Sharma',
   ];
-  constructor(private fb: UntypedFormBuilder) {
+  constructor(private fb: UntypedFormBuilder , private notificationService:NotifcationServiceService ) {
     this.projectForm = this.fb.group({
       projectID: ['', [Validators.required]],
       projectTitle: ['', [Validators.required]],
@@ -62,6 +63,7 @@ export class AddprojectsComponent {
       status: ['', [Validators.required]],
       fileUpload: [''],
     });
+    
   }
   onSubmit() {
     console.log('Form Value', this.projectForm.value);

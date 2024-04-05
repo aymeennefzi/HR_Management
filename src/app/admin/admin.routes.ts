@@ -1,4 +1,6 @@
 import { Route } from '@angular/router';
+import { BillingComponent } from 'app/client/billing/billing.component';
+import { ChatComponent } from 'app/employee/chat/chat.component';
 
 export const ADMIN_ROUTE: Route[] = [
   {
@@ -10,6 +12,11 @@ export const ADMIN_ROUTE: Route[] = [
     path: 'projects',
     loadChildren: () =>
       import('./projects/projects.routes').then((m) => m.PROJECT_ROUTE),
+  },
+  {
+    path:'mission',
+
+    loadChildren:()=>import('./missions/missions.routes').then((m)=>m.ADMIN_EMPLOYEE_ROUTE)
   },
   {
     path: 'employees',
@@ -60,5 +67,9 @@ export const ADMIN_ROUTE: Route[] = [
     loadChildren: () =>
       import('./reports/reports.routes').then((m) => m.REPORT_ROUTE),
   },
+  {
+    path : 'chat' , component : ChatComponent
+  }
+  
 ];
 

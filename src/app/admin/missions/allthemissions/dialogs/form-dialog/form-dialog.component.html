@@ -1,0 +1,59 @@
+<div class="addContainer">
+    <div class="modalHeader">
+      <div class="editRowModal">
+        <div class="modalHeader clearfix">
+          <h2 mat-dialog-title>{{ dialogTitle }}</h2>
+        </div>
+      </div>
+    </div>
+    <div mat-dialog-content>
+      <form [formGroup]="missionForm" class="register-form m-4">
+        <div class="row">
+          <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 mb-2">
+            <mat-form-field class="example-full-width" appearance="outline">
+              <mat-label>Title</mat-label>
+              <input matInput formControlName="title" required>
+              <mat-error *ngIf="missionForm.get('title')?.hasError('required')">Title is required</mat-error>
+            </mat-form-field>
+          </div>
+          <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 mb-2">
+            <mat-form-field class="example-full-width" appearance="outline">
+              <mat-label>Description</mat-label>
+              <textarea matInput formControlName="description" required></textarea>
+              <mat-error *ngIf="missionForm.get('description')?.hasError('required')">Description is required</mat-error>
+            </mat-form-field>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 mb-2">
+            <mat-form-field class="example-full-width" appearance="outline">
+              <mat-label>Start Date</mat-label>
+              <input matInput [matDatepicker]="startDatePicker" formControlName="startDate" required>
+              <mat-datepicker-toggle matSuffix [for]="startDatePicker"></mat-datepicker-toggle>
+              <mat-datepicker #startDatePicker></mat-datepicker>
+              <mat-error *ngIf="missionForm.get('startDate')?.hasError('required')">Start Date is required</mat-error>
+            </mat-form-field>
+          </div>
+          <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 mb-2">
+            <mat-form-field class="example-full-width" appearance="outline">
+              <mat-label>End Date</mat-label>
+              <input matInput [matDatepicker]="endDatePicker" formControlName="endDate" required>
+              <mat-datepicker-toggle matSuffix [for]="endDatePicker"></mat-datepicker-toggle>
+              <mat-datepicker #endDatePicker></mat-datepicker>
+              <mat-error *ngIf="missionForm.get('endDate')?.hasError('required')">End Date is required</mat-error>
+            </mat-form-field>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-2">
+            <div class="example-button-row" align="end">
+              <button mat-raised-button color="warn" (click)="closeDialog()">Cancel</button>
+              <button mat-raised-button color="primary" (click)="submit()" [disabled]="!missionForm.valid">
+                {{ action === 'edit' ? 'Update' : 'Add' }}
+              </button>
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>

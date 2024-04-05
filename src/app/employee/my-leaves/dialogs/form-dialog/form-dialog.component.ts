@@ -12,6 +12,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { CookieService } from 'ngx-cookie-service';
 import { MyLeavesComponent } from '../../my-leaves.component';
+import { NotifcationServiceService } from 'app/layout/header/Notifcation.service';
 
 export interface DialogData {
   id: number;
@@ -50,7 +51,8 @@ constructor(
   public myLeavesService: MyLeavesService,
   private fb: UntypedFormBuilder,
   private formBuilder: FormBuilder,
-  private cookieService: CookieService
+  private cookieService: CookieService,
+  private notificationService:NotifcationServiceService
 ) {
   // Set the defaults
   this.action = data.action;
@@ -122,7 +124,18 @@ submit() {
     } else {
       this.myLeavesService.addMyLeaves(payload).subscribe({
         next: (data) => {
-          console.log("Add successful!");
+         // console.log("Add successful!");
+         const notificationDetails = {
+          title: 'New Project Added',
+          description: `Project ${payload.name} has been successfully added.`,
+     
+        };
+        
+        this.notificationService.createNotification( notificationDetails).subscribe(() => {
+          alert('Project added and notification sent!');
+        }, error => {
+          console.error('Error sending notification', error);
+        });
         },
         error: (error) => {
           console.error("Error while adding:", error);

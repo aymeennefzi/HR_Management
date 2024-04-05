@@ -103,31 +103,27 @@
                       <mat-cell *matCellDef="let row" (contextmenu)="onContextMenu($event, row)">
                         <span class="mobile-label">Leave type:</span> {{row.leaveType}}</mat-cell>
                       </ng-container>
-                      <ng-container matColumnDef="status">
-                        <mat-header-cell *matHeaderCellDef mat-sort-header> Status
-                        </mat-header-cell>
-                        <mat-cell mat-cell *matCellDef="let row">
-                          <span class="mobile-label">Status:</span>
-                          @if (row.status==='Approved') {
-                            <div>
-                              <span class="badge badge-pill badge-primary col-green">
-                              {{row.status}}</span>
-                            </div>
-                          }
-                          @if (row.status==='Declined') {
-                            <div>
-                              <span class="badge badge-pill badge-primary col-red">
-                              {{row.status}}</span>
-                            </div>
-                          }
-                          @if (row.status==='Pending') {
-                            <div>
-                              <span class="badge badge-pill badge-primary col-blue">
-                              {{row.status}}</span>
-                            </div>
-                          }
-                        </mat-cell>
-                      </ng-container>
+                    <ng-container matColumnDef="status">
+                      <mat-header-cell *matHeaderCellDef mat-sort-header>Status</mat-header-cell>
+                      <mat-cell mat-cell *matCellDef="let row" [ngClass]="{'disabled-row': row.status==='Approved' || row.status==='Declined'}">
+                        <span class="mobile-label">Status:</span>
+                        <div *ngIf="row.status==='Approved'">
+                          <span class="badge badge-pill badge-primary col-green">
+                            {{row.status}}
+                          </span>
+                        </div>
+                        <div *ngIf="row.status==='Declined'">
+                          <span class="badge badge-pill badge-primary col-red">
+                            {{row.status}}
+                          </span>
+                        </div>
+                        <div *ngIf="row.status==='Pending'">
+                          <span class="badge badge-pill badge-primary col-blue">
+                            {{row.status}}
+                          </span>
+                        </div>
+                      </mat-cell>
+                    </ng-container>
                       <ng-container matColumnDef="reason">
                         <mat-header-cell *matHeaderCellDef mat-sort-header>Reason
                         </mat-header-cell>

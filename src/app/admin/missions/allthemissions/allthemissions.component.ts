@@ -1,3 +1,4 @@
+
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { MatDialog } from '@angular/material/dialog';
@@ -9,15 +10,11 @@ import {
   MatSnackBarHorizontalPosition,
   MatSnackBarVerticalPosition,
 } from '@angular/material/snack-bar';
-import { BehaviorSubject, fromEvent, merge, Observable } from 'rxjs';
-import { map, switchMap } from 'rxjs/operators';
-import { FormDialogComponent } from './dialogs/form-dialog/form-dialog.component';
-import { DeleteDialogComponent } from './dialogs/delete/delete.component';
 import { MatMenuTrigger, MatMenuModule } from '@angular/material/menu';
+import { BehaviorSubject, fromEvent, merge, Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 import { SelectionModel } from '@angular/cdk/collections';
 import { UnsubscribeOnDestroyAdapter } from '@shared';
-import { MyLeaves } from './my-leaves.model';
-import { MyLeavesService } from './my-leaves.service';
 import { Direction } from '@angular/cdk/bidi';
 import { TableExportUtil, TableElement } from '@shared';
 import { formatDate, NgClass, DatePipe, CommonModule } from '@angular/common';
@@ -30,15 +27,19 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { BreadcrumbComponent } from '@shared/components/breadcrumb/breadcrumb.component';
-import { CookieService } from 'ngx-cookie-service';
+import { TheMissionService } from './themissions.service';
+import { Mission } from '@core/models/mission';
+import{DeleteComponent} from'./dialogs/delete/delete.component'
+import { FormDialogComponent } from './dialogs/form-dialog/form-dialog.component';
+import { Router } from '@angular/router';
 
 @Component({
-  selector: 'app-my-leaves',
-  templateUrl: './my-leaves.component.html',
-  styleUrls: ['./my-leaves.component.scss'],
+  selector: 'app-allthemissions',
+  templateUrl: './allthemissions.component.html',
+  styleUrls: ['./allthemissions.component.scss'],
   standalone: true,
   imports: [
-    BreadcrumbComponent,
+  BreadcrumbComponent,
     MatTooltipModule,
     MatButtonModule,
     MatIconModule,
@@ -51,38 +52,34 @@ import { CookieService } from 'ngx-cookie-service';
     MatProgressSpinnerModule,
     MatMenuModule,
     MatPaginatorModule,
-    DatePipe,
-    CommonModule
+    DatePipe,CommonModule
   ],
 })
-export class MyLeavesComponent
+export class AllthemissionsComponent
   extends UnsubscribeOnDestroyAdapter
   implements OnInit
 {
   displayedColumns = [
     'select',
-    'startDate',
-    'startTime',
-    'endDate',
-    'endTime',
-    'leaveType',
+    'name',
+    'description',
     'status',
-    'reason',
+    'startDate',
+    'endDate',
     'actions',
   ];
-
-  exampleDatabase?: MyLeavesService | null;
+  exampleDatabase?: TheMissionService;
   dataSource!: ExampleDataSource;
-  selection = new SelectionModel<MyLeaves>(true, []);
+  selection = new SelectionModel<Mission>(true, []);
+  index?: string;
   id?: string;
-  index?: number;
-  myLeaves?: MyLeaves | null;
+  mission?: Mission;
   constructor(
     public httpClient: HttpClient,
     public dialog: MatDialog,
-    public myLeavesService: MyLeavesService,
+    public missionsService: TheMissionService,
     private snackBar: MatSnackBar,
-    private cookieService : CookieService 
+    private r:Router
   ) {
     super();
   }
@@ -92,9 +89,11 @@ export class MyLeavesComponent
   @ViewChild(MatMenuTrigger)
   contextMenu?: MatMenuTrigger;
   contextMenuPosition = { x: '0px', y: '0px' };
-
   ngOnInit() {
     this.loadData();
+  }
+  route(id:string){
+    this.r.navigate(['admin/mission/assignusertomission/'+id])
   }
   refresh() {
     this.loadData();
@@ -108,7 +107,7 @@ export class MyLeavesComponent
     }
     const dialogRef = this.dialog.open(FormDialogComponent, {
       data: {
-        myLeaves: this.myLeaves,
+        missions: this.mission,
         action: 'add',
       },
       direction: tempDirection,
@@ -116,9 +115,9 @@ export class MyLeavesComponent
     this.subs.sink = dialogRef.afterClosed().subscribe((result) => {
       if (result === 1) {
         // After dialog is closed we're doing frontend updates
-        // For add we're just pushing a new row inside DataService
+        // For add we're just pushing a new row inside DataServicex
         this.exampleDatabase?.dataChange.value.unshift(
-          this.myLeavesService.getDialogData()
+          this.missionsService.getDialogData()
         );
         this.refreshTable();
         this.showNotification(
@@ -130,7 +129,8 @@ export class MyLeavesComponent
       }
     });
   }
-  editCall(row: MyLeaves) {
+  editCall(row: Mission) {
+    
     this.id = row._id;
     let tempDirection: Direction;
     if (localStorage.getItem('isRtl') === 'true') {
@@ -140,7 +140,8 @@ export class MyLeavesComponent
     }
     const dialogRef = this.dialog.open(FormDialogComponent, {
       data: {
-        myLeaves: row,
+     mission: row,
+      id:row._id,
         action: 'edit',
       },
       direction: tempDirection,
@@ -152,9 +153,9 @@ export class MyLeavesComponent
           (x) => x._id === this.id
         );
         // Then you update that record using data from dialogData (values you enetered)
-        if (foundIndex != null && this.exampleDatabase) {
+        if (foundIndex !== undefined && this.exampleDatabase !== undefined) {
           this.exampleDatabase.dataChange.value[foundIndex] =
-            this.myLeavesService.getDialogData();
+            this.missionsService.getDialogData();
           // And lastly refresh table
           this.refreshTable();
           this.showNotification(
@@ -165,10 +166,8 @@ export class MyLeavesComponent
           );
         }
       }
-    });
-  }
- 
- deleteItem(i: number, row: MyLeaves) {
+    });  }
+  deleteItem(i: string, row: Mission) {
     this.index = i;
     this.id = row._id;
     let tempDirection: Direction;
@@ -178,10 +177,10 @@ export class MyLeavesComponent
       tempDirection = 'ltr';
     }
 
-    const dialogRef = this.dialog.open(DeleteDialogComponent, {
+    const dialogRef = this.dialog.open(DeleteComponent, {
       height: '270px',
       width: '300px',
-      data: row,
+      data: { id: row._id, title: row.title, description: row.description, status: row.status, startdate: row.startDate, enddate: row.endDate },
       direction: tempDirection,
     });
     this.subs.sink = dialogRef.afterClosed().subscribe((result) => {
@@ -191,7 +190,7 @@ export class MyLeavesComponent
         );
         // for delete we use splice in order to remove single object from DataService
         if (foundIndex !== undefined && this.exampleDatabase !== undefined) {
-          this.exampleDatabase?.dataChange.value.splice(foundIndex, 1);
+          this.exampleDatabase.dataChange.value.splice(foundIndex, 1);
           this.refreshTable();
           this.showNotification(
             'snackbar-danger',
@@ -222,31 +221,32 @@ export class MyLeavesComponent
         );
   }
   removeSelectedRows() {
-    const totalSelect = this.selection.selected.length;
-    this.selection.selected.forEach((item) => {
-      const index: number = this.dataSource.renderedData.findIndex(
-        (d) => d === item
-      );
-      // console.log(this.dataSource.renderedData.findIndex((d) => d === item));
-      this.exampleDatabase?.dataChange.value.splice(index, 1);
-      this.refreshTable();
-      this.selection = new SelectionModel<MyLeaves>(true, []);
-    });
-    this.showNotification(
-      'snackbar-danger',
-      totalSelect + ' Record Delete Successfully...!!!',
-      'bottom',
-      'center'
-    );
+      let selectedMissionIds;
+      selectedMissionIds = this.selection.selected.map(item => item._id);
+      const totalSelect = selectedMissionIds.length;
+
+      if (totalSelect > 0) {
+        this.missionsService.deleteMultipleMissions(selectedMissionIds).subscribe(
+          () => {
+            // Suppression réussie, effectuez les actions nécessaires
+            this.selection.clear();
+            this.refreshTable();
+          },
+          (error) => {
+            // Gérez les erreurs de suppression
+            console.error('Erreur lors de la suppression des missions:', error);
+          }
+        );
+      }
   }
   public loadData() {
-    this.exampleDatabase = new MyLeavesService(this.httpClient);
+    this.exampleDatabase = new TheMissionService(this.httpClient);
     this.dataSource = new ExampleDataSource(
       this.exampleDatabase,
       this.paginator,
-      this.sort,
-      this.cookieService
+      this.sort
     );
+
     this.subs.sink = fromEvent(this.filter.nativeElement, 'keyup').subscribe(
       () => {
         if (!this.dataSource) {
@@ -256,7 +256,21 @@ export class MyLeavesComponent
       }
     );
   }
+  // export table data in excel file
+  exportExcel() {
+    // key name with space add in brackets
+    const exportData: Partial<TableElement>[] =
+      this.dataSource.filteredData.map((x) => ({
+        Title: x.title,
+        Description: x.description,
+        Status: x.status,
+        'Start Date': formatDate(new Date(x.startDate), 'yyyy-MM-dd', 'en') || '',
+        'End Date': formatDate(new Date(x.endDate), 'yyyy-MM-dd', 'en') || '',
+      }));
 
+    TableExportUtil.exportToExcel(exportData, 'excel');
+  }
+  
   showNotification(
     colorName: string,
     text: string,
@@ -271,18 +285,11 @@ export class MyLeavesComponent
     });
   }
   // context menu
-  onContextMenu(event: MouseEvent, item: MyLeaves) {
-    event.preventDefault();
-    this.contextMenuPosition.x = event.clientX + 'px';
-    this.contextMenuPosition.y = event.clientY + 'px';
-    if (this.contextMenu !== undefined && this.contextMenu.menu !== null) {
-      this.contextMenu.menuData = { item: item };
-      this.contextMenu.menu.focusFirstItem('mouse');
-      this.contextMenu.openMenu();
-    }
+  onContextMenu(event: MouseEvent, item: Mission) {
+    // Ajoutez ici votre logique pour afficher le menu contextuel
   }
 }
-export class ExampleDataSource extends DataSource<MyLeaves> {
+export class ExampleDataSource extends DataSource<Mission> {
   filterChange = new BehaviorSubject('');
   get filter(): string {
     return this.filterChange.value;
@@ -290,96 +297,105 @@ export class ExampleDataSource extends DataSource<MyLeaves> {
   set filter(filter: string) {
     this.filterChange.next(filter);
   }
-  filteredData: MyLeaves[] = [];
-  renderedData: MyLeaves[] = [];
+  filteredData: Mission[] = [];
+  renderedData: Mission[] = [];
   constructor(
-    public exampleDatabase: MyLeavesService,
+    public exampleDatabase: TheMissionService,
     public paginator: MatPaginator,
-    public _sort: MatSort,
-    private cookieService: CookieService 
+    public _sort: MatSort
   ) {
     super();
     // Reset to the first page when the user changes the filter.
     this.filterChange.subscribe(() => (this.paginator.pageIndex = 0));
   }
-  connect(): Observable<MyLeaves[]> {
-    // Écouter les changements de données de base, de tri, de filtrage ou de pagination
+  /** Connect function called by the table to retrieve one stream containing the data to render. */
+  connect(): Observable<Mission[]> {
+    // Listen for any changes in the base data, sorting, filtering, or pagination
     const displayDataChanges = [
       this.exampleDatabase.dataChange,
       this._sort.sortChange,
       this.filterChange,
       this.paginator.page,
     ];
-    
-    // Récupérer l'ID de l'utilisateur à partir du cookie
-    const cookieData = this.cookieService.get('user_data');
-    const userData = JSON.parse(cookieData);
-    const userId = userData.user.id;
-    
+    this.exampleDatabase.getAllMissions();
     return merge(...displayDataChanges).pipe(
-      switchMap(() => {
-        // Appeler la méthode pour obtenir les congés de l'utilisateur par son ID
-        return this.exampleDatabase.getleavesByemployeeId(userId);
-      }),
-      map((leaves: MyLeaves[]) => {
+      map(() => {
         // Filter data
-        const filteredData = leaves.filter((myLeaves: MyLeaves) => {
-          const searchStr = (
-            myLeaves.leaveType +
-            myLeaves.startDate +
-            myLeaves.startTime +
-            myLeaves.endDate +
-            myLeaves.endTime +
-            myLeaves.reason
-          ).toLowerCase();
-          return searchStr.indexOf(this.filter.toLowerCase()) !== -1;
-        });
+        this.filteredData = this.exampleDatabase.data
+          .slice()
+          .filter((missions: Mission) => {
+            const searchStr = (
+              missions.title +
+              missions.description +
+              missions.status +
+              missions.startDate +
+              missions.endDate
+            ).toLowerCase();
+            return searchStr.indexOf(this.filter.toLowerCase()) !== -1;
+          });
         // Sort filtered data
-        const sortedData = this.sortData(filteredData);
-        // Paginate sorted data
+        const sortedData = this.sortData(this.filteredData.slice());
+        // Grab the page's slice of the filtered sorted data.
         const startIndex = this.paginator.pageIndex * this.paginator.pageSize;
-        const endIndex = startIndex + this.paginator.pageSize;
-        const renderedData = sortedData.slice(startIndex, endIndex);
-        return renderedData;
+        this.renderedData = sortedData.splice(
+          startIndex,
+          this.paginator.pageSize
+        );
+        return this.renderedData;
       })
     );
   }
-  
-  
   disconnect() {
-    //disconnect
+    // disconnect
   }
   /** Returns a sorted copy of the database data. */
-  sortData(data: MyLeaves[]): MyLeaves[] {
+  sortData(data: Mission[]): Mission[] {
     if (!this._sort.active || this._sort.direction === '') {
       return data;
     }
     return data.sort((a, b) => {
-      let propertyA: number | string = '';
-      let propertyB: number | string = '';
+      let propertyA: string | undefined = '';
+      let propertyB: string | undefined = '';
       switch (this._sort.active) {
         case 'id':
-          [propertyA, propertyB] = [a._id, b._id];
+          propertyA = a._id ? a._id.toString() : undefined;
+          propertyB = b._id ? b._id.toString() : undefined;
           break;
-        case 'leavetype':
-          [propertyA, propertyB] = [a.leaveType, b.leaveType];
+        case 'name':
+          [propertyA, propertyB] = [a.title, b.title];
+          break;
+        case 'description':
+          [propertyA, propertyB] = [a.description, b.description];
           break;
         case 'status':
           [propertyA, propertyB] = [a.status, b.status];
           break;
-        case 'startdate':
+        case 'startDate':
           [propertyA, propertyB] = [a.startDate, b.startDate];
           break;
         case 'endDate':
           [propertyA, propertyB] = [a.endDate, b.endDate];
           break;
       }
-      const valueA = isNaN(+propertyA) ? propertyA : +propertyA;
-      const valueB = isNaN(+propertyB) ? propertyB : +propertyB;
-      return (
-        (valueA < valueB ? -1 : 1) * (this._sort.direction === 'asc' ? 1 : -1)
-      );
+  
+      // Vérifiez si propertyA et propertyB sont définis
+      if (propertyA !== undefined && propertyB !== undefined) {
+        const valueA = isNaN(+propertyA) ? propertyA : +propertyA;
+        const valueB = isNaN(+propertyB) ? propertyB : +propertyB;
+  
+        // Si l'une des valeurs est indéfinie, placer l'élément à la fin
+        if (propertyA === undefined || propertyB === undefined) {
+          return propertyA === undefined ? 1 : -1;
+        }
+  
+        return (valueA < valueB ? -1 : 1) * (this._sort.direction === 'asc' ? 1 : -1);
+      } else {
+        // Si l'une des valeurs est indéfinie, placer l'élément à la fin
+        return propertyA === undefined ? 1 : -1;
+      }
     });
   }
-}
+  
+  
 
+}

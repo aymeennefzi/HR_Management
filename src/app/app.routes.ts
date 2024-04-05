@@ -44,24 +44,9 @@ export const APP_ROUTE: Route[] = [
           import('./task/task.routes').then((m) => m.TASK_ROUTE),
       },
       {
-        path: 'contacts',
-        loadChildren: () =>
-          import('./contacts/contacts.routes').then((m) => m.CONTACT_ROUTE),
-      },
-      {
         path: 'email',
         loadChildren: () =>
           import('./email/email.routes').then((m) => m.EMAIL_ROUTE),
-      },
-      {
-        path: 'apps',
-        loadChildren: () =>
-          import('./apps/apps.routes').then((m) => m.APPS_ROUTE),
-      },
-      {
-        path: 'widget',
-        loadChildren: () =>
-          import('./widget/widget.routes').then((m) => m.WIDGET_ROUTE),
       },
       {
         path: 'ui',

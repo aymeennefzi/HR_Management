@@ -59,7 +59,7 @@ export class CalendarService {
   }
 
   updateAttendanceList(personnelId: string, attend: Calendar[]): Observable<void> {
-    return this.httpClient.post<void>(this.API_URL + "/" + personnelId , attend);
+    return this.httpClient.post<void>(this.API_URL + "/att/" + personnelId , attend);
   }
   getAttendancesForUser(userId: string): Observable<Calendar[]> {
     return this.httpClient.get<Calendar[]>(this.API_URL + "/" +  userId);

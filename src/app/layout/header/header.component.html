@@ -61,16 +61,16 @@
                 <div class="noti-list header-menu">
                   <div class="menu">
                     @for (notification of notifications; track notification) {
-                    <button mat-menu-item onClick="return false;" [ngClass]="[notification.status]">
-                      <span class="table-img msg-user ">
+                    <button mat-menu-item onClick="return false;" [ngClass]="[notification.title]">
+                      <!-- <span class="table-img msg-user ">
                         <i class="material-icons-outlined nfc-type-icon"
                           [ngClass]="[notification.color]">{{notification.icon}}</i>
-                      </span>
+                      </span> -->
                       <span class="menu-info">
-                        <span class="menu-title">{{notification.message}}</span>
-                        <span class="menu-desc mt-2">
+                        <span class="menu-title">{{notification.description}}</span>
+                        <!-- <span class="menu-desc mt-2">
                           <i class="material-icons">access_time</i> {{notification.time}}
-                        </span>
+                        </span> -->
                       </span>
                       <span class="nfc-close">
                         <app-feather-icons [icon]="'x'" [class]="'user-menu-icons'"></app-feather-icons>

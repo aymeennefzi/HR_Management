@@ -32,6 +32,7 @@
     "@fullcalendar/interaction": "^6.1.11",
     "@fullcalendar/list": "^6.1.9",
     "@fullcalendar/timegrid": "^6.1.9",
+    "@ionic/angular": "^7.8.3",
     "@ngx-loading-bar/core": "^6.0.2",
     "@ngx-loading-bar/router": "^6.0.2",
     "@ngx-translate/core": "^15.0.0",
@@ -47,6 +48,7 @@
     "browser-sync": "^3.0.2",
     "chart.js": "^4.4.0",
     "core-js": "^3.33.3",
+    "debounce-decorator-ts": "^1.0.4",
     "echarts": "^5.4.3",
     "jsonwebtoken": "^9.0.2",
     "moment": "^2.29.4",
@@ -59,9 +61,10 @@
     "ngx-gauge": "^8.0.0",
     "ngx-mask": "^17.0.0",
     "ngx-scrollbar": "^13.0.3",
+    "ngx-socket-io": "^4.6.1",
     "rxjs": "~7.8.1",
     "subsink": "^1.0.2",
-    "sweetalert2": "^11.10.6",
+    "sweetalert2": "^11.6.13",
     "tslib": "^2.6.2",
     "xlsx": "^0.18.5",
     "zone.js": "~0.14.2"
@@ -89,6 +92,7 @@
     "karma-coverage": "~2.2.1",
     "karma-jasmine": "~5.1.0",
     "karma-jasmine-html-reporter": "~2.1.0",
-    "typescript": "~5.2.2"
+    "typescript": "~5.2.2",
+    "webpack": "^5.91.0"
   }
 }

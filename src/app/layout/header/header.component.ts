@@ -1,4 +1,4 @@
-import { DOCUMENT, NgClass } from '@angular/common';
+import { CommonModule, DOCUMENT, NgClass } from '@angular/common';
 import {
   Component,
   Inject,
@@ -15,6 +15,8 @@ import { MatMenuModule } from '@angular/material/menu';
 import { FeatherIconsComponent } from '@shared/components/feather-icons/feather-icons.component';
 import { MatButtonModule } from '@angular/material/button';
 import { CookieService } from 'ngx-cookie-service';
+import { NotifcationServiceService } from './Notifcation.service';
+import { CreateNotificationsDto } from './createNotifications.dto';
 
 interface Notifications {
   message: string;
@@ -36,6 +38,7 @@ interface Notifications {
     FeatherIconsComponent,
     MatMenuModule,
     NgScrollbar,
+    CommonModule
   ],
 })
 export class HeaderComponent
@@ -62,7 +65,8 @@ export class HeaderComponent
     private authService: AuthService,
     private router: Router,
     public languageService: LanguageService,
-    private cookieService: CookieService
+    private cookieService: CookieService,
+    private notificationService : NotifcationServiceService
 
   ) {
     super();
@@ -72,64 +76,58 @@ export class HeaderComponent
     { text: 'Spanish', flag: 'assets/images/flags/spain.jpg', lang: 'es' },
     { text: 'German', flag: 'assets/images/flags/germany.jpg', lang: 'de' },
   ];
-  notifications: Notifications[] = [
-    {
-      message: 'Please check your mail',
-      time: '14 mins ago',
-      icon: 'mail',
-      color: 'nfc-green',
-      status: 'msg-unread',
-    },
-    {
-      message: 'New Employee Added..',
-      time: '22 mins ago',
-      icon: 'person_add',
-      color: 'nfc-blue',
-      status: 'msg-read',
-    },
-    {
-      message: 'Your leave is approved!! ',
-      time: '3 hours ago',
-      icon: 'event_available',
-      color: 'nfc-orange',
-      status: 'msg-read',
-    },
-    {
-      message: 'Lets break for lunch...',
-      time: '5 hours ago',
-      icon: 'lunch_dining',
-      color: 'nfc-blue',
-      status: 'msg-read',
-    },
-    {
-      message: 'Employee report generated',
-      time: '14 mins ago',
-      icon: 'description',
-      color: 'nfc-green',
-      status: 'msg-read',
-    },
-    {
-      message: 'Please check your mail',
-      time: '22 mins ago',
-      icon: 'mail',
-      color: 'nfc-red',
-      status: 'msg-read',
-    },
-    {
-      message: 'Salary credited...',
-      time: '3 hours ago',
-      icon: 'paid',
-      color: 'nfc-purple',
-      status: 'msg-read',
-    },
-  ];
+  notifications: any[] = [];
+  notificationsCount: string = ''; 
+
   userData: any; 
   ngOnInit() {
     const cookieData = this.cookieService.get('user_data');
     if (cookieData) {
       this.userData = JSON.parse(cookieData);
     }
+    this.notificationService.notificationListener().subscribe({
+      next: (notification: any) => {
+        this.notificationService.getNotifications().subscribe({
+          next: (notifications) => {
+            this.notifications = notifications;
+            console.log(notifications)
+            // Mettez à jour ici pour compter seulement les notifications non vues
+            this.updateNotificationsCount();
+          },
+          error: (err) => console.error(err)
+        });
+        this.notifications.unshift(notification); // Add the new notification to the beginning of the list
+        this.updateNotificationsCount(true);
+        console.log("jjbhuftf" , notification)
+      },
+      error: (err) => console.error(err)
+    });
   }
+  openNotifications() {
+    this.notificationsCount = ''; // Réinitialise le compteur à une chaîne vide
+    // Marquer toutes les notifications comme vues ici
+    this.markNotificationsAsSeen();
+  }
+  updateNotificationsCount(isNew: boolean = false) {
+    if(isNew) {
+      // Incrémenter le compteur pour une nouvelle notification
+      const count = parseInt(this.notificationsCount || '0', 10);
+      this.notificationsCount = (count + 1).toString();
+    } else {
+      // Compter seulement les notifications non vues pour l'initialisation
+      const unseenCount = this.notifications.filter(not => !not.isSeen).length;
+      this.notificationsCount = unseenCount > 0 ? unseenCount.toString() : '';
+    }
+  }
+  markNotificationsAsSeen() {
+    // Mettez à jour vos notifications pour les marquer comme vues, par exemple, en faisant une requête PATCH au serveur
+    // Supposons que le serveur marque toutes les notifications comme vues et renvoie le total des notifications mises à jour
+    this.notificationService.updateUnseenNotificationByIds({notifications_ids: this.notifications.filter(not => !not.isSeen).map(not => not._id)}).subscribe(() => {
+      this.notifications.forEach(not => not.isSeen = true);
+      this.notificationsCount = ''; // Assurez-vous que le compteur est réinitialisé après la mise à jour
+    });
+  }
+
 
   callFullscreen() {
     if (!this.isFullScreen) {
