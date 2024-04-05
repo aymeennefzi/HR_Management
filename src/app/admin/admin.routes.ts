@@ -44,6 +44,11 @@ export const ADMIN_ROUTE: Route[] = [
       import('./holidays/holidays.routes').then((m) => m.HOLIDAY_ROUTE),
   },
   {
+    path: 'departements',
+    loadChildren: () =>
+      import('./departements/departements.routes').then((m) => m.ADMIN_DEPARTEMENT_ROUTE),
+  },
+  {
     path: 'attendance',
     loadChildren: () =>
       import('./attendance/attendance.routes').then((m) => m.ATTENDANCE_ROUTE),

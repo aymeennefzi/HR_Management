@@ -14,7 +14,7 @@ export const PROJECT_ROUTE: Route[] = [
     component: AllprojectsComponent,
   },
   {
-    path: "estimates",
+    path: "estimates/:_id",
     component: EstimatesComponent,
   },
   {

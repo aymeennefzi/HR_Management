@@ -1,0 +1,69 @@
+.truncate-text {
+    overflow: hidden;
+    white-space: pre-wrap;
+    text-overflow: ellipsis;
+    word-wrap: break-word;
+    min-width: 200px;
+}
+.tag-container {
+    display: flex;
+    flex-wrap: wrap;
+  }
+.tag {
+    overflow: hidden;
+    white-space: pre-wrap;
+    text-overflow: ellipsis;
+    word-wrap: break-word;
+    min-width: 200px;
+    background-color: #e0e0e0;
+  color: #333;
+  padding: 5px 10px;
+  margin: 2px;
+  border-radius: 3px;
+}
+.description-column {
+    min-width: 200px; /* Définir une largeur fixe pour la cellule de description */
+}
+.description-tooltip {
+//     overflow: hidden;
+//     text-overflow: ellipsis;
+//     white-space: nowrap;
+//     min-width: 300px; /* ajustez la largeur maximale selon vos besoins */
+//     cursor: pointer;
+//     white-space: pre-wrap; /* Permettre au texte de s'étendre sur plusieurs lignes */
+//   word-wrap: break-word; 
+//   overflow-x: auto;/* curseur pointer pour indiquer que c'est cliquable */ 
+overflow-x: auto; /* Activer le défilement horizontal si nécessaire */
+ /* Curseur pointer pour indiquer que c'est cliquable */
+white-space: pre-wrap; /* Permettre au texte de s'étendre sur plusieurs lignes */
+word-wrap: break-word; /* Forcer les mots longs à se casser */
+}
+.mat-cell {
+    min-width: 100px; /* Définir une largeur minimale pour les cellules */
+    overflow: hidden;
+    text-overflow: ellipsis; /* Tronquer le texte avec des points de suspension s'il est trop long */
+    // white-space: nowrap;
+    overflow-x: auto; /* Empêcher le texte de passer à la ligne */
+    white-space: pre-wrap; /* Permettre au texte de s'étendre sur plusieurs lignes */
+word-wrap: break-word;
+  }
+  .column-header {
+    width: 150px; /* Largeur fixe pour la colonne du titre */
+  }
+  
+  .column-cell {
+    width: 200px; /* Largeur fixe ou flexible pour les cellules de la colonne */
+  }
+/* Exemple de définition des classes de couleur */
+.col-green {
+    color: green; /* Définition de la couleur du texte */
+  }
+  
+  .col-red {
+    color: red; /* Définition de la couleur du texte */
+  }
+  
+  .col-black {
+    color: black; /* Définition de la couleur du texte */
+  }
+  

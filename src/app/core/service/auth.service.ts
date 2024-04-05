@@ -124,7 +124,19 @@ export class AuthService {
   getUserData(): Observable<UserData> {
     return this.userData$;
   }
+getUserByTaskId(taskId: string): Observable<any> {
+  // Construct the request body
+  const requestBody = { taskId: taskId };
+  // Make a POST request with the task ID in the body
+  return this.http.post(`${this.apiUrl}/user-by-task/ahmed`, requestBody);
+}
+getUserById(id: string): Observable<any> {
 
+  return this.http.get<any>(`${this.apiUrl}/${id}/ahmed`);
+}
+getUserByEmail(email: string): Observable<any> {
+  return this.http.get(`${this.apiUrl}/email/${email}`);
+}
   resetPassword(newPassword: string, pinCode: string): Observable<void> {
     const resetPasswordDto = { newPassword, pinCode };
     return this.http.post<void>(this.apiUrl + "/reset-password", resetPasswordDto);

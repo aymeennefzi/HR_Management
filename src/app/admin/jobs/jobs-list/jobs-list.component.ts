@@ -1,10 +1,10 @@
-import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { JobsListService } from './jobs-list.service';
 import { HttpClient } from '@angular/common/http';
-import { MatDialog } from '@angular/material/dialog';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
 import { MatSort, MatSortModule } from '@angular/material/sort';
-import { JobsList } from './jobs-list.model';
+import { JobsList, Skill } from './jobs-list.model';
 import { DataSource } from '@angular/cdk/collections';
 import {
   MatSnackBar,
@@ -20,9 +20,9 @@ import { SelectionModel } from '@angular/cdk/collections';
 import { UnsubscribeOnDestroyAdapter } from '@shared';
 import { Direction } from '@angular/cdk/bidi';
 import { TableExportUtil, TableElement } from '@shared';
-import { formatDate, NgClass, DatePipe } from '@angular/common';
+import { formatDate, NgClass, DatePipe, CommonModule } from '@angular/common';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { MatRippleModule } from '@angular/material/core';
+import { MatOptionModule, MatRippleModule } from '@angular/material/core';
 import { FeatherIconsComponent } from '@shared/components/feather-icons/feather-icons.component';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatTableModule } from '@angular/material/table';
@@ -30,12 +30,19 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { BreadcrumbComponent } from '@shared/components/breadcrumb/breadcrumb.component';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatSelectModule } from '@angular/material/select';
+import { MatChipListbox, MatChipsModule } from '@angular/material/chips';
+import { ChipsComponent } from 'app/ui/chips/chips.component';
+import { FormsModule } from '@angular/forms';
+import { MatInputModule } from '@angular/material/input';
 
 @Component({
   selector: 'app-jobs-list',
   templateUrl: './jobs-list.component.html',
   styleUrls: ['./jobs-list.component.scss'],
   standalone: true,
+  providers: [JobsListService],
   imports: [
     BreadcrumbComponent,
     MatTooltipModule,
@@ -46,11 +53,21 @@ import { BreadcrumbComponent } from '@shared/components/breadcrumb/breadcrumb.co
     NgClass,
     MatCheckboxModule,
     FeatherIconsComponent,
+    MatDialogModule,
     MatRippleModule,
     MatProgressSpinnerModule,
+    MatFormFieldModule,
+    MatSelectModule,
+    MatInputModule,
+    MatOptionModule,
     MatMenuModule,
     MatPaginatorModule,
     DatePipe,
+    CommonModule,
+    FormsModule,
+    MatChipsModule,
+    ChipsComponent,
+    MatChipListbox
   ],
 })
 export class JobsListComponent
@@ -59,32 +76,47 @@ export class JobsListComponent
 {
   displayedColumns = [
     'select',
+    
     'title',
-    'department',
-    'role',
-    'jobType',
-    'vacancies',
+    'description',
+    'requiredSkills',
+    'location',
+    'contractType',
+    'salary',
+    'applicationDeadline',
+    'publicationDate',
     'status',
-    'date',
-    'actions',
+    'recruitingManager',
+    'applicants',
+   
+    'actions'
   ];
   exampleDatabase?: JobsListService;
+  // newSkill: Skill = { name: '' };
+  // skill: Skill = 
   dataSource!: ExampleDataSource;
   selection = new SelectionModel<JobsList>(true, []);
   index?: number;
-  id?: number;
+  id?: string;
   jobsList?: JobsList;
+  // newSkill: Skill = new Skill();
+  newSkill: Skill = {  name: '', };
+
+
+  skills: Skill[] = [];
   constructor(
     public httpClient: HttpClient,
     public dialog: MatDialog,
     public jobsListService: JobsListService,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
+    
   ) {
     super();
   }
   @ViewChild(MatPaginator, { static: true }) paginator!: MatPaginator;
   @ViewChild(MatSort, { static: true }) sort!: MatSort;
   @ViewChild('filter', { static: true }) filter!: ElementRef;
+  @ViewChild('addSkillDialogContent') addSkillDialogContent!: TemplateRef<any>;
   @ViewChild(MatMenuTrigger)
   contextMenu?: MatMenuTrigger;
   contextMenuPosition = { x: '0px', y: '0px' };
@@ -126,7 +158,7 @@ export class JobsListComponent
     });
   }
   editCall(row: JobsList) {
-    this.id = row.id;
+    this.id = row._id;
     let tempDirection: Direction;
     if (localStorage.getItem('isRtl') === 'true') {
       tempDirection = 'rtl';
@@ -135,6 +167,7 @@ export class JobsListComponent
     }
     const dialogRef = this.dialog.open(FormDialogComponent, {
       data: {
+        id: row._id,
         jobsList: row,
         action: 'edit',
       },
@@ -144,7 +177,7 @@ export class JobsListComponent
       if (result === 1) {
         // When using an edit things are little different, firstly we find record inside DataService by id
         const foundIndex = this.exampleDatabase?.dataChange.value.findIndex(
-          (x) => x.id === this.id
+          (x) => x._id === this.id
         );
         // Then you update that record using data from dialogData (values you enetered)
         if (foundIndex != null && this.exampleDatabase) {
@@ -164,7 +197,7 @@ export class JobsListComponent
   }
   deleteItem(i: number, row: JobsList) {
     this.index = i;
-    this.id = row.id;
+    this.id = row._id;
     let tempDirection: Direction;
     if (localStorage.getItem('isRtl') === 'true') {
       tempDirection = 'rtl';
@@ -172,15 +205,16 @@ export class JobsListComponent
       tempDirection = 'ltr';
     }
     const dialogRef = this.dialog.open(DeleteDialogComponent, {
+      // data: { jobId: this.jobsList?._id },
       height: '280px',
       width: '380px',
-      data: row,
+      data: { jobId: row._id },
       direction: tempDirection,
     });
     this.subs.sink = dialogRef.afterClosed().subscribe((result) => {
       if (result === 1) {
         const foundIndex = this.exampleDatabase?.dataChange.value.findIndex(
-          (x) => x.id === this.id
+          (x) => x._id === this.id
         );
         // for delete we use splice in order to remove single object from DataService
         if (foundIndex != null && this.exampleDatabase) {
@@ -249,18 +283,43 @@ export class JobsListComponent
       }
     );
   }
+  openAddSkillDialog(): void {
+    this.dialog.open(this.addSkillDialogContent);
+  }
+
+  closeAddSkillDialog(): void {
+    this.dialog.closeAll();
+  }
+  
+  addSkill(): void {
+    this.jobsListService.addSkill(this.newSkill)
+      .subscribe((addedSkill: Skill) => {
+        console.log('Skill added:', addedSkill);
+        alert('skill added');
+        // Vous pouvez effectuer d'autres actions ici après l'ajout réussi
+        this.newSkill = {  name: '' }; // Réinitialiser le nouveau skill
+      }, (error) => {
+        console.error('Error adding skill:', error);
+        // Gérer l'erreur ici
+      });
+  }
   // export table data in excel file
   exportExcel() {
     // key name with space add in brackets
     const exportData: Partial<TableElement>[] =
       this.dataSource.filteredData.map((x) => ({
-        'Job Title': x.title,
-        Department: x.department,
-        Role: x.role,
-        'Job Type': x.jobType,
-        Vacancies: x.vacancies,
-        Status: x.status,
-        Date: formatDate(new Date(x.date), 'yyyy-MM-dd', 'en') || '',
+        Title: x.title,
+        Description: x.description,
+        requiredSkills: x.requiredSkills.join(', '), // Convertit le tableau de compétences en une chaîne séparée par des virgules
+        Location: x.location,
+        contractType: x.contractType,
+        salary: x.salary,
+        applicationDeadline: formatDate(x.applicationDeadline, 'yyyy-MM-dd', 'en'),
+        status: x.status,
+        publicationDate: formatDate(x.publicationDate, 'yyyy-MM-dd', 'en'),
+        recruitingManager: x.recruitingManager,
+        
+
       }));
 
     TableExportUtil.exportToExcel(exportData, 'excel');
@@ -328,11 +387,11 @@ export class ExampleDataSource extends DataSource<JobsList> {
           .filter((jobsList: JobsList) => {
             const searchStr = (
               jobsList.title +
-              jobsList.department +
-              jobsList.role +
-              jobsList.jobType +
+              jobsList.description +
+              jobsList.requiredSkills +
               jobsList.status +
-              jobsList.vacancies
+              jobsList.applicants.join(', ')
+             
             ).toLowerCase();
             return searchStr.indexOf(this.filter.toLowerCase()) !== -1;
           });
@@ -357,27 +416,45 @@ export class ExampleDataSource extends DataSource<JobsList> {
       return data;
     }
     return data.sort((a, b) => {
-      let propertyA: number | string = '';
-      let propertyB: number | string = '';
+      let propertyA: number | string | string[] | Date = '';
+      let propertyB: number | string | string[] | Date = '';
       switch (this._sort.active) {
         case 'id':
-          [propertyA, propertyB] = [a.id, b.id];
+          [propertyA, propertyB] = [a._id, b._id];
           break;
-        case 'title':
+        case 'Title':
           [propertyA, propertyB] = [a.title, b.title];
           break;
-        case 'status':
-          [propertyA, propertyB] = [a.status, b.status];
+        case 'Description':
+          [propertyA, propertyB] = [a.description, b.description];
           break;
-        case 'date':
-          [propertyA, propertyB] = [a.date, b.date];
+        case 'requiredSkills':
+          [propertyA, propertyB] = [a.requiredSkills, b.requiredSkills];
           break;
-        case 'time':
-          [propertyA, propertyB] = [a.department, b.department];
+        case ' location':
+          [propertyA, propertyB] = [a. location, b. location];
           break;
-        case 'vacancies':
-          [propertyA, propertyB] = [a.vacancies, b.vacancies];
+        case 'contractType':
+          [propertyA, propertyB] = [a.contractType, b.contractType];
           break;
+          case 'salary':
+            [propertyA, propertyB] = [a.salary, b.salary];
+            break;
+            case 'applicationDeadline':
+              [propertyA, propertyB] = [a.applicationDeadline, b.applicationDeadline];
+              break;
+              case 'status':
+                [propertyA, propertyB] = [a.status, b.status];
+                break;
+                case 'publicationDate':
+              [propertyA, propertyB] = [a.publicationDate, b.publicationDate];
+              break;
+              case 'recruitingManager':
+                [propertyA, propertyB] = [a.recruitingManager, b.recruitingManager];
+                break;
+                case 'applicants':
+                  [propertyA, propertyB] = [a.applicants, b.applicants];
+                  break;
       }
       const valueA = isNaN(+propertyA) ? propertyA : +propertyA;
       const valueB = isNaN(+propertyB) ? propertyB : +propertyB;

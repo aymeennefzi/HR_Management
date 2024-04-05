@@ -1,0 +1,27 @@
+.tag-container {
+    display: flex;
+    flex-wrap: wrap;
+  }
+  
+  .tag {
+    background-color: #e0e0e0;
+    color: #333;
+    border-radius: 4px;
+    padding: 4px 8px;
+    margin: 4px;
+    display: flex;
+    align-items: center;
+  }
+  .remove-button {
+    margin-left: 70px; /* Espacement entre le nom de la compétence et le bouton de suppression */
+  }
+  .remove-icon {
+    margin-left: 4px;
+    cursor: pointer;
+  }
+  .option-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  

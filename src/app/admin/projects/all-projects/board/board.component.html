@@ -1,39 +1,17 @@
 <div class="board">
-  @for (list of $any(lists) | keyvalue: unsorted; track list) {
+
     <div class="list">
-      <div class="header">
-        <div class="title">
-          <h2>
-            @switch (list.key) {
-              @case ('NEWPROJECTS') {
-                New Projects
-              }
-              @case ('RUNNING') {
-                Running
-              }
-              @case ('ONHOLD') {
-                On Hold
-              }
-              @case ('FINISHED') {
-                Finished
-              }
-            }
-          </h2>
-          <div class="count">{{ $any(list).value.length }}
-            {{ $any(list).value.length | pluralize: 'project':'projects':'projects' }}
-          </div>
-        </div>
-      </div>
-      <ul class="projects" id="{{ list.key }}" cdkDropList cdkDropListSortingDisabled [cdkDropListData]="list.value"
-        [cdkDropListConnectedTo]="['NEWPROJECTS', 'RUNNING', 'ONHOLD', 'FINISHED']" (cdkDropListDropped)="drop($event)">
-        @for (project of $any(list).value; track project) {
-          <li class="project " cdkDrag [cdkDragData]="project" (dblclick)="editProjectDialog(project)"
+ 
+      <ul class="projects" 
+    >
+        @for (project of userfinded?.projects ; track project) {
+          <li class="project " cdkDrag [cdkDragData]="project"  (dblclick)="route(project._id)"
             >
-            <h4 class="project-title"><span class="material-icons-outlined project-icon">
+            <h4   class="project-title"><span  class="material-icons-outlined project-icon">
               task_alt
-            </span>{{ project.name }}</h4>
+            </span >{{ project.NomProject }}</h4>
             <small class="block text-ellipsis m-b-15">
-              <span class="text-xs">{{ project.open_task }}</span> <span class="text-muted"> open tasks </span>
+              <span class="text-xs">{{ project.tasks?.length || '0' }}</span> <span class="text-muted"> open tasks </span>
             </small>
             <span class="project-bedge project-type-{{ project.type }}">
               <div class="pro-left ">
@@ -49,9 +27,12 @@
                 @if (project.type === 'Testing') {
                   Testing
                 }
+                @if (project.type === 'other type') {
+                  other type
+                }
               </div>
             </span>
-            <p class="mt-3"> {{ project.description | truncate:[280, '&hellip;'] }}
+            <p class="mt-3"> {{ project?.description | truncate:[280, '&hellip;'] | stripHtml  }}
             </p>
             <div class="project-members m-b-15">
               <ul class="team-members">
@@ -60,9 +41,9 @@
                     <div class="col-5 pro-left mb-2">Created:</div>
                     <div class="col-7 pro-left mb-2"> <span class="material-icons-outlined project-icon2">
                       date_range
-                    </span>{{ project.created | date }}</div>
-                    <div class="col-5 pro-left mb-2">Team Leader:</div>
-                    <div class="col-7 pro-left mb-2">{{ project.team_leader }}</div>
+                    </span>{{convertDate(project?.StartDate)  | date }}</div>
+             <!--        <div class="col-5 pro-left mb-2">Team Leader:</div>
+                    <div class="col-7 pro-left mb-2">{{ project.NomChefProjet }}</div> -->
                     <div class="col-5 pro-left mb-2">Priority:</div>
                     <div class="col-7 pro-lef mb-2 project-priority-{{ project.priority }}">
                       @if (project.priority === 1) {
@@ -83,15 +64,15 @@
                     </div>
                     <div class="col-5 pro-left mb-2">Deadline:</div>
                     <div class="col-7 pro-left mb-2">
-                      @if (project.deadline) {
-                        <div class="deadline">
+                      @if (project?.FinishDate ) {
+                        <div class="deadline" >
                           <span class="material-icons-outlined project-icon2">
                             date_range
-                          </span>{{ project.deadline | date }}
+                          </span>{{ convertDate(project.FinishDate)  | date }}
                         </div>
                       }
                     </div>
-                    <div class="col-5 pro-left mb-2">Comments:</div>
+                 <!--    <div class="col-5 pro-left mb-2">Comments:</div>
                     <div class="col-7 pro-left mb-2">{{ project.comments }}</div>
                     <div class="col-5 pro-left mb-2">Bug:</div>
                     <div class="col-7 pro-left mb-2">{{ project.bugs }}</div>
@@ -106,7 +87,7 @@
                         class="rounded-circle"></li>
                         <li class="avatar avatar-sm"><span class="badge">+4</span></li>
                       </ul>
-                    </div>
+                    </div> -->
                   </div>
                 </li>
               </ul>
@@ -119,11 +100,11 @@
               <mat-icon>more_vert</mat-icon>
             </button>
             <mat-menu #menu="matMenu" class="project-actions-menu">
-              <button mat-menu-item (click)="editProjectDialog(project)">
+              <button mat-menu-item (click)="editProjectDialog(project._id,project)">
                 <mat-icon>edit</mat-icon>
                 <span>Edit Project</span>
               </button>
-              <button mat-menu-item (click)="removeProject(project)">
+              <button mat-menu-item (click)="removeProject(project._id)">
                 <mat-icon>delete</mat-icon>
                 <span>Delete Project</span>
               </button>
@@ -132,5 +113,6 @@
         }
       </ul>
     </div>
-  }
+  
 </div>
+

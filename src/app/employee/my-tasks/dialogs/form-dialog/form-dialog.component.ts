@@ -3,7 +3,7 @@ import { Component, Inject } from '@angular/core';
 import { UntypedFormControl, Validators, UntypedFormGroup, UntypedFormBuilder, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { formatDate } from '@angular/common';
 import { MyTasksService } from '../../my-tasks.service';
-import { MyTasks } from '../../my-tasks.model';
+import {  TasksModel } from '../../my-tasks.model';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatOptionModule } from '@angular/material/core';
 import { MatSelectModule } from '@angular/material/select';
@@ -11,11 +11,18 @@ import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
+import { EstimatesService } from 'app/admin/projects/estimates/estimates.service';
+import { ActivatedRoute } from '@angular/router';
+import { AuthService } from '@core';
+import { ProjectService } from 'app/admin/projects/all-projects/core/project.service';
 
 export interface DialogData {
   id: number;
   action: string;
-  myTasks: MyTasks;
+  task: any;
+  taskId:string;
+  idProject:string;
+  tasks:TasksModel[]
 }
 
 @Component({
@@ -38,63 +45,130 @@ export interface DialogData {
     ],
 })
 export class FormDialogComponent {
-  action: string;
-  dialogTitle: string;
-  myTasksForm: UntypedFormGroup;
-  myTasks: MyTasks;
+  action!: string; 
+  dialogTitle!: string; 
+  taskForm!: UntypedFormGroup ;
+taskAdd!:any
+  task:any;
+  user!:any
+  users:any[]=[]
+  p!:any
   constructor(
     public dialogRef: MatDialogRef<FormDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: DialogData,
-    public myTasksService: MyTasksService,
-    private fb: UntypedFormBuilder
+    public estimatesService: EstimatesService,
+    private fb: UntypedFormBuilder,
+    private actR : ActivatedRoute,
+    private authService:AuthService,
+    private projectService: ProjectService,
   ) {
-    // Set the defaults
-    this.action = data.action;
-    if (this.action === 'edit') {
-      this.dialogTitle = data.myTasks.taskNo;
-      this.myTasks = data.myTasks;
+
+  }
+/*   estimates: Estimates; */
+  ngOnInit(): void {
+    this.authService.getAllUsers().subscribe((dataaa)=>this.users=dataaa)
+    this.estimatesService.getTasks().subscribe((dataa)=>{this.data.tasks=dataa;  
+   })
+ 
+    this.taskForm = this.fb.group({
+  
+      NomTask: ['', [Validators.required]],
+      priority: [''],
+  
+      startDate: ['', [Validators.required]],
+      FinishDate: ['', [Validators.required]],
+  
+      statut: [''],
+       description: ['', [Validators.required]],
+       employeeAffected:['', [Validators.required]],
+       projectId: [this.data.idProject],
+    
+
+  
+    });
+    this.action =this.data.action;
+    if (this.action === 'edit' && this.data.taskId) {
+      this.authService.getUserByTaskId( this.data.taskId).subscribe((datauser) => {
+this.user=datauser
+      });
+      this.estimatesService.getTaskById(this.data.taskId).subscribe((dataa) => {
+        console.log(this.data.taskId)    
+       
+        this.task = dataa;
+        this.dialogTitle =  this.task.NomTask;
+        const T= {
+           _id:this.task._id,
+           NomTask: this.task.NomTask,
+          description: this.task.description,
+          startDate : this.task.startDate,
+          FinishDate : this.task.FinishDate,
+          statut : this.task.statut ,
+          priority : this.task.priority  ,
+          employeeAffected : this.user._id ,
+    
+        };
+/*     console.log(TSansU) */
+    this.taskForm.patchValue(T);
+
+      })
+
     } else {
-      this.dialogTitle = 'New MyTasks';
-      const blankObject = {} as MyTasks;
-      this.myTasks = new MyTasks(blankObject);
+      this.dialogTitle = 'New task';
+
     }
-    this.myTasksForm = this.createContactForm();
+  
+
   }
-  formControl = new UntypedFormControl('', [
-    Validators.required,
-    // Validators.email,
-  ]);
-  getErrorMessage() {
-    return this.formControl.hasError('required')
-      ? 'Required field'
-      : this.formControl.hasError('email')
-      ? 'Not a valid email'
-      : '';
-  }
+
+
   createContactForm(): UntypedFormGroup {
     return this.fb.group({
-      id: [this.myTasks.id],
-      taskNo: [this.myTasks.taskNo],
-      project: [this.myTasks.project],
-      client: [this.myTasks.client],
-      status: [this.myTasks.status],
-      priority: [this.myTasks.priority],
-      type: [this.myTasks.type],
-      executor: [this.myTasks.executor],
-      date: [
-        formatDate(this.myTasks.date, 'yyyy-MM-dd', 'en'),
-        [Validators.required],
-      ],
-      details: [this.myTasks.details],
+      NomTask: ['', [Validators.required]],
+      priority: [''],
+      startDate: ['', [Validators.required]],
+      FinishDate: ['', [Validators.required]],
+      statut: [''],
+       description: ['', [Validators.required]],
+       employeeAffected:['', [Validators.required]],
+       projectId: [this.data.idProject],
     });
   }
-  submit() {
-    // emppty stuff
-  }
+
+
   onNoClick(): void {
     this.dialogRef.close();
   }
   public confirmAdd(): void {
-    this.myTasksService.addMyTasks(this.myTasksForm.getRawValue());
+  if(this.data.taskId){
+    this.updateT()
+    Object.assign(this.data.task, this.taskForm.value);
+  }else{
+    this.estimatesService.createTask2(this.taskForm.getRawValue()).subscribe((newTask) => {
+
+this.data.tasks.push(newTask)
+
+this.dialogRef.close(this.data.tasks);
+    });
+  }
+   }
+  updateT() {
+    const updatedValues = {
+      _id: this.taskForm.value._id,
+      NomTask: this.taskForm.value.NomTask,
+      description: this.taskForm.value.description,
+      startDate:  this.taskForm.value.startDate,// Converts to string in specified format
+      FinishDate:  this.taskForm.value.FinishDate,
+      statut: this.taskForm.value.statut,
+      priority: this.taskForm.value.priority,
+    
+  
+      // Incluez 'f' si vous ne le mettez pas à jour ici
+    };
+  
+    this.estimatesService.updateTask(this.data.taskId, updatedValues).subscribe(() => {
+
+
+    });
+
   }
 }

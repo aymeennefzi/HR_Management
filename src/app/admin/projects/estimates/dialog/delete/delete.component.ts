@@ -33,6 +33,6 @@ export class DeleteDialogComponent {
     this.dialogRef.close();
   }
   confirmDelete(): void {
-    this.estimatesService.deleteEstimates(this.data.id);
+
   }
 }

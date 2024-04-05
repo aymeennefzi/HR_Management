@@ -13,12 +13,20 @@ import { MatMenuTrigger } from '@angular/material/menu';
 import { SelectionModel } from '@angular/cdk/collections';
 import { FormComponent } from './form/form.component';
 import { UnsubscribeOnDestroyAdapter } from '@shared';
-import { DatePipe } from '@angular/common';
+import { DatePipe, KeyValuePipe } from '@angular/common';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatRippleModule } from '@angular/material/core';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatTableModule } from '@angular/material/table';
 import { BreadcrumbComponent } from '@shared/components/breadcrumb/breadcrumb.component';
+import { ProjectService } from 'app/admin/projects/all-projects/core/project.service';
+import { Router } from '@angular/router';
+import { CookieService } from 'ngx-cookie-service';
+import { AuthService } from '@core';
+import Swal from 'sweetalert2';
+import * as moment from 'moment';
+import { PluralPipe, StripHtmlPipe, TruncatePipe } from 'app/admin/projects/all-projects/core/pipes';
+import { CdkDrag, CdkDropList } from '@angular/cdk/drag-drop';
 
 @Component({
   selector: 'app-my-projects',
@@ -34,171 +42,112 @@ import { BreadcrumbComponent } from '@shared/components/breadcrumb/breadcrumb.co
     MatProgressSpinnerModule,
     MatPaginatorModule,
     DatePipe,
+    CdkDropList,
+    CdkDrag,
+    KeyValuePipe,
+    TruncatePipe,
+    PluralPipe,
+    StripHtmlPipe,
   ],
 })
 export class MyProjectsComponent
   extends UnsubscribeOnDestroyAdapter
   implements OnInit {
-  filterToggle = false;
-  displayedColumns = [
-    'id',
-    'title',
-    'clientName',
-    'startDate',
-    'endDate',
-    'deadLine',
-    'noOfMembers',
-    'priority',
-    'progress',
-    'status',
-  ];
-  exampleDatabase?: MyProjectsService | null;
-  dataSource!: ExampleDataSource;
-  selection = new SelectionModel<MyProjects>(true, []);
-  id?: number;
-  myProjects?: MyProjects | null;
-  constructor(
-    public httpClient: HttpClient,
-    public dialog: MatDialog,
-    public myProjectsService: MyProjectsService,
-    private snackBar: MatSnackBar
-  ) {
-    super();
-  }
-  @ViewChild(MatPaginator, { static: true }) paginator!: MatPaginator;
-  @ViewChild(MatSort, { static: true }) sort!: MatSort;
-  @ViewChild('filter', { static: true }) filter!: ElementRef;
-  @ViewChild(MatMenuTrigger)
-  contextMenu?: MatMenuTrigger;
-  contextMenuPosition = { x: '0px', y: '0px' };
-
-  ngOnInit() {
-    this.loadData();
-  }
-  detailsCall(row: MyProjects) {
-    this.dialog.open(FormComponent, {
-      data: {
-        myProjects: row,
-        action: 'details',
-      },
-      height: '80%',
-      width: '35%',
-    });
-  }
-  toggleStar(row: MyProjects) {
-    console.log(row);
-  }
-
-  public loadData() {
-    this.exampleDatabase = new MyProjectsService(this.httpClient);
-    this.dataSource = new ExampleDataSource(
-      this.exampleDatabase,
-      this.paginator,
-      this.sort
-    );
-    this.subs.sink = fromEvent(this.filter.nativeElement, 'keyup').subscribe(
-      () => {
-        if (!this.dataSource) {
-          return;
-        }
-        this.dataSource.filter = this.filter.nativeElement.value;
-      }
-    );
-  }
-}
-export class ExampleDataSource extends DataSource<MyProjects> {
-  filterChange = new BehaviorSubject('');
-  get filter(): string {
-    return this.filterChange.value;
-  }
-  set filter(filter: string) {
-    this.filterChange.next(filter);
-  }
-  filteredData: MyProjects[] = [];
-  renderedData: MyProjects[] = [];
-  constructor(
-    public exampleDatabase: MyProjectsService,
-    public paginator: MatPaginator,
-    public _sort: MatSort
-  ) {
-    super();
-    // Reset to the first page when the user changes the filter.
-    this.filterChange.subscribe(() => (this.paginator.pageIndex = 0));
-  }
-  /** Connect function called by the table to retrieve one stream containing the data to render. */
-  connect(): Observable<MyProjects[]> {
-    // Listen for any changes in the base data, sorting, filtering, or pagination
-    const displayDataChanges = [
-      this.exampleDatabase.dataChange,
-      this._sort.sortChange,
-      this.filterChange,
-      this.paginator.page,
-    ];
-    this.exampleDatabase.getAllMyProjectss();
-    return merge(...displayDataChanges).pipe(
-      map(() => {
-        // Filter data
-        this.filteredData = this.exampleDatabase.data
-          .slice()
-          .filter((myProjects: MyProjects) => {
-            const searchStr = (
-              myProjects.clientName +
-              myProjects.startDate +
-              myProjects.endDate +
-              myProjects.deadLine +
-              myProjects.status +
-              myProjects.priority
-            ).toLowerCase();
-            return searchStr.indexOf(this.filter.toLowerCase()) !== -1;
-          });
-        // Sort filtered data
-        const sortedData = this.sortData(this.filteredData.slice());
-        // Grab the page's slice of the filtered sorted data.
-        const startIndex = this.paginator.pageIndex * this.paginator.pageSize;
-        this.renderedData = sortedData.splice(
-          startIndex,
-          this.paginator.pageSize
-        );
-        return this.renderedData;
-      })
-    );
-  }
-  disconnect() {
-    //disconnect
-  }
-  /** Returns a sorted copy of the database data. */
-  sortData(data: MyProjects[]): MyProjects[] {
-    if (!this._sort.active || this._sort.direction === '') {
-      return data;
+    user!:any
+    projects: any[] = [];
+    userfinded: any ;
+  
+    constructor(
+      private projectService: ProjectService,
+      private dialog: MatDialog,
+      private r:Router,
+      private cookieService:CookieService,
+      private auth:AuthService
+   
+    ) {
+      super();
     }
-    return data.sort((a, b) => {
-      let propertyA: number | string = '';
-      let propertyB: number | string = '';
-      switch (this._sort.active) {
-        case 'id':
-          [propertyA, propertyB] = [a.id, b.id];
-          break;
-        case 'clientName':
-          [propertyA, propertyB] = [a.clientName, b.clientName];
-          break;
-        case 'startDate':
-          [propertyA, propertyB] = [a.startDate, b.startDate];
-          break;
-        case 'endDate':
-          [propertyA, propertyB] = [a.endDate, b.endDate];
-          break;
-        case 'status':
-          [propertyA, propertyB] = [a.status, b.status];
-          break;
-        case 'noOfMembers':
-          [propertyA, propertyB] = [a.noOfMembers, b.noOfMembers];
-          break;
+  
+    public ngOnInit(): void {
+   this.retrieveUserData()
+      
+    }
+  
+    retrieveUserData() {
+      const cookieData = this.cookieService.get('user_data');
+      if (cookieData) {
+        try {
+          const userData = JSON.parse(cookieData);
+          this.user = userData.user; // Store user data in the component's variable
+          this.auth.getUserById(this.user.id).subscribe((userData) => {
+            this.userfinded = userData;
+            console.log('User data:', this.userfinded);
+            
+            if (this.userfinded?.tasks && Array.isArray(this.userfinded.tasks)) {
+              // Assuming tasks is an array, we extract the _id of each task
+              const taskIds = this.userfinded.tasks.map((task: { _id: any; }) => task._id);
+              
+              this.projectService.getProjectsByTaskIds(taskIds).subscribe((projectsData) => {
+                this.projects = projectsData;
+                console.log('Projects:', this.projects);
+              }, (error) => {
+                // It's a good practice to handle potential errors in subscriptions
+                console.error('Error fetching projects:', error);
+              });
+            } else {
+              console.log('No tasks found for this user or tasks structure is unexpected');
+            }
+          }, (error) => {
+            console.error('Error fetching user data:', error);
+          });
+          
+        } catch (error) {
+          console.error('Error decoding cookie:', error);
+        }
+      } else {
+        console.error('Cookie "user_data" is not set');
       }
-      const valueA = isNaN(+propertyA) ? propertyA : +propertyA;
-      const valueB = isNaN(+propertyB) ? propertyB : +propertyB;
-      return (
-        (valueA < valueB ? -1 : 1) * (this._sort.direction === 'asc' ? 1 : -1)
-      );
-    });
-  }
+    }
+    
+  
+  
+    public removeProject(id: string): void {
+      Swal.fire({
+        title: 'Êtes-vous sûr?',
+        text: "Vous ne pourrez pas revenir en arrière!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Oui, supprimez-le!'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          this.projectService.deleteProject(id).subscribe(() => {
+            Swal.fire(
+              'Supprimé!',
+              'Votre projet a été supprimé.',
+              'success'
+            );
+            this.ngOnInit(); // Ou une autre méthode pour actualiser la liste des projets
+          }, (error) => {
+            // Gérer l'erreur ici, par exemple :
+            Swal.fire(
+              'Erreur!',
+              'La suppression du projet a échoué.',
+              'error'
+            );
+          });
+        }
+      });
+    }
+
+    public route(id: string): void {
+      this.r.navigate(['admin/projects/estimates', id]);
+    }
+    
+
+    
+    convertDate(dateStr: string): string {
+      return moment(dateStr, 'DD-MM-YYYY').format('YYYY-MM-DD');
+    }
 }

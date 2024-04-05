@@ -1,8 +1,9 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject } from 'rxjs';
-import { Estimates } from './estimates.model';
+import { BehaviorSubject, Observable } from 'rxjs';
+
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { UnsubscribeOnDestroyAdapter } from '@shared';
+import { TasksModel } from '../all-projects/core/project.model';
 
 @Injectable({
   providedIn: 'root',
@@ -10,15 +11,15 @@ import { UnsubscribeOnDestroyAdapter } from '@shared';
 export class EstimatesService extends UnsubscribeOnDestroyAdapter {
   private readonly API_URL = 'assets/data/estimates.json';
   isTblLoading = true;
-  dataChange: BehaviorSubject<Estimates[]> = new BehaviorSubject<Estimates[]>(
+  dataChange: BehaviorSubject<TasksModel[]> = new BehaviorSubject<TasksModel[]>(
     []
   );
   // Temporarily stores data from dialogs
-  dialogData!: Estimates;
+  dialogData!: TasksModel;
   constructor(private httpClient: HttpClient) {
     super();
   }
-  get data(): Estimates[] {
+  get data(): TasksModel[] {
     return this.dataChange.value;
   }
   getDialogData() {
@@ -26,7 +27,7 @@ export class EstimatesService extends UnsubscribeOnDestroyAdapter {
   }
   /** CRUD METHODS */
   getAllEstimatess(): void {
-    this.subs.sink = this.httpClient.get<Estimates[]>(this.API_URL).subscribe({
+    this.subs.sink = this.httpClient.get<TasksModel[]>(this.apiUrl).subscribe({
       next: (data) => {
         this.isTblLoading = false;
         this.dataChange.next(data);
@@ -37,43 +38,30 @@ export class EstimatesService extends UnsubscribeOnDestroyAdapter {
       },
     });
   }
-  addEstimates(estimates: Estimates): void {
-    this.dialogData = estimates;
 
-    // this.httpClient.post(this.API_URL, estimates)
-    //   .subscribe({
-    //     next: (data) => {
-    //       this.dialogData = estimates;
-    //     },
-    //     error: (error: HttpErrorResponse) => {
-    //        // error code here
-    //     },
-    //   });
+
+  private apiUrl = 'http://localhost:3000'; 
+  createTask(createTaskDto: any): Observable<any> {
+    return this.httpClient.post<any>(`${this.apiUrl}/task`, createTaskDto);
   }
-  updateEstimates(estimates: Estimates): void {
-    this.dialogData = estimates;
 
-    // this.httpClient.put(this.API_URL + estimates.id, estimates)
-    //     .subscribe({
-    //       next: (data) => {
-    //         this.dialogData = estimates;
-    //       },
-    //       error: (error: HttpErrorResponse) => {
-    //          // error code here
-    //       },
-    //     });
+  getTasks(): Observable<any> {
+    return this.httpClient.get<any>(`${this.apiUrl}/task`);
   }
-  deleteEstimates(id: number): void {
-    console.log(id);
 
-    // this.httpClient.delete(this.API_URL + id)
-    //     .subscribe({
-    //       next: (data) => {
-    //         console.log(id);
-    //       },
-    //       error: (error: HttpErrorResponse) => {
-    //          // error code here
-    //       },
-    //     });
+  getTaskById(id: string): Observable<any> {
+    return this.httpClient.get<any>(`${this.apiUrl}/task/${id}`);
+  }
+
+  updateTask(id: string, taskDto: any): Observable<any> {
+    return this.httpClient.patch<any>(`${this.apiUrl}/task/${id}`, taskDto);
+  }
+
+  deleteTask(id: string): Observable<any> {
+    return this.httpClient.delete<any>(`${this.apiUrl}/task/${id}`);
+  }
+
+  createTask2(createTaskDto: TasksModel): Observable<TasksModel> {
+    return this.httpClient.post<TasksModel>(`${this.apiUrl}/task/post`, createTaskDto);
   }
 }
