@@ -13,9 +13,47 @@
   </div>
   <div mat-dialog-content>
     <form class="register-form m-4" [formGroup]="taskForm">
-  
       <div class="row">
-   
+        <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 mb-2">
+          <mat-form-field class="example-full-width" appearance="outline">
+            <mat-label>task Name</mat-label>
+            <input matInput formControlName="NomTask" required>
+            <mat-icon class="material-icons-outlined color-icon p-3" matSuffix>face</mat-icon>
+            @if (taskForm.get('NomTask')?.hasError('required')) {
+            <mat-error>
+              task Name is required
+            </mat-error>
+            }
+          </mat-form-field>
+        </div>
+        <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 mb-2">
+          <mat-form-field class="example-full-width" appearance="outline">
+            <mat-label>start Date</mat-label>
+            <input matInput [matDatepicker]="picker" formControlName="startDate">
+            <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+            <mat-datepicker #picker></mat-datepicker>
+            @if (taskForm.get('startDate')?.hasError('required')) {
+            <mat-error>
+              Please select date
+            </mat-error>
+            }
+          </mat-form-field>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 mb-2">
+          <mat-form-field class="example-full-width" appearance="outline">
+            <mat-label>Finish Date</mat-label>
+            <input matInput [matDatepicker]="picker1" formControlName="FinishDate">
+            <mat-datepicker-toggle matSuffix [for]="picker1"></mat-datepicker-toggle>
+            <mat-datepicker #picker1></mat-datepicker>
+            @if (taskForm.get('FinishDate')?.hasError('required')) {
+            <mat-error>
+              Please select date
+            </mat-error>
+            }
+          </mat-form-field>
+        </div>
         <div class=" col-xl-6 col-lg-6 col-md-12 col-sm-12 mb-2">
           <mat-form-field class="example-full-width " appearance="outline">
             <mat-label>Status</mat-label>
@@ -54,7 +92,22 @@
          
           </mat-form-field>
         </div> 
-
+        <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 mb-2">
+      
+          <mat-form-field class="example-full-width " appearance="outline">
+            <mat-label>employeeAffected</mat-label>
+            <mat-select formControlName="employeeAffected" >
+              @for (u of users ; track u) {
+              <mat-option  [value]="u.email">
+              {{u.email}}
+              </mat-option>
+            }
+            
+            </mat-select>
+         
+          </mat-form-field>
+     
+        </div>
       </div>
       <div class="row">
         <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-2">

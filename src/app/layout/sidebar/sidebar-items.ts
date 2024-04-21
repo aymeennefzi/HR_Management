@@ -123,30 +123,7 @@ export const ROUTES: RouteInfo[] = [
         role: [''],
         submenu: [],
       },
-      {
-        path: '/admin/projects/estimates',
-        title: 'MENUITEMS.PROJECTS.LIST.ESTIMATES',
-        iconType: '',
-        icon: '',
-        class: 'ml-menu',
-        groupTitle: false,
-        badge: '',
-        badgeClass: '',
-        role: [''],
-        submenu: [],
-      },
-      {
-        path: '/admin/projects/projectDetails',
-        title: 'MENUITEMS.PROJECTS.LIST.PROJECT-DETAILS',
-        iconType: '',
-        icon: '',
-        class: 'ml-menu',
-        groupTitle: false,
-        badge: '',
-        badgeClass: '',
-        role: [''],
-        submenu: [],
-      },
+
     ],
   },
   {
@@ -176,6 +153,33 @@ export const ROUTES: RouteInfo[] = [
      
     ],
   },
+/*   {
+    path: '',
+    title: 'Performance',
+    iconType: 'feather',
+    icon: 'grid',
+    class: 'menu-toggle',
+    groupTitle: false,
+    badge: '',
+    badgeClass: '',
+    role: ['Admin'],
+    submenu: [
+   
+      {
+        path: 'admin/performance',
+        title: 'performances',
+        iconType: '',
+        icon: '',
+        class: 'ml-menu',
+        groupTitle: false,
+        badge: '',
+        badgeClass: '',
+        role: [''],
+        submenu: [],
+      },
+     
+    ],
+  }, */
   {
     path: '',
     title: 'MENUITEMS.EMPLOYEES.TEXT',
@@ -755,7 +759,7 @@ export const ROUTES: RouteInfo[] = [
   },
   {
     path: '',
-    title: 'MENUITEMS.CLIENT.PROJECTS.TEXT',
+    title: 'MENUITEMS.PROJECTS.TEXT',
     iconType: 'feather',
     icon: 'book',
     class: 'menu-toggle',
@@ -765,8 +769,8 @@ export const ROUTES: RouteInfo[] = [
     role: ['Client'],
     submenu: [
       {
-        path: '/client/projects/myProjects',
-        title: 'MENUITEMS.CLIENT.PROJECTS.LIST.MY-PROJECTS',
+        path: '/client/projects/allProjects',
+        title: 'MENUITEMS.PROJECTS.LIST.ALL-PROJECTS',
         iconType: '',
         icon: '',
         class: 'ml-menu',
@@ -777,8 +781,8 @@ export const ROUTES: RouteInfo[] = [
         submenu: [],
       },
       {
-        path: '/client/projects/projectDetails',
-        title: 'MENUITEMS.CLIENT.PROJECTS.LIST.PROJECT-DETAILS',
+        path: '/client/projects/addProject',
+        title: 'MENUITEMS.PROJECTS.LIST.ADD-PROJECT',
         iconType: '',
         icon: '',
         class: 'ml-menu',
@@ -788,6 +792,7 @@ export const ROUTES: RouteInfo[] = [
         role: [''],
         submenu: [],
       },
+
     ],
   },
   {

@@ -1,17 +1,25 @@
-import { Route } from '@angular/router';
-import { Page404Component } from 'app/authentication/page404/page404.component';
-import { MyProjectsComponent } from './my-projects/my-projects.component';
-import { ProjectDetailsComponent } from './project-details/project-details.component';
-
-export const PROJECTS_ROUTE: Route[] = [
+import { Route } from "@angular/router";
+import { EstimatesComponent } from "./estimates/estimates.component";
+import { ProjectDetailsComponent } from "./project-details/project-details.component";
+import { Page404Component } from "../../authentication/page404/page404.component";
+import { AddprojectsComponent } from "./add-project/add-project.component";
+import { AllprojectsComponent } from "./all-projects/all-projects.component";
+export const PROJECT_ROUTE: Route[] = [
   {
-    path: 'myProjects',
-    component: MyProjectsComponent,
+    path: "addProject",
+    component: AddprojectsComponent,
   },
   {
-    path: 'projectDetails',
+    path: "allProjects",
+    component: AllprojectsComponent,
+  },
+  {
+    path: "estimates/:_id",
+    component: EstimatesComponent,
+  },
+  {
+    path: "projectDetails",
     component: ProjectDetailsComponent,
   },
-  { path: '**', component: Page404Component },
+  { path: "**", component: Page404Component },
 ];
-

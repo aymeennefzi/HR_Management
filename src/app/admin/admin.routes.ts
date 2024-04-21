@@ -1,6 +1,7 @@
 import { Route } from '@angular/router';
 import { BillingComponent } from 'app/client/billing/billing.component';
-import { ChatComponent } from 'app/employee/chat/chat.component';
+import { PerformanceComponent } from './performance/performance.component';
+/* import { ChatComponent } from 'app/employee/chat/chat.component'; *///ahmed
 
 export const ADMIN_ROUTE: Route[] = [
   {
@@ -72,8 +73,11 @@ export const ADMIN_ROUTE: Route[] = [
     loadChildren: () =>
       import('./reports/reports.routes').then((m) => m.REPORT_ROUTE),
   },
-  {
+/*   {
     path : 'chat' , component : ChatComponent
+  } */
+  {
+    path : 'performance' , component : PerformanceComponent
   }
   
 ];

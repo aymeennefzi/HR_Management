@@ -1,17 +1,17 @@
 import { MAT_DIALOG_DATA, MatDialogRef, MatDialogTitle, MatDialogContent, MatDialogActions, MatDialogClose } from '@angular/material/dialog';
 import { Component, Inject } from '@angular/core';
-import { MyProjectsService } from '../../my-projects.service';
+import { EstimatesService } from '../../estimates.service';
 import { MatButtonModule } from '@angular/material/button';
 
 export interface DialogData {
   id: number;
-  pName: string;
-  open_task: string;
+  eNo: string;
+  cName: string;
   status: string;
 }
 
 @Component({
-    selector: 'app-delete:not(n)',
+    selector: 'app-delete:not(m)',
     templateUrl: './delete.component.html',
     styleUrls: ['./delete.component.scss'],
     standalone: true,
@@ -23,16 +23,16 @@ export interface DialogData {
         MatDialogClose,
     ],
 })
-export class DeleteComponent {
+export class DeleteDialogComponent {
   constructor(
-    public dialogRef: MatDialogRef<DeleteComponent>,
+    public dialogRef: MatDialogRef<DeleteDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: DialogData,
-    public myProjectsService: MyProjectsService
+    public estimatesService: EstimatesService
   ) {}
   onNoClick(): void {
     this.dialogRef.close();
   }
   confirmDelete(): void {
-    this.myProjectsService.deleteMyProjects(this.data.id);
+
   }
 }

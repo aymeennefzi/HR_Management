@@ -18,6 +18,6 @@ import { BreadcrumbComponent } from '@shared/components/breadcrumb/breadcrumb.co
 })
 export class ProjectDetailsComponent {
   constructor() {
-    //constructor
+    // constructor
   }
 }

@@ -1,7 +1,7 @@
 import { MAT_DIALOG_DATA, MatDialogRef, MatDialogContent, MatDialogClose } from '@angular/material/dialog';
 import { Component, EventEmitter, Inject, Output } from '@angular/core';
 import { EstimatesService } from '../../estimates.service';
-import { UntypedFormControl, Validators, UntypedFormGroup, UntypedFormBuilder, FormsModule, ReactiveFormsModule, FormControl } from '@angular/forms';
+import { UntypedFormControl, Validators, UntypedFormGroup, UntypedFormBuilder, FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 import { MatOptionModule } from '@angular/material/core';
 import { MatSelectModule } from '@angular/material/select';
@@ -15,8 +15,6 @@ import { TasksModel } from 'app/admin/projects/all-projects/core/project.model';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ProjectService } from 'app/admin/projects/all-projects/core/project.service';
 import { AuthService } from '@core';
-import { MatAutocompleteModule } from '@angular/material/autocomplete';
-import { map, startWith } from 'rxjs';
 export interface DialogData {
   id: number;
   action: string;
@@ -44,7 +42,6 @@ export interface DialogData {
         MatSelectModule,
         MatOptionModule,
         MatDialogClose,
-        MatAutocompleteModule
     ],
 })
 export class FormDialogComponent {
@@ -58,9 +55,6 @@ taskAdd!:any
   users:any[]=[]
   p!:any
   idEmployee!:string
-  filteredUsers: any[] = [];
-  employeeAffected = new FormControl();
-
   constructor(
     public dialogRef: MatDialogRef<FormDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: DialogData,
@@ -74,13 +68,7 @@ taskAdd!:any
   }
 /*   estimates: Estimates; */
   ngOnInit(): void {
-    this.filteredUsers = this.users; // Initialize your filtered users
-    
-
-    this.authService.getAllUsers().subscribe((data) => {
-      this.users = data.filter((user) => user.role && Array.isArray(user.role) && user.role.includes('Employe'));
-      this.filteredUsers = [...this.users]; // Initialize filtered list
-    })
+    this.authService.getAllUsers().subscribe((dataaa)=>this.users=dataaa)
     this.actR.params.subscribe(params => {
       const _id = params['_id'];
       this.projectService.getProjectById(this.data.idP).subscribe(data => {
@@ -151,24 +139,7 @@ this.user=datauser
 
   }
 
- 
- 
-  filterUsers(event: Event): void {
-    // Effectuez une assertion de type pour indiquer à TypeScript que target est un élément d'input
-    const target = event.target as HTMLInputElement;
-  
-    // Vérifiez si target n'est pas null avant d'essayer d'accéder à value
-    const searchValue = target ? target.value : '';
-  
-    if (!searchValue) {
-      this.filteredUsers = this.users; // Aucune valeur de recherche, affichez tous les utilisateurs
-    } else {
-      // Filtrer les utilisateurs
-      this.filteredUsers = this.users.filter(user =>
-        user.email.toLowerCase().includes(searchValue.toLowerCase())
-      );
-    }
-  }
+
 
 
 
