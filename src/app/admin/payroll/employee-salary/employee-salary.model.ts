@@ -1,30 +1,35 @@
 export class EmployeeSalary {
-  id: number;
-  img: string;
-  name: string;
-  email: string;
-  payslip: string;
-  role: string;
-  empID: string;
-  department: string;
-  salary: string;
-  constructor(employeeSalary: EmployeeSalary) {
-    {
-      this.id = employeeSalary.id || this.getRandomID();
-      this.img = employeeSalary.img || 'assets/images/user/user1.jpg';
-      this.name = employeeSalary.name || '';
-      this.email = employeeSalary.email || '';
-      this.payslip = employeeSalary.payslip || '';
-      this.role = employeeSalary.role || '';
-      this.empID = employeeSalary.empID || '';
-      this.department = employeeSalary.department || '';
-      this.salary = employeeSalary.salary || '';
-    }
-  }
-  public getRandomID(): number {
-    const S4 = () => {
-      return ((1 + Math.random()) * 0x10000) | 0;
+  _id: string;
+  netSalary: number;
+  user: {
+    _id: string;
+    firstName: string;
+    lastName: string;
+    email: string;
+    Matricule: string;
+    poste: {
+      _id: string;
+      PostName: string;
     };
-    return S4() + S4();
+  };
+
+  constructor(data: any) {
+    this._id = data._id;
+    this.netSalary = data.netSalary;
+    this.user = {
+      _id: data.user._id,
+      firstName: data.user.firstName,
+      lastName: data.user.lastName,
+      email: data.user.email,
+      Matricule: data.user.Matricule,
+      poste: {
+        _id: data.user.poste._id,
+        PostName: data.user.poste.PostName
+      }
+    };
   }
 }
+
+ 
+ 
+

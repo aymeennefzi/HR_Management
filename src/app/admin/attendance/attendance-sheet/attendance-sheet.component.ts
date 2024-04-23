@@ -49,11 +49,10 @@ export class AttendanceSheetComponent implements OnInit {
   getUsersWithAttendances(): void {
     this.calanderS.getUsersWithAttendances().subscribe({
       next: (users: User[]) => {
-        this.users = users; // Assigner les utilisateurs récupérés à la variable locale
-        console.log(this.users);
+        this.users = users; 
       },
       error: (error) => {
-        console.error('Error fetching users with attendances:', error); // Gestion des erreurs
+        console.error('Error fetching users with attendances:', error); 
       }
     });
   }
@@ -73,6 +72,5 @@ export class AttendanceSheetComponent implements OnInit {
     const currentDate = new Date();
     const numDays = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0).getDate();
     this.monthDates = Array.from({ length: numDays }, (_, i) => i + 1);
-    console.log(this.monthDates)
   }
 }

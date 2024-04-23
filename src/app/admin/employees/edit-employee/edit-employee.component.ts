@@ -53,7 +53,6 @@ export class EditEmployeeComponent {
     this.docForm = this.createContactForm();
   }
   onSubmit() {
-    console.log('Form Value', this.docForm.value);
   }
   createContactForm(): UntypedFormGroup {
     return this.fb.group({

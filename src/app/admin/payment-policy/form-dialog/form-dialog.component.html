@@ -1,0 +1,114 @@
+
+
+<div class="addContainer">
+  <div class="modalHeader">
+    <div class="editRowModal">
+      <div class="modalHeader clearfix">
+        <div class="font-icon">
+          <div class="icon-preview">
+            <i [ngClass]="{'fas fa-plus add-icon': action === 'ADD', 'fas fa-pencil-alt edit-icon': action === 'EDIT'}"></i>
+          </div>
+        </div>
+      
+        <h1 mat-dialog-title>
+          <span [ngClass]="{'red-text': action === 'EDIT', 'green-text': action === 'ADD'}">
+            {{ action === 'EDIT' ? 'Edit Policy' : 'Add Policy' }}
+          </span>
+        </h1>
+      
+      
+      </div>
+    </div>
+    <button mat-icon-button (click)="dialogRef.close()" class="modal-close-button" aria-label="Close dialog">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+  <div mat-dialog-content>
+    
+    <form class="register-form m-4" [formGroup]="PolicyForm" (ngSubmit)="submit">
+      <!-- Autres champs du formulaire -->
+      <div class="row">
+        <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 mb-2">
+          <mat-form-field class="example-full-width" appearance="outline">
+            <mat-label>Tax Rate</mat-label>
+            <input matInput formControlName="taxRate" type="number" required>
+            <mat-icon class="material-icons-outlined color-icon p-3" matSuffix>attach_money</mat-icon>
+            <mat-error *ngIf="PolicyForm.get('taxRate')?.hasError('required')">Tax Rate is required</mat-error>
+          </mat-form-field>
+        </div>
+        <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 mb-2">
+          <mat-form-field class="example-full-width" appearance="outline">
+            <mat-label>Social Security Rate</mat-label>
+            <input matInput formControlName="socialSecurityRate" type="number" required>
+            <mat-icon class="material-icons-outlined color-icon p-3" matSuffix>security</mat-icon>
+            <mat-error *ngIf="PolicyForm.get('socialSecurityRate')?.hasError('required')">Social Security Rate is required</mat-error>
+          </mat-form-field>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 mb-2">
+          <mat-form-field class="example-full-width" appearance="outline">
+            <mat-label>Other Deductions</mat-label>
+            <input matInput formControlName="otherDeductions" type="number" required>
+            <mat-icon class="material-icons-outlined color-icon p-3" matSuffix>money_off</mat-icon>
+            <mat-error *ngIf="PolicyForm.get('otherDeductions')?.hasError('required')">Other Deductions is required</mat-error>
+          </mat-form-field>
+        </div>
+        <div class="row">
+          <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 mb-2">
+            <mat-form-field class="example-full-width" appearance="outline">
+              <mat-label>Payment Day</mat-label>
+              <input matInput formControlName="paymentDay" type="number">
+              <mat-icon class="material-icons-outlined color-icon p-3" matSuffix>payment</mat-icon>
+            </mat-form-field>
+          </div>
+        </div>
+        <!-- Ajoutez les autres champs ici -->
+        <div class="row">
+          <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 mb-2">
+            <mat-form-field class="example-full-width" appearance="outline">
+              <mat-label>Excess Day Payment</mat-label>
+              <input matInput formControlName="exessDayPay" type="number">
+              <mat-icon class="material-icons-outlined color-icon p-3" matSuffix>attach_money</mat-icon>
+              <!-- Ajoutez ici un message d'erreur si nécessaire -->
+            </mat-form-field>
+          </div>
+        </div>
+        <div style="display: flex; align-items: center;">
+          <div style="flex-grow: 1; height: 1px; background-color: black;"></div>
+          <p style="margin: 0 10px;">Allowed Days</p>
+          <div style="flex-grow: 1; height: 1px; background-color: black;"></div>
+        </div>
+        
+       <!-- Supprimez le code existant pour allowedDays -->
+       <div class="row">
+        <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 mb-2" *ngFor="let leaveType of leaveTypes">
+          <mat-form-field class="example-full-width" appearance="outline">
+            <mat-label>{{ leaveType }}</mat-label>
+            <input matInput type="number" placeholder="Enter value" [formControlName]="leaveType" (input)="updateValue($event, leaveType)">
+            <mat-icon class="material-icons-outlined color-icon p-3" matSuffix>Days</mat-icon>
+            <mat-error *ngIf="PolicyForm.get(leaveType)?.hasError('required')">Value is required</mat-error>
+          </mat-form-field>
+        </div>
+      </div>
+      
+      
+      
+
+       </div>
+
+
+        
+      <!-- Boutons Save et Cancel -->
+      <div class="row">
+        <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-2">
+          <div class="example-button-row"align="end">
+            <button mat-raised-button color="primary" [disabled]="!PolicyForm.valid" [mat-dialog-close]="1" (click)="confirmAdd()">Save</button>
+            <button mat-raised-button color="warn" (click)="onNoClick()" tabindex="-1">Cancel</button>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+  
+</div>

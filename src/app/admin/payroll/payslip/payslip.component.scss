@@ -1,0 +1,23 @@
+.printer-button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+    font-size: 24px; /* Ajustez la taille de la police selon vos besoins */
+}
+
+.printer-button i {
+    margin-right: 10px; /* Marge à droite de l'icône pour l'espace */
+}
+
+.printer-icon {
+    width: 48px; /* Ajustez la taille de l'icône de l'imprimante selon vos besoins */
+    height: 48px; /* Ajustez la taille de l'icône de l'imprimante selon vos besoins */
+    /* Ajoutez ici votre image d'imprimante en tant que fond */
+    background-image: url('../../../../assets/images/383121643_837545864745849_4741595037010773415_n.jpg');
+    background-size: cover;
+}
+
+

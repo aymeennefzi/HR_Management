@@ -1,0 +1,85 @@
+<section class="content">
+    <div class="content-block">
+      <div class="block-header">
+        <!-- breadcrumb -->
+        <app-breadcrumb [title]="''" [items]="['Payment Policy ']" [active_item]="'Payments Policies'"></app-breadcrumb>
+      </div>
+      <div #content>
+        <div class="row clearfix">
+          <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+            <div class="card">
+              <div class="materialTableHeader">
+                <div class="left">
+                  <ul class="header-buttons-left ms-0">
+                    <li class="tbl-title">
+                      <h2></h2>
+                    </li>
+                   
+                  </ul>
+                </div>
+                <div class="right">
+                  <ul class="tbl-export-btn">
+                    <li class="tbl-header-btn">
+                      <div class="m-l-10" matTooltip="ADD">
+                        <button mat-mini-fab color="primary" (click)="addNew()">
+                          <mat-icon class="col-white">add</mat-icon>
+                        </button>
+                      </div>
+                    </li>
+                    <li class="tbl-header-btn">
+                      <div class="m-l-10" matTooltip="EDIT">
+                        <button mat-mini-fab color="primary" (click)="edit()">
+                          <mat-icon class="col-white">edit</mat-icon>
+                        </button>
+                      </div>
+                    </li>
+                    <li class="tbl-header-btn">
+                      <div class="m-l-10" matTooltip="REFRESH">
+                        <button mat-mini-fab color="primary" (click)="refresh()">
+                          <mat-icon class="col-white">refresh</mat-icon>
+                        </button>
+                      </div>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+              <div class="body">
+                <div class="container">
+                  <h2>Payment Policy</h2>
+                  <table class="table">
+                    <thead>
+                      <tr>
+                        <th>Tax Rate (%)</th>
+                        <th>Social Security Rate (%)</th>
+                        <th>Other Deductions (dinars)</th>
+                        <th>Payment Day</th>
+                        <th>Excess Day Payment</th>
+                        <th>Allowed Days</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr *ngFor="let policy of paymentPolicies">
+                        <td class="bold center">{{ policy.taxRate }}</td>
+                        <td class="bold center">{{ policy.socialSecurityRate }}</td>
+                        <td class="bold center">{{ policy.otherDeductions }}</td>
+                        <td class="bold center">{{ policy.paymentDay }}</td>
+                        <td class="bold center">{{ policy.exessDayPay }}</td>
+                        <td>
+                          <ul>
+                            <ng-container *ngFor="let item of policy.allowedDays | keyvalue">
+                              <li>{{ item.key }}: {{ item.value }}</li>
+                            </ng-container>
+                          </ul>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  

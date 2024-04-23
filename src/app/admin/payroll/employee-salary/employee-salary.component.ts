@@ -59,13 +59,13 @@ export class EmployeeSalaryComponent
 {
   displayedColumns = [
     'select',
-    'img',
-    'name',
-    'empID',
+   // 'img',
+    'firstName',
+    'lastName',
     'email',
-    'department',
-    'role',
-    'salary',
+    'poste',
+    'Matricule',
+    'netSalary',
     'payslip',
     'actions',
   ];
@@ -127,80 +127,81 @@ export class EmployeeSalaryComponent
       }
     });
   }
-  editCall(row: EmployeeSalary) {
-    this.id = row.id;
-    let tempDirection: Direction;
-    if (localStorage.getItem('isRtl') === 'true') {
-      tempDirection = 'rtl';
-    } else {
-      tempDirection = 'ltr';
-    }
-    const dialogRef = this.dialog.open(FormDialogComponent, {
-      data: {
-        employeeSalary: row,
-        action: 'edit',
-      },
-      direction: tempDirection,
-    });
-    this.subs.sink = dialogRef.afterClosed().subscribe((result) => {
-      if (result === 1) {
-        // When using an edit things are little different, firstly we find record inside DataService by id
-        const foundIndex = this.exampleDatabase?.dataChange.value.findIndex(
-          (x) => x.id === this.id
-        );
-        // Then you update that record using data from dialogData (values you enetered)
-        if (foundIndex != null && this.exampleDatabase) {
-          this.exampleDatabase.dataChange.value[foundIndex] =
-            this.employeeSalaryService.getDialogData();
-          // And lastly refresh table
-          this.refreshTable();
-          this.showNotification(
-            'black',
-            'Edit Record Successfully...!!!',
-            'bottom',
-            'center'
-          );
-        }
-      }
-    });
+  // editCall(row: EmployeeSalary) {
+  //   this.id = row.id;
+  //   let tempDirection: Direction;
+  //   if (localStorage.getItem('isRtl') === 'true') {
+  //     tempDirection = 'rtl';
+  //   } else {
+  //     tempDirection = 'ltr';
+  //   }
+  //   const dialogRef = this.dialog.open(FormDialogComponent, {
+  //     data: {
+  //       employeeSalary: row,
+  //       action: 'edit',
+  //     },
+  //     direction: tempDirection,
+  //   });
+  //   this.subs.sink = dialogRef.afterClosed().subscribe((result) => {
+  //     if (result === 1) {
+  //       // When using an edit things are little different, firstly we find record inside DataService by id
+  //       const foundIndex = this.exampleDatabase?.dataChange.value.findIndex(
+  //         (x) => x.id === this.id
+  //       );
+  //       // Then you update that record using data from dialogData (values you enetered)
+  //       if (foundIndex != null && this.exampleDatabase) {
+  //         this.exampleDatabase.dataChange.value[foundIndex] =
+  //           this.employeeSalaryService.getDialogData();
+  //         // And lastly refresh table
+  //         this.refreshTable();
+  //         this.showNotification(
+  //           'black',
+  //           'Edit Record Successfully...!!!',
+  //           'bottom',
+  //           'center'
+  //         );
+  //       }
+  //     }
+  //   });
+  // }
+  downloadCall(_id:string) {
+
+    this.router.navigate(['/admin/payroll/payslip',_id]);
   }
-  downloadCall() {
-    this.router.navigateByUrl('admin/payroll/payslip');
-  }
-  deleteItem(i: number, row: EmployeeSalary) {
-    this.index = i;
-    this.id = row.id;
-    let tempDirection: Direction;
-    if (localStorage.getItem('isRtl') === 'true') {
-      tempDirection = 'rtl';
-    } else {
-      tempDirection = 'ltr';
-    }
-    const dialogRef = this.dialog.open(DeleteDialogComponent, {
-      height: '280px',
-      width: '300px',
-      data: row,
-      direction: tempDirection,
-    });
-    this.subs.sink = dialogRef.afterClosed().subscribe((result) => {
-      if (result === 1) {
-        const foundIndex = this.exampleDatabase?.dataChange.value.findIndex(
-          (x) => x.id === this.id
-        );
-        // for delete we use splice in order to remove single object from DataService
-        if (foundIndex != null && this.exampleDatabase) {
-          this.exampleDatabase.dataChange.value.splice(foundIndex, 1);
-          this.refreshTable();
-          this.showNotification(
-            'snackbar-danger',
-            'Delete Record Successfully...!!!',
-            'bottom',
-            'center'
-          );
-        }
-      }
-    });
-  }
+  // deleteItem(i: number, row: EmployeeSalary) {
+  //   this.index = i;
+  //   this.id = row.id;
+  //   let tempDirection: Direction;
+  //   if (localStorage.getItem('isRtl') === 'true') {
+  //     tempDirection = 'rtl';
+  //   } else {
+  //     tempDirection = 'ltr';
+  //   }
+  //   const dialogRef = this.dialog.open(DeleteDialogComponent, {
+  //     height: '280px',
+  //     width: '300px',
+  //     data: row,
+  //     direction: tempDirection,
+  //   });
+  //   this.subs.sink = dialogRef.afterClosed().subscribe((result) => {
+  //     if (result === 1) {
+  //       const foundIndex = this.exampleDatabase?.dataChange.value.findIndex(
+  //         (x) => x.id === this.id
+  //       );
+  //       // for delete we use splice in order to remove single object from DataService
+  //       if (foundIndex != null && this.exampleDatabase) {
+  //         this.exampleDatabase.dataChange.value.splice(foundIndex, 1);
+  //         this.refreshTable();
+  //         this.showNotification(
+  //           'snackbar-danger',
+  //           'Delete Record Successfully...!!!',
+  //           'bottom',
+  //           'center'
+  //         );
+  //       }
+  //    }
+  //  });
+ // }
   private refreshTable() {
     this.paginator._changePageSize(this.paginator.pageSize);
   }
@@ -225,7 +226,7 @@ export class EmployeeSalaryComponent
       const index: number = this.dataSource.renderedData.findIndex(
         (d) => d === item
       );
-      // console.log(this.dataSource.renderedData.findIndex((d) => d === item));
+       console.log(this.dataSource.renderedData.findIndex((d) => d === item));
       this.exampleDatabase?.dataChange.value.splice(index, 1);
 
       this.refreshTable();
@@ -256,21 +257,21 @@ export class EmployeeSalaryComponent
   }
 
   // export table data in excel file
-  exportExcel() {
-    // key name with space add in brackets
-    const exportData: Partial<TableElement>[] =
-      this.dataSource.filteredData.map((x) => ({
-        Name: x.name,
-        'Employee ID': x.empID,
-        Email: x.email,
-        Department: x.department,
-        Role: x.role,
-        Salary: x.salary,
-        Payslip: x.payslip,
-      }));
+  // exportExcel() {
+  //   // key name with space add in brackets
+  //   const exportData: Partial<TableElement>[] =
+  //     // this.dataSource.filteredData.map((x) => ({
+  //     //   Name: x.name,
+  //     //   'Employee ID': x.empID,
+  //     //   Email: x.email,
+  //     //   Department: x.department,
+  //     //   Role: x.role,
+  //     //   Salary: x.salary,
+  //     //   Payslip: x.payslip,
+  //     // }));
 
-    TableExportUtil.exportToExcel(exportData, 'excel');
-  }
+  //   TableExportUtil.exportToExcel(exportData, 'excel');
+  // }
   showNotification(
     colorName: string,
     text: string,
@@ -324,7 +325,7 @@ export class ExampleDataSource extends DataSource<EmployeeSalary> {
       this.filterChange,
       this.paginator.page,
     ];
-    this.exampleDatabase.getAllEmployeeSalarys();
+    this.exampleDatabase.getAllPayrollsWithUsersAndPoste();
     return merge(...displayDataChanges).pipe(
       map(() => {
         // Filter data
@@ -332,12 +333,15 @@ export class ExampleDataSource extends DataSource<EmployeeSalary> {
           .slice()
           .filter((employeeSalary: EmployeeSalary) => {
             const searchStr = (
-              employeeSalary.name +
-              employeeSalary.department +
-              employeeSalary.role +
-              employeeSalary.salary +
-              employeeSalary.email +
-              employeeSalary.empID
+              employeeSalary._id+
+              employeeSalary.user._id+
+              employeeSalary.user.poste._id+
+              employeeSalary.user.firstName +
+              employeeSalary.user.lastName +
+              employeeSalary.user.Matricule +
+              employeeSalary.user.email +
+              employeeSalary.netSalary+
+              employeeSalary.user.poste.PostName
             ).toLowerCase();
             return searchStr.indexOf(this.filter.toLowerCase()) !== -1;
           });
@@ -361,34 +365,22 @@ export class ExampleDataSource extends DataSource<EmployeeSalary> {
     if (!this._sort.active || this._sort.direction === '') {
       return data;
     }
+  
     return data.sort((a, b) => {
-      let propertyA: number | string = '';
-      let propertyB: number | string = '';
+      const isAsc = this._sort.direction === 'asc';
       switch (this._sort.active) {
-        case 'id':
-          [propertyA, propertyB] = [a.id, b.id];
-          break;
-        case 'name':
-          [propertyA, propertyB] = [a.name, b.name];
-          break;
-        case 'email':
-          [propertyA, propertyB] = [a.email, b.email];
-          break;
-        case 'payslip':
-          [propertyA, propertyB] = [a.payslip, b.payslip];
-          break;
-        case 'department':
-          [propertyA, propertyB] = [a.department, b.department];
-          break;
-        case 'empID':
-          [propertyA, propertyB] = [a.empID, b.empID];
-          break;
+        case 'firstName': return this.compare(a.user.firstName, b.user.firstName, isAsc);
+        case 'lastName': return this.compare(a.user.lastName, b.user.lastName, isAsc);
+        case 'email': return this.compare(a.user.email, b.user.email, isAsc);
+        case 'Matricule': return this.compare(a.user.Matricule, b.user.Matricule, isAsc);
+        case 'netSalary': return this.compare(a.netSalary, b.netSalary, isAsc);
+        case 'poste': return this.compare(a.user.poste.PostName, b.user.poste.PostName, isAsc);
+        default: return 0;
       }
-      const valueA = isNaN(+propertyA) ? propertyA : +propertyA;
-      const valueB = isNaN(+propertyB) ? propertyB : +propertyB;
-      return (
-        (valueA < valueB ? -1 : 1) * (this._sort.direction === 'asc' ? 1 : -1)
-      );
     });
+  }
+  
+  compare(a: number | string, b: number | string, isAsc: boolean) {
+    return (a < b ? -1 : 1) * (isAsc ? 1 : -1);
   }
 }

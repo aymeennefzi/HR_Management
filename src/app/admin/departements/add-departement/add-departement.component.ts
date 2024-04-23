@@ -9,6 +9,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { FileUploadComponent } from '@shared/components/file-upload/file-upload.component';
 import { MatButtonModule } from '@angular/material/button';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-add-departement',
@@ -24,6 +25,7 @@ import { MatButtonModule } from '@angular/material/button';
     MatDatepickerModule,
     FileUploadComponent,
     MatButtonModule,
+    CommonModule
   ],
   templateUrl: './add-departement.component.html',
   styleUrl: './add-departement.component.scss'

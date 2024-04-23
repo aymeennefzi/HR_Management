@@ -101,9 +101,7 @@ export class AllemployeesComponent
   }
   activateUser(userId: string): void {
     this.employeesService.activateUser(userId).subscribe(
-      user => {
-        console.log('Utilisateur activé :', user);
-        
+      user => {        
       },
       error => {
         console.error("Une erreur s'est produite lors de l'activation de l'utilisateur :", error);
@@ -115,8 +113,6 @@ export class AllemployeesComponent
     this.employeesService.desactivatedUser(userId).subscribe(
       user => {
         this.ngOnInit ;
-
-        console.log('Utilisateur activé :', user);
       },
       error => {
         console.error("Une erreur s'est produite lors de l'activation de l'utilisateur :", error);
@@ -139,8 +135,6 @@ export class AllemployeesComponent
     });
     this.subs.sink = dialogRef.afterClosed().subscribe((result) => {
       if (result === 1) {
-        // After dialog is closed we're doing frontend updates
-        // For add we're just pushing a new row inside DataServicex
         this.exampleDatabase?.dataChange.value.unshift(
           this.employeesService.getDialogData()
         );
@@ -250,7 +244,6 @@ export class AllemployeesComponent
       const index: number = this.dataSource.renderedData.findIndex(
         (d) => d === item
       );
-      // console.log(this.dataSource.renderedData.findIndex((d) => d === item));
       this.exampleDatabase?.dataChange.value.splice(index, 1);
 
       this.refreshTable();
@@ -279,22 +272,6 @@ export class AllemployeesComponent
       }
     );
   }
-  // export table data in excel file
-  // exportExcel() {
-  //   // key name with space add in brackets
-  //   const exportData: Partial<TableElement>[] =
-  //     this.dataSource.filteredData.map((x) => ({
-  //       Name: x.name,
-  //       Department: x.department,
-  //       Role: x.role,
-  //       'Joining Date': formatDate(new Date(x.date), 'yyyy-MM-dd', 'en') || '',
-  //       Degree: x.degree,
-  //       Mobile: x.mobile,
-  //       Email: x.email,
-  //     }));
-
-  //   TableExportUtil.exportToExcel(exportData, 'excel');
-  // }
   showNotification(
     colorName: string,
     text: string,
@@ -350,7 +327,6 @@ export class ExampleDataSource extends DataSource<Employees> {
     ];
   
     const test$ = this.exampleDatabase.getAllUsers();
-    console.log(test$)
     return merge(test$, ...displayDataChanges).pipe(
       map((data) => {
         if (Array.isArray(data)) {
@@ -379,7 +355,6 @@ export class ExampleDataSource extends DataSource<Employees> {
             startIndex,
             startIndex + this.paginator.pageSize
           ); 
-          console.log(this.renderedData);
           return this.renderedData;
         } else {
           return [];

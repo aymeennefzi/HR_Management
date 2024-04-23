@@ -33,7 +33,6 @@ import { BreadcrumbComponent } from '@shared/components/breadcrumb/breadcrumb.co
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
 import { MatChipListbox, MatChipsModule } from '@angular/material/chips';
-import { ChipsComponent } from 'app/ui/chips/chips.component';
 import { FormsModule } from '@angular/forms';
 import { MatInputModule } from '@angular/material/input';
 
@@ -66,7 +65,6 @@ import { MatInputModule } from '@angular/material/input';
     CommonModule,
     FormsModule,
     MatChipsModule,
-    ChipsComponent,
     MatChipListbox
   ],
 })
@@ -254,7 +252,6 @@ export class JobsListComponent
       const index: number = this.dataSource.renderedData.findIndex(
         (d) => d === item
       );
-      // console.log(this.dataSource.renderedData.findIndex((d) => d === item));
       this.exampleDatabase?.dataChange.value.splice(index, 1);
 
       this.refreshTable();
@@ -294,7 +291,6 @@ export class JobsListComponent
   addSkill(): void {
     this.jobsListService.addSkill(this.newSkill)
       .subscribe((addedSkill: Skill) => {
-        console.log('Skill added:', addedSkill);
         alert('skill added');
         // Vous pouvez effectuer d'autres actions ici après l'ajout réussi
         this.newSkill = {  name: '' }; // Réinitialiser le nouveau skill

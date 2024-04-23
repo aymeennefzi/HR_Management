@@ -4,7 +4,6 @@ import { Page404Component } from "../../authentication/page404/page404.component
 import { AllemployeesComponent } from "./allEmployees/allemployees.component";
 import { EditEmployeeComponent } from "./edit-employee/edit-employee.component";
 import { EmployeeProfileComponent } from "./employee-profile/employee-profile.component";
-import { ProfileComponent } from "app/extra-pages/profile/profile.component";
 export const ADMIN_EMPLOYEE_ROUTE: Route[] = [
   {
     path: "allEmployees",
@@ -17,10 +16,6 @@ export const ADMIN_EMPLOYEE_ROUTE: Route[] = [
   {
     path: "edit-employee",
     component: EditEmployeeComponent,
-  },
-  {
-    path: "employee-profile",
-    component: ProfileComponent,
   },
   { path: "**", component: Page404Component },
 ];

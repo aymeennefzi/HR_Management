@@ -48,7 +48,7 @@ export class FormDialogComponent {
     // Set the defaults
     this.action = data.action;
     if (this.action === 'edit') {
-      this.dialogTitle = data.employeeSalary.name;
+      this.dialogTitle = data.employeeSalary.user.firstName;
       this.employeeSalary = data.employeeSalary;
     } else {
       this.dialogTitle = 'New EmployeeSalary';
@@ -70,15 +70,14 @@ export class FormDialogComponent {
   }
   createContactForm(): UntypedFormGroup {
     return this.fb.group({
-      id: [this.employeeSalary.id],
-      img: [this.employeeSalary.img],
-      name: [this.employeeSalary.name],
-      email: [this.employeeSalary.email],
-      payslip: [this.employeeSalary.payslip],
-      role: [this.employeeSalary.role],
-      empID: [this.employeeSalary.empID],
-      department: [this.employeeSalary.department],
-      salary: [this.employeeSalary.salary],
+      id: [this.employeeSalary._id],
+      // img: [this.employeeSalary.img],
+      name: [this.employeeSalary.user.firstName],
+      email: [this.employeeSalary.user.email],
+      payslip: [this.employeeSalary.user.lastName],
+      role: [this.employeeSalary.user.Matricule],
+      empID: [this.employeeSalary.user.poste.PostName],
+      salary: [this.employeeSalary.netSalary],
     });
   }
   submit() {

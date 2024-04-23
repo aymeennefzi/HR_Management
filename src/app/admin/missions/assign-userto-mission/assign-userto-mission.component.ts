@@ -51,21 +51,14 @@ export class AssignUsertoMissionComponent {
   this.id=_id
     });
   }
- 
   onSubmit() {
     const userId = this.userForm.value.userId;
-    // Assuming `this.id` is the mission ID and `this.userForm.value` contains the user data
     this.missionsService.assignUserToMission(this.id,userId).subscribe({
+
       next: (response) => {
-        console.log(this.id)
-        console.log(this.userForm.value)
-        // Handle the response if needed, for example, logging it or setting some state
-        console.log('Mission assignment successful', response);
-        // Navigate to the 'all missions' page upon successful mission assignment
         this.r.navigate(['admin/mission/allmissions']);
       },
       error: (error) => {
-        // Handle any errors that occur during the subscription
         console.error('Error during mission assignment', error);
       }
     });

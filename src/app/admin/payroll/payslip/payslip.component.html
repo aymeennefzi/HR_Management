@@ -1,8 +1,8 @@
-<section class="content">
+<!-- <section class="content">
     <div class="content-block">
         <div class="block-header">
-            <!-- breadcrumb -->
-            <app-breadcrumb [title]="'Payslip'" [items]="['Payroll']" [active_item]="'Payslip'">
+           breadcrumb -->
+              <!--<app-breadcrumb [title]="'Payslip'" [items]="['Payroll']" [active_item]="'Payslip'">
             </app-breadcrumb>
         </div>
         <div class="row clearfix">
@@ -161,4 +161,93 @@
             </div>
         </div>
     </div>
+</section> -->
+
+<section class="content">
+    <div class="content-block">
+        <div class="block-header">
+            
+        <app-breadcrumb [title]="'Payslip'" [items]="['Payroll']" [active_item]="'Payslip'">
+            </app-breadcrumb>
+        </div>
+        <div #content>
+        <div class="row clearfix">
+            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                <div class="card">
+                    <div class="header">
+                        <h2></h2>
+                    </div>
+                    
+                    <div class="body">
+                        <div class="payslip-container">
+                            <div class="row">
+                                <div class="col-md-12 text-center">
+                                    <h1 class="payslip-header">Payslip for {{ getMonthName(payslipData.payroll.month) }} {{ payslipData.payroll.year }}</h1>
+                                </div>
+                            </div>
+                            <div *ngIf="payslipData">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="employee-info">
+                                            <h2 class="info-header">Employee Information</h2>
+                                            <p><strong>Name:</strong> {{ payslipData.payroll.user.firstName }} {{ payslipData.payroll.user.lastName }}</p>
+                                            <p><strong>Email:</strong> {{ payslipData.payroll.user.email }}</p>
+                                            <p><strong>Matricule:</strong> {{ payslipData.payroll.user.Matricule }}</p>
+                                            <p><strong>Poste:</strong> {{ payslipData.payroll.user.poste.posteName }}</p>
+                                            <!-- Autres détails de l'employé à afficher -->
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="payroll-details">
+                                            <h2 class="info-header">Payroll Details</h2>
+                                            <p><strong>Month:</strong> {{ payslipData.payroll.month }}</p>
+                                            <p><strong>Year:</strong> {{ payslipData.payroll.year }}</p>
+                                            <p><strong>Basic Salary:</strong> {{ payslipData.payroll.basicSalary }}</p>
+                                            <!-- Autres détails de la paie à afficher -->
+                                        </div>
+                                    </div>
+                                </div>
+                                <hr> <!-- Ligne verticale pour séparer la partie gauche de la partie droite -->
+                                <div class="row mt-4">
+                                    <div class="col-md-12">
+                                        <div class="deductions-details">
+                                            <h2 class="info-header">Deductions</h2>
+                                            <p><strong>Tax Deduction:</strong> {{ payslipData.deductions[0] }}</p>
+                                            <p><strong>Social Security Deduction:</strong> {{ payslipData.deductions[1] }}</p>
+                                            <p><strong>Other Deductions:</strong> {{ payslipData.deductions[2] }}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                               
+                                <div class="row">
+                                    <div class="col-md-12 text-center mt-5">
+                                        <h2 class="info-header">Net Salary</h2>
+                                        <p class="fw-bold">{{ payslipData.payroll.netSalary }}</p>
+                                        <p>{{ convertToWords(payslipData.payroll.netSalary) }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="d-flex justify-content-end">
+                        <div class="d-flex flex-column mt-2"> <span class="fw-bolder">For Priya
+                                Jain</span> <span class="mt-4">Authorised Signatory</span> </div>
+                    </div>
+                    <div class="print">
+                        <button class="printer-button" (click)="downloadAsPDF()">
+                            <span class="printer-icon"></span>
+                            <strong>Print this receipt</strong>
+                        </button>
+                    </div>
+                    
+                    
+                </div>
+            </div>
+           
+        </div>
+                               
+        <!-- <button (click)="downloadAsPDF()">Télécharger en PDF</button> -->
+        
+    </div>
+</div>
 </section>

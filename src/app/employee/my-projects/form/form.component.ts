@@ -1,6 +1,5 @@
 import { MAT_DIALOG_DATA, MatDialogRef, MatDialogContent } from '@angular/material/dialog';
 import { Component, Inject } from '@angular/core';
-import { MyProjectsService } from '../my-projects.service';
 import { MyProjects } from '../my-projects.model';
 import { DatePipe } from '@angular/common';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
@@ -36,7 +35,6 @@ export class FormComponent {
   constructor(
     public dialogRef: MatDialogRef<FormComponent>,
     @Inject(MAT_DIALOG_DATA) public data: DialogData,
-    public myProjectsService: MyProjectsService
   ) {
     // Set the defaults
     this.myProjects = data.myProjects;

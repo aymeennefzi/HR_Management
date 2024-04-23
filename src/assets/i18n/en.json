@@ -27,6 +27,13 @@
         "EDIT-EMPLOYEE": "Edit Employee",
         "PROFILE": "Employee Profile"
       }
+    },"POLICYPAYMENT": {
+      "TEXT": "Payment Policy",
+      "LIST": {
+        "PAYMENTP": "All Payments Policy"
+      }
+        
+      
     },
     "CLIENTS": {
       "TEXT": "Clients",

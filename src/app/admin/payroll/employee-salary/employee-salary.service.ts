@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, Observable, tap } from 'rxjs';
 import { EmployeeSalary } from './employee-salary.model';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { UnsubscribeOnDestroyAdapter } from '@shared';
@@ -8,7 +8,7 @@ import { UnsubscribeOnDestroyAdapter } from '@shared';
   providedIn: 'root',
 })
 export class EmployeeSalaryService extends UnsubscribeOnDestroyAdapter {
-  private readonly API_URL = 'assets/data/employee-salary.json';
+   baseUrl = 'http://localhost:3000/payroll';
   isTblLoading = true;
   dataChange: BehaviorSubject<EmployeeSalary[]> = new BehaviorSubject<
     EmployeeSalary[]
@@ -25,9 +25,9 @@ export class EmployeeSalaryService extends UnsubscribeOnDestroyAdapter {
     return this.dialogData;
   }
   /** CRUD METHODS */
-  getAllEmployeeSalarys(): void {
+  getAllPayrollsWithUsersAndPoste(): void {
     this.subs.sink = this.httpClient
-      .get<EmployeeSalary[]>(this.API_URL)
+      .get<EmployeeSalary[]>('http://localhost:3000/payroll/withUsersAndPoste')
       .subscribe({
         next: (data) => {
           this.isTblLoading = false;
@@ -39,6 +39,16 @@ export class EmployeeSalaryService extends UnsubscribeOnDestroyAdapter {
         },
       });
   }
+  // getAllPayrollsWithUsersAndPoste(): Observable<any[]> {
+  //   return this.httpClient.get<any[]>('http://localhost:3000/payroll/withUsersAndPoste').pipe(
+  //     tap(payroll => console.log('payroll', payroll))
+  //   );
+  // }
+  
+    
+  
+  
+  
   addEmployeeSalary(employeeSalary: EmployeeSalary): void {
     this.dialogData = employeeSalary;
 

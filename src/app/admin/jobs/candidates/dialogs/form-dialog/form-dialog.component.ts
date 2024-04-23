@@ -68,22 +68,6 @@ export class FormDialogComponent implements OnInit {
     this.candidatesForm = this.createContactForm();
     this.contactForm = this.createContactForm();
   }
-  // ngOnInit(): void {
-  //   this.contactForm = this.fb.group({
-     
-  //     id: [this.data.id], // Assurez-vous que l'ID est initialisé correctement
-  //     title: [this.data.jobsList.title, Validators.required],
-  //     description: [this.data.jobsList.description, Validators.required],
-  //     location: [this.data.jobsList.location, Validators.required],
-  //     contractType: [this.data.jobsList.contractType, Validators.required],
-  //     salary: [this.data.jobsList.salary, Validators.required],
-  //     applicationDeadline: [this.data.jobsList.applicationDeadline, Validators.required],
-  //     status: [this.data.jobsList.status, Validators.required],
-  //     publicationDate: [this.data.jobsList.publicationDate, Validators.required],
-  //     requiredSkills: [this.data.jobsList.requiredSkills, Validators.required],
-  //     recruitingManager: [this.data.jobsList.recruitingManager, Validators.required]
-  //   });
-  // }
   formControl = new UntypedFormControl('', [
     Validators.required,
     // Validators.mobile,
@@ -170,31 +154,7 @@ export class FormDialogComponent implements OnInit {
   onNoClick(): void {
     this.dialogRef.close();
   }
- 
-  // public confirmAdd(): void {
-  //   if (this.contactForm && this.contactForm.valid && this.cvFile) {
-  //     const formData = new FormData();
-  //     formData.append('candidateName', this.contactForm.get('candidateName')!.value);
-  //     formData.append('email', this.contactForm.get('email')!.value);
-  //     formData.append('jobId', this.contactForm.get('jobId')!.value);
-  //     formData.append('cv', this.cvFile);
-  
-  //     this.candidatesService.applyforjob(formData).subscribe(
-  //       (response) => {
-  //         // Traitement du succès de la requête
-  //         console.log('Application submitted successfully:', response);
-  //         alert('Application submitted successfully!');
-  //         this.dialogRef.close(true); // Fermer le dialogue après la soumission réussie
-  //       },
-  //       (error) => {
-  //         // Gérer les erreurs de la requête
-  //         console.error('Error submitting application:', error);
-  //         // Afficher un message d'erreur à l'utilisateur si nécessaire
-  //       }
-  //     );
-  //   }
-  // }
-  
+
   public confirmAdd(): void {
     if (this.contactForm && this.contactForm.valid && this.cvFile) {
       const formData = new FormData();
@@ -204,17 +164,13 @@ export class FormDialogComponent implements OnInit {
       formData.append('cv', this.cvFile);
   
       if (this.action === 'edit') {
-        // Modification
-        // Appelez la méthode de mise à jour du service avec l'ID du candidat et les données mises à jour
+        
         this.candidatesService.updateCandidate(this.candidates._id, formData).subscribe(
           (response) => {
-            console.log('Candidate updated successfully:', response);
             alert('Candidate updated successfully!');
             this.dialogRef.close(true); // Fermer le dialogue après la mise à jour réussie
           },
           (error) => {
-            console.error('Error updating candidate:', error);
-            // Gérer les erreurs de mise à jour
           }
         );
       } else {
@@ -222,13 +178,11 @@ export class FormDialogComponent implements OnInit {
         // Appelez la méthode d'ajout du service avec les données du formulaire
         this.candidatesService.applyforjob(formData).subscribe(
           (response) => {
-            console.log('Application submitted successfully:', response);
             alert('Application submitted successfully!');
             this.dialogRef.close(true); // Fermer le dialogue après l'ajout réussi
           },
           (error) => {
             console.error('Error submitting application:', error);
-            // Gérer les erreurs d'ajout
           }
         );
       }
