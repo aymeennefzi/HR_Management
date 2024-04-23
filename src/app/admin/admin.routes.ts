@@ -1,5 +1,6 @@
 import { Route } from '@angular/router';
 import { BillingComponent } from 'app/client/billing/billing.component';
+import { PerformanceComponent } from './performance/performance.component';
 
 export const ADMIN_ROUTE: Route[] = [
   {
@@ -72,6 +73,19 @@ export const ADMIN_ROUTE: Route[] = [
     loadChildren: () =>
       import('./payment-policy/paymentPolicy.routes').then((m) => m.PAYMENTPOLICY_ROUTE),
   },
+  {
+    path : 'performance' , component : PerformanceComponent
+  },
+  {
+    path: 'Policy',
+    loadChildren: () =>
+      import('./payment-policy/paymentPolicy.routes').then((m) => m.PAYMENTPOLICY_ROUTE),
+  },
+  {
+    path: 'Postes',
+    loadChildren: () =>
+      import('./poste/poste.routes').then((m) => m.POSTE_ROUTE),
+  }
   
 ];
 

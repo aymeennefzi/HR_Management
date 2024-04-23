@@ -10,6 +10,7 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 import { FileUploadComponent } from '@shared/components/file-upload/file-upload.component';
 import { MatButtonModule } from '@angular/material/button';
 import { CommonModule } from '@angular/common';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-add-departement',
@@ -65,17 +66,33 @@ export class AddDepartementComponent {
           console.log('Company added successfully!', response);
           // Réinitialisez le formulaire après l'ajout réussi
           this.docForm.reset();
-          alert('L\'entreprise a été ajoutée avec succès !');
+          // Afficher une alerte avec SweetAlert
+          Swal.fire({
+            icon: 'success',
+            title: 'Succès !',
+            text: 'L\'entreprise a été ajoutée avec succès !',
+          });
         },
         error => {
           // Gérer les erreurs de l'ajout d'entreprise
           console.error('Error adding company:', error);
+          // Afficher une alerte d'erreur avec SweetAlert
+          Swal.fire({
+            icon: 'error',
+            title: 'Erreur !',
+            text: 'Une erreur est survenue lors de l\'ajout de l\'entreprise.',
+          });
         }
       );
     } else {
       // Affichez les erreurs de validation du formulaire
       console.log('Invalid form data');
+      // Afficher une alerte avec SweetAlert pour les données de formulaire invalides
+      Swal.fire({
+        icon: 'error',
+        title: 'Erreur !',
+        text: 'Veuillez remplir tous les champs correctement.',
+      });
     }
-  }
-    // console.log('Form Value', this.docForm.value);
+}
 }

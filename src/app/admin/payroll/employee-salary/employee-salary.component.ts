@@ -6,6 +6,8 @@ import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
 import { MatSort, MatSortModule } from '@angular/material/sort';
 import { EmployeeSalary } from './employee-salary.model';
 import { DataSource } from '@angular/cdk/collections';
+import * as XLSX from 'xlsx';
+
 import {
   MatSnackBar,
   MatSnackBarHorizontalPosition,
@@ -31,6 +33,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { BreadcrumbComponent } from '@shared/components/breadcrumb/breadcrumb.component';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-employee-salary',
@@ -92,6 +95,7 @@ export class EmployeeSalaryComponent
   contextMenuPosition = { x: '0px', y: '0px' };
   ngOnInit() {
     this.loadData();
+    // this.generatePayroll();
   }
   refresh() {
     this.loadData();
@@ -239,6 +243,34 @@ export class EmployeeSalaryComponent
       'center'
     );
   }
+  generatePayroll(): void {
+    this.employeeSalaryService.generatePayroll().subscribe(
+      (response) => {
+        console.log(response);
+        Swal.fire({
+          icon: 'success',
+          title: 'Success!',
+          text: `La génération de la paie a été planifiée avec succès pour le ${new Date().toLocaleDateString()}`,
+        });
+      },
+      (error) => {
+        if (error.error === "Ce n'est pas le jour de paiement") {
+          Swal.fire({
+            icon: 'error',
+            title: 'Erreur!',
+            text: "Ce n'est pas le jour de paiement.",
+          });
+        } else {
+          console.error('Erreur lors de la planification de la paie:', error);
+          Swal.fire({
+            icon: 'error',
+            title: 'Erreur!',
+            text: 'Erreur lors de la planification de la paie.',
+          });
+        }
+      }
+    );
+  }
   public loadData() {
     this.exampleDatabase = new EmployeeSalaryService(this.httpClient);
     this.dataSource = new ExampleDataSource(
@@ -254,6 +286,14 @@ export class EmployeeSalaryComponent
         this.dataSource.filter = this.filter.nativeElement.value;
       }
     );
+  }
+  exportExcel(): void {
+    const exportData: Partial<EmployeeSalary>[] = this.dataSource.renderedData;
+
+    const ws: XLSX.WorkSheet = XLSX.utils.json_to_sheet(exportData);
+    const wb: XLSX.WorkBook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
+    XLSX.writeFile(wb, 'employee_salary.xlsx');
   }
 
   // export table data in excel file

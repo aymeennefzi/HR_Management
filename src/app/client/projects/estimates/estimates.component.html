@@ -1,0 +1,216 @@
+<section class="content">
+  <div class="content-block">
+    <div class="block-header">
+      <!-- breadcrumb -->
+      <app-breadcrumb [title]="'Tasks'" [items]="['Projects']" [active_item]="'tasks'">
+      </app-breadcrumb>
+    </div>
+    <div class="row">
+      <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+        <div class="card">
+          <div class="materialTableHeader">
+            <div class="left">
+              <ul class="header-buttons-left ms-0">
+                <li class="tbl-title">
+                  <h2>tasks</h2>
+                </li>
+                <li class="tbl-search-box">
+                  <label for="search-input"><i class="material-icons search-icon">search</i></label>
+                  <input placeholder="Search" type="text" #filter class="browser-default search-field"
+                    aria-label="Search box">
+                  </li>
+                </ul>
+              </div>
+              <div class="right">
+                <ul class="tbl-export-btn">
+                  <li class="tbl-header-btn">
+                    <div class="m-l-10" matTooltip="ADD">
+                      <button mat-mini-fab color="primary" (click)="addNew(p._id)">
+                        <mat-icon class="col-white">add</mat-icon>
+                      </button>
+                    </div>
+                  </li>
+                  <li class="tbl-header-btn">
+                    <div class="m-l-10" matTooltip="REFRESH">
+                      <button mat-mini-fab color="primary" (click)="refresh()">
+                        <mat-icon class="col-white">refresh</mat-icon>
+                      </button>
+                    </div>
+                  </li>
+                  <li class="tbl-header-btn">
+                    <div class="m-l-10" [hidden]=!selection.hasValue() matTooltip="DELETE">
+                      <button mat-mini-fab color="warn" (click)="removeSelectedRows()">
+                        <mat-icon class="col-white">delete
+                        </mat-icon>
+                      </button>
+                    </div>
+                  </li>
+                  <li>
+                    <div class="export-button m-l-10" matTooltip="XLSX">
+                      <img src="assets/images/icons/xlsx.png" alt="" (click)="exportExcel()" />
+                    </div>
+                  </li>
+                </ul>
+              </div>
+            </div>
+            <div class="body overflow-auto">
+              <div class="responsive_table">
+                <table mat-table [dataSource]="p?.tasks" matSort class="mat-cell advance-table">
+                  <!-- Checkbox Column -->
+                  <ng-container matColumnDef="select">
+                    <mat-header-cell *matHeaderCellDef [ngClass]="'tbl-col-width-per-6'">
+                      <mat-checkbox (change)="$event ? masterToggle() : null"
+                        [checked]="selection.hasValue() && isAllSelected()"
+                        [indeterminate]="selection.hasValue() && !isAllSelected()" [ngClass]="'tbl-checkbox'">
+                      </mat-checkbox>
+                    </mat-header-cell>
+                    <mat-cell *matCellDef="let row" [ngClass]="'tbl-col-width-per-6'">
+                      <mat-checkbox (click)="$event.stopPropagation()" (change)="$event ? selection.toggle(row) : null"
+                        [checked]="selection.isSelected(row)" [ngClass]="'tbl-checkbox'">
+                      </mat-checkbox>
+                    </mat-cell>
+                  </ng-container>
+                  <!-- ID Column -->
+             
+                  <ng-container matColumnDef="NomTask">
+                    <mat-header-cell *matHeaderCellDef mat-sort-header>task name</mat-header-cell>
+                    <mat-cell *matCellDef="let row"> <span class="mobile-label">task:</span>{{row.NomTask}}</mat-cell>
+                  </ng-container>
+                  <ng-container matColumnDef="description">
+                    <mat-header-cell *matHeaderCellDef mat-sort-header>description</mat-header-cell>
+                    <mat-cell *matCellDef="let row"> <span class="mobile-label">description:</span>{{row.description}}
+                  </mat-cell>
+                </ng-container>
+                <ng-container matColumnDef="startDate">
+                  <mat-header-cell *matHeaderCellDef mat-sort-header>start Date</mat-header-cell>
+                  <mat-cell *matCellDef="let row"> <span class="mobile-label">start
+                  Date:</span>{{row.startDate | date: 'MM/dd/yyyy'}}</mat-cell>
+                </ng-container>
+                <ng-container matColumnDef="FinishDate">
+                  <mat-header-cell *matHeaderCellDef mat-sort-header>finished Date</mat-header-cell>
+                  <mat-cell *matCellDef="let row"> <span class="mobile-label">finished
+                  Date:</span>{{row.FinishDate | date: 'MM/dd/yyyy'}}</mat-cell>
+                </ng-container>
+                <ng-container matColumnDef="statut">
+                  <mat-header-cell *matHeaderCellDef mat-sort-header> Statut
+                  </mat-header-cell>
+                  <mat-cell mat-cell *matCellDef="let row">
+                    <span class="mobile-label">statut:</span>
+                    @if (row.statut==='To Do') {
+                      <div>
+                        <span class="badge badge-pill badge-primary col-green">
+                        {{row.statut}}</span>
+                      </div>
+                    }
+                    @if (row.statut==='RUNNING') {
+                      <div>
+                        <span class="badge badge-pill badge-primary col-red">
+                        {{row.statut}}</span>
+                      </div>
+                    }
+                    @if (row.statut==='FINISHED') {
+                      <div>
+                        <span class="badge badge-pill badge-primary col-blue">
+                        {{row.statut}}</span>
+                      </div>
+                    }
+                   
+                  </mat-cell>
+                </ng-container>
+                <ng-container matColumnDef="priority">
+                  <mat-header-cell *matHeaderCellDef mat-sort-header> priority
+                  </mat-header-cell>
+                  <mat-cell mat-cell *matCellDef="let row">
+                    <span class="mobile-label">priority:</span>
+                    @if (row.priority==='high') {
+                      <div>
+                        <span class="badge badge-pill badge-primary col-green">
+                        {{row.priority}}</span>
+                      </div>
+                    }
+                    @if (row.priority==='medium') {
+                      <div>
+                        <span class="badge badge-pill badge-primary col-red">
+                        {{row.priority}}</span>
+                      </div>
+                    }
+                    @if (row.priority==='low') {
+                      <div>
+                        <span class="badge badge-pill badge-primary col-blue">
+                        {{row.priority}}</span>
+                      </div>
+                    }
+                   
+                  </mat-cell>
+                </ng-container>
+            
+             <!--    <ng-container matColumnDef="status">
+                  <mat-header-cell *matHeaderCellDef mat-sort-header> Status
+                  </mat-header-cell>
+                  <mat-cell mat-cell *matCellDef="let row">
+                    <span class="mobile-label">Status:</span>
+                    @if (row.status==='Accepted') {
+                      <div>
+                        <span class="badge badge-pill badge-primary col-green">
+                        {{row.status}}</span>
+                      </div>
+                    }
+                    @if (row.status==='Declined') {
+                      <div>
+                        <span class="badge badge-pill badge-primary col-red">
+                        {{row.status}}</span>
+                      </div>
+                    }
+                    @if (row.status==='Sent') {
+                      <div>
+                        <span class="badge badge-pill badge-primary col-blue">
+                        {{row.status}}</span>
+                      </div>
+                    }
+                    @if (row.status==='Expired') {
+                      <div>
+                        <span class="badge badge-pill badge-primary col-orange">
+                        {{row.status}}</span>
+                      </div>
+                    }
+                  </mat-cell>
+                </ng-container> -->
+             <!--    <ng-container matColumnDef="details">
+                  <mat-header-cell *matHeaderCellDef mat-sort-header>Details</mat-header-cell>
+                  <mat-cell *matCellDef="let row" class="column-nowrap"> <span class="truncate-text"><span
+                  class="mobile-label">Details:</span>{{row.details}}</span>
+                </mat-cell>
+              </ng-container> -->
+              <!-- actions -->
+              <ng-container matColumnDef="actions">
+                <mat-header-cell *matHeaderCellDef class="pr-0">Actions</mat-header-cell>
+                <mat-cell *matCellDef="let row; let i=index;" class="pr-0">
+                  <button mat-icon-button color="accent" (click)="$event.stopPropagation()" (click)="editCall(row)"
+                    class="tbl-action-btn" matTooltip="Edit">
+                    <app-feather-icons [icon]="'edit'" [class]="'tbl-fav-edit'">
+                    </app-feather-icons>
+                  </button>
+                  <button mat-icon-button color="accent" (click)="$event.stopPropagation()"
+                    (click)="deleteItem( row)" class="tbl-action-btn" matTooltip="Delete">
+                    <app-feather-icons [icon]="'trash-2'" [class]="'tbl-fav-delete'">
+                    </app-feather-icons>
+                  </button>
+                </mat-cell>
+              </ng-container>
+              <mat-header-row *matHeaderRowDef="columns"></mat-header-row>
+            <!-- <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row> -->
+            <mat-row *matRowDef="let row; columns:   columns;" (click)="editCall(row)"
+              [style.cursor]="'pointer'" matRipple>
+            </mat-row>
+         
+          </table>
+          <!-- Loading spinner -->
+    
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+</section>
+

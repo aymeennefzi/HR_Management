@@ -33,7 +33,6 @@ export const EMPLOYEE_ROUTE: Route[] = [
     path: 'myleaves',
     component: MyLeavesComponent,
   },
-  
   {
     path: 'settings',
     component: SettingsComponent,

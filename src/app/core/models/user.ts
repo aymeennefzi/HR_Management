@@ -17,6 +17,7 @@ export class User {
   Matricule!: string;
   password!: string;
   roleName!: Role;
+  role!:string[]//me permet de fetcher seulement les user de role employe(ahmed)
   soldeConges !: number; 
   soldeMaladie !: number ;
   fonction !: string ;

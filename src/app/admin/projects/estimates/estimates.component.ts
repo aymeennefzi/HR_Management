@@ -24,7 +24,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatRippleModule } from '@angular/material/core';
 import { FeatherIconsComponent } from '@shared/components/feather-icons/feather-icons.component';
 import { MatCheckboxModule } from '@angular/material/checkbox';
-import { MatTableModule } from '@angular/material/table';
+import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatTooltipModule } from '@angular/material/tooltip';
@@ -78,6 +78,7 @@ export class EstimatesComponent
   p!:any
 _id!:any
   t!:any
+  dataSource2!: MatTableDataSource<any>;
   constructor(
     private actR : ActivatedRoute,
     public httpClient: HttpClient,
@@ -92,13 +93,17 @@ _id!:any
   @ViewChild(MatSort, { static: true }) sort!: MatSort;
   @ViewChild('filter', { static: true }) filter!: ElementRef;
   ngOnInit() {
+    this.loadData();
     this.actR.params.subscribe(params => {
-       this._id = params['_id'];
-      this.projectService.getProjectById(this._id).subscribe(data => {
-        this.p= data; 
-   
-      });
-    });
+      this._id = params['_id'];
+     this.projectService.getProjectById(this._id).subscribe(data => {
+      this.p = data;
+  
+     });
+   });
+   this.dataSource2.filterPredicate = (data: any, filter: string) => {
+    return data.NomTask.toLowerCase().includes(filter);
+  };
     this.estimatesService.getTasks().subscribe({
       next: (data: any) => {
         this.tasks = data;
@@ -111,7 +116,22 @@ _id!:any
     
 
   }
+  loadData() {
+    this.actR.params.subscribe(params => {
+      this._id = params['_id'];
+     this.projectService.getProjectById(this._id).subscribe(data => {
+      this.dataSource2 =  new MatTableDataSource(data.tasks);
+  
+     });
+   });
  
+  }
+  applyFilter(event: Event) {
+    const filterValue = (event.target as HTMLInputElement).value;
+    this.dataSource2.filter = filterValue.trim().toLowerCase();
+
+ 
+  }
   refresh() {
 this.ngOnInit()
   }
@@ -137,7 +157,7 @@ this.ngOnInit()
       if (result) {
        
 
-        this.p.tasks=  result
+        this.dataSource2=  result
 
       }
     });
@@ -224,22 +244,7 @@ this.ngOnInit()
       'center'
     );
   }
-  public loadData() {
-    this.exampleDatabase = new EstimatesService(this.httpClient);
-    this.dataSource = new ExampleDataSource(
-      this.exampleDatabase,
-      this.paginator,
-      this.sort
-    );
-    this.subs.sink = fromEvent(this.filter.nativeElement, 'keyup').subscribe(
-      () => {
-        if (!this.dataSource) {
-          return;
-        }
-        this.dataSource.filter = this.filter.nativeElement.value;
-      }
-    );
-  }
+
   // export table data in excel file
   exportExcel() {
     // key name with space add in brackets

@@ -98,12 +98,10 @@ createContactForm(): UntypedFormGroup {
 submit() {  
   if (this.myLeavesForm.valid) {
     const cookieDataString: string = this.cookieService.get('user_data');
-    console.log("Cookie Data:", cookieDataString);
     if (cookieDataString) {
     const cookieData = JSON.parse(decodeURIComponent(cookieDataString));
     if (cookieData && cookieData.user && cookieData.user.id) {
       const personnelId: string = cookieData.user.id;
-      console.log("Personnel ID:", personnelId);
     const formValue = this.myLeavesForm.value;
     const payload = {
       ...formValue,
@@ -114,17 +112,13 @@ submit() {
       this.myLeavesService.updateMyLeaves(this.myLeaves._id ,payload).subscribe({
 
         next: (data) => {
-          console.log("Update successful!");
-          console.log(data);
         },
         error: (error) => {
-          console.error("Error while updating:", error);
         }
       });
     } else {
       this.myLeavesService.addMyLeaves(payload).subscribe({
         next: (data) => {
-         // console.log("Add successful!");
          const notificationDetails = {
           title: 'New Project Added',
           description: `Project ${payload.name} has been successfully added.`,
@@ -134,16 +128,13 @@ submit() {
         this.notificationService.createNotification( notificationDetails).subscribe(() => {
           alert('Project added and notification sent!');
         }, error => {
-          console.error('Error sending notification', error);
         });
         },
         error: (error) => {
-          console.error("Error while adding:", error);
         }
       });
     }
   } else {
-    console.log("Error: The form is not valid");
   }
 }
   }

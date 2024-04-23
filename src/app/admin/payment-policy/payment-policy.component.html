@@ -62,7 +62,7 @@
                         <td class="bold center">{{ policy.taxRate }}</td>
                         <td class="bold center">{{ policy.socialSecurityRate }}</td>
                         <td class="bold center">{{ policy.otherDeductions }}</td>
-                        <td class="bold center">{{ policy.paymentDay }}</td>
+                        <td class="bold center">{{ policy.paymentDay}}</td>
                         <td class="bold center">{{ policy.exessDayPay }}</td>
                         <td>
                           <ul>
@@ -77,6 +77,61 @@
                 </div>
               </div>
             </div>
+          </div>
+        </div>
+
+        <div style="display: flex; flex-wrap: wrap; gap: 20px;">
+          <!-- Tax Rate -->
+          <div style="border: 2px solid #234161; padding: 20px; border-radius: 5px; width: 300px;">
+            <h3 style="color: #234161;">Tax Rate (%)</h3>
+            <p>Percentage of gross salary deducted as income tax.</p>
+            <p>Example: 14% of 1000 dinars = 140 dinars of tax.</p>
+          </div>
+        
+          <!-- Social Security Rate -->
+          <div style="border: 2px solid #234161; padding: 20px; border-radius: 5px; width: 300px;">
+            <h3 style="color: #234161;">Social Security Rate (%)</h3>
+            <p>Percentage of gross salary deducted as social security contribution.</p>
+            <p>Finances healthcare, family allowances, etc.</p>
+            <p>Example: 14% of 1000 dinars = 140 dinars of contribution.</p>
+          </div>
+        
+          <!-- Other Deductions -->
+          <div style="border: 2px solid #234161; padding: 20px; border-radius: 5px; width: 300px;">
+            <h3 style="color: #234161;">Other Deductions (dinars)</h3>
+            <p>Fixed amount of deductions not tied to percentages.</p>
+            <p>Includes union dues, loan repayments, etc.</p>
+            <p>Example: 150 dinars deducted in addition to percentages.</p>
+          </div>
+        
+          <!-- Payment Day -->
+          <div style="border: 2px solid #234161; padding: 20px; border-radius: 5px; width: 300px;">
+            <h3 style="color: #234161;">Payment Day</h3>
+            <p>Day when salaries are paid to employees.</p>
+            <p>Example: Payment on the 22nd of each month.</p>
+          </div>
+        
+          <!-- Excess Day Payment -->
+          <div style="border: 2px solid #234161; padding: 20px; border-radius: 5px; width: 300px;">
+            <h3 style="color: #234161;">Excess Day Payment</h3>
+            <p>Payment per day for excess leave days.</p>
+            <p>Example: 5 % per excess day.</p>
+          </div>
+        
+          <!-- Allowed Days -->
+          <div style="border: 2px solid #234161; padding: 20px; border-radius: 5px; width: 300px;">
+            <h3 style="color: #234161;">Allowed Days</h3>
+            <p>Number of days allowed for each type of leave.</p>
+            <p>:</p>
+            <ul>
+              <li>Bereavement: Leave for family death.</li>
+              <li>Maternity: Maternity leave.</li>
+              <li>Paternity: Paternity leave.</li>
+              <li>RTT: Compensatory rest days.</li>
+              <li>Sick Leave: Sick leave.</li>
+              <li>Unpaid leave: Leave without pay.</li>
+              <li>Paid leave: Standard paid leave.</li>
+            </ul>
           </div>
         </div>
       </div>

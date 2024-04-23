@@ -16,7 +16,10 @@ import html2canvas from 'html2canvas';
 export class PayslipComponent {
   payslipData: any;
   @ViewChild('content', { static: false }) content!: ElementRef;
+
+
   constructor(private route: ActivatedRoute, private http: HttpClient) { }
+
   ngOnInit(): void {
     this.route.paramMap.subscribe(params => {
       const payrollId = params.get('id');
@@ -30,12 +33,18 @@ export class PayslipComponent {
     const content = this.content.nativeElement;
     html2canvas(content).then(canvas => {
       const imageData = canvas.toDataURL('image/png');
-      const imgWidth = 210; 
+      // Calculer les dimensions pour l'insertion de l'image dans le PDF
+      const imgWidth = 210; // Largeur maximale de l'image
       const imgHeight = canvas.height * imgWidth / canvas.width;
+
+      // Insérer l'image dans le PDF
       doc.addImage(imageData, 'PNG', 0, 0, imgWidth, imgHeight);
         doc.save('bulletin_de_salaire.pdf');
+      // }
     });
   }
+
+
   getPayslipData(payrollId: string) {
     this.http.get<any>('http://localhost:3000/payroll/getPayrollWithPayP/' + payrollId)
       .subscribe(
@@ -73,12 +82,14 @@ convertToWords(num: number): string {
           return tens[ten] + (unit !== 0 ? '-' + units[unit] : '');
       }
   }
+
   // Gestion des centaines et des milliers
   if (num < 1000) {
       const hundred = Math.floor(num / 100);
       const remainder = num % 100;
       return units[hundred] + ' Cent ' + (remainder !== 0 ? 'et ' + this.convertToWords(remainder) : '');
   }
+
   // Gestion des milliers et des millions
   if (num < 1000000) {
       const thousand = Math.floor(num / 1000);
@@ -90,7 +101,6 @@ convertToWords(num: number): string {
       const remainder = num % 1000000;
       return this.convertToWords(million) + ' Million ' + (remainder !== 0 ? 'et ' + this.convertToWords(remainder) : '');
   }
-  // Gestion des nombres supérieurs à un milliard (à étendre selon vos besoins)
   return '';
 }
 }

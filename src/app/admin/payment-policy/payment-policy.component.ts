@@ -1,14 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 import { PaymentPolicy } from './PaymentPolicy.model';
 import { BreadcrumbComponent } from '@shared/components/breadcrumb/breadcrumb.component';
-import { CardComponent } from '@swimlane/ngx-charts';
 import { MatCardModule } from '@angular/material/card';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog } from '@angular/material/dialog';
-import { Direction } from '@angular/cdk/bidi';
 import { FormDialogComponent } from '../payment-policy/form-dialog/form-dialog.component';
 
 
@@ -73,6 +71,9 @@ export class PaymentPolicyComponent implements OnInit {
 
   refresh() {
     // Implémentez la logique pour rafraîchir la liste
+
+    this.fetchPaymentPolicies();
+
     console.log('Fonction refresh() appelée');
   }
 
@@ -80,6 +81,7 @@ export class PaymentPolicyComponent implements OnInit {
     // Implémentez la logique pour supprimer les lignes sélectionnées
     console.log('Fonction removeSelectedRows() appelée');
   }
+
 }
   
   

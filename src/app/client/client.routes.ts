@@ -12,7 +12,7 @@ export const CLIENT_ROUTE: Route[] = [
   {
     path: 'projects',
     loadChildren: () =>
-      import('./projects/projects.routes').then((m) => m.PROJECTS_ROUTE),
+      import('./projects/projects.routes').then((m) => m.PROJECT_ROUTE),
   },
   {
     path: 'supports',

@@ -96,15 +96,24 @@
       
           <mat-form-field class="example-full-width " appearance="outline">
             <mat-label>employeeAffected</mat-label>
-            <mat-select formControlName="employeeAffected" >
-              @for (u of users ; track u) {
+            <input type="text"
+         placeholder="Search employees"
+         matInput
+         [matAutocomplete]="auto"
+         (input)="filterUsers($event)"
+         formControlName="employeeAffected" >
+     
+  <mat-autocomplete  #auto="matAutocomplete">
+              @for (u of filteredUsers ; track u) {
               <mat-option  [value]="u.email">
               {{u.email}}
               </mat-option>
             }
-            
-            </mat-select>
-         
+          </mat-autocomplete>
+       
+  
+
+
           </mat-form-field>
      
         </div>
