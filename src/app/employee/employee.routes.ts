@@ -26,6 +26,8 @@ export const EMPLOYEE_ROUTE: Route[] = [
     path: 'myprojects',
     component: MyProjectsComponent,
   },
+  {path:'mission',
+  loadChildren:()=>import('./missions/missionemployee.routes').then((m)=>m.EMPLOYEE_MISSION_ROUTE)},
   {
     path: 'mytasks',
     component: MyTasksComponent,

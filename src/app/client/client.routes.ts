@@ -19,6 +19,9 @@ export const CLIENT_ROUTE: Route[] = [
     loadChildren: () =>
       import('./supports/supports.routes').then((m) => m.CLIENT_SUPPORT_ROUTE),
   },
+  {path:'mission',
+  loadChildren:()=>import('./missions/mission.routes').then((m)=>m.CLIENT_MISSION_ROUTE)},
+    
   {
     path: 'billing',
     component: BillingComponent,

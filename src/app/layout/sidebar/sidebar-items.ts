@@ -128,6 +128,60 @@ export const ROUTES: RouteInfo[] = [
   },
   {
     path: '',
+    title: 'My Mission',
+    iconType: 'feather',
+    icon: 'grid',
+    class: 'menu-toggle',
+    groupTitle: false,
+    badge: '',
+    badgeClass: '',
+    role: ['Employee'],
+    submenu: [
+   
+      {
+        path: '/employee/mission/missions',
+        title: 'Missions',
+        iconType: '',
+        icon: '',
+        class: 'ml-menu',
+        groupTitle: false,
+        badge: '',
+        badgeClass: '',
+        role: [''],
+        submenu: [],
+      },
+     
+    ],
+  },
+  {
+    path: '',
+    title: ' Missions',
+    iconType: 'feather',
+    icon: 'grid',
+    class: 'menu-toggle',
+    groupTitle: false,
+    badge: '',
+    badgeClass: '',
+    role: ['Client'],
+    submenu: [
+   
+      {
+        path: '/client/mission/missions',
+        title: 'Demande Missions',
+        iconType: '',
+        icon: '',
+        class: 'ml-menu',
+        groupTitle: false,
+        badge: '',
+        badgeClass: '',
+        role: [''],
+        submenu: [],
+      },
+     
+    ],
+  },
+  {
+    path: '',
     title: 'Mission',
     iconType: 'feather',
     icon: 'grid',

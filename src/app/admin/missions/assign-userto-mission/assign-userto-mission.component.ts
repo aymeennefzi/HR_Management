@@ -13,6 +13,7 @@ import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 import { BreadcrumbComponent } from '@shared/components/breadcrumb/breadcrumb.component';
 import { FileUploadComponent } from '@shared/components/file-upload/file-upload.component';
 import { TheMissionService } from '../allthemissions/themissions.service';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-assign-userto-mission',
@@ -53,9 +54,10 @@ export class AssignUsertoMissionComponent {
   }
  
   onSubmit() {
-    const userId = this.userForm.value.userId;
+    const userEmail = this.userForm.value.userId;
+    console.log(userEmail);
     // Assuming `this.id` is the mission ID and `this.userForm.value` contains the user data
-    this.missionsService.assignUserToMission(this.id,userId).subscribe({
+    this.missionsService.assignUserToMission(this.id,userEmail).subscribe({
       next: (response) => {
         console.log(this.id)
         console.log(this.userForm.value)
@@ -66,6 +68,7 @@ export class AssignUsertoMissionComponent {
       },
       error: (error) => {
         // Handle any errors that occur during the subscription
+        Swal.fire('Erreur', 'Cet employé est indisponible à cette date.', 'error');
         console.error('Error during mission assignment', error);
       }
     });

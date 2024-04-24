@@ -21,21 +21,19 @@ export class TheMissionService extends UnsubscribeOnDestroyAdapter {
     super();
   }
 
-  assignUserToMission(missionId: string, userId: string): Observable<Mission> {
-    const data = { missionId, userId };
-    return this.http.post<Mission>(`${this.baseUrl}/assign-user`, data);
+  assignUserToMission(missionId: string, useremail: string): Observable<Mission> {
+    const data = { missionId, useremail };
+    return this.http.post<Mission>(`${this.baseUrl}`, data);
   }
   getDialogData() {
     return this.dialogData;
   }
 
   createMission(createMissionDto: CreateMissionDto): Observable<Mission> {
-    return this.http.post<Mission>(`${this.baseUrl}/addmission`, createMissionDto);
+    return this.http.post<Mission>(`${this.baseUrl}/create`, createMissionDto);
   }
 
-  // getAllMissions(): Observable<Mission[]> {
-  //   return this.http.get<Mission[]>(`${this.baseUrl}`);
-  // }
+ 
 
   // Méthode pour mettre à jour la valeur de dataChange
   updateDataChange(missions: Mission[]): void {
