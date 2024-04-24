@@ -5,7 +5,6 @@ import { ActivatedRoute } from '@angular/router';
 import { BreadcrumbComponent } from '@shared/components/breadcrumb/breadcrumb.component';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
-
 @Component({
   selector: 'app-payslip',
   templateUrl: './payslip.component.html',
@@ -17,6 +16,7 @@ import html2canvas from 'html2canvas';
 export class PayslipComponent {
   payslipData: any;
   @ViewChild('content', { static: false }) content!: ElementRef;
+
 
   constructor(private route: ActivatedRoute, private http: HttpClient) { }
 
@@ -33,21 +33,12 @@ export class PayslipComponent {
     const content = this.content.nativeElement;
     html2canvas(content).then(canvas => {
       const imageData = canvas.toDataURL('image/png');
-
       // Calculer les dimensions pour l'insertion de l'image dans le PDF
       const imgWidth = 210; // Largeur maximale de l'image
       const imgHeight = canvas.height * imgWidth / canvas.width;
 
       // Insérer l'image dans le PDF
       doc.addImage(imageData, 'PNG', 0, 0, imgWidth, imgHeight);
-
-
-    // Générer le PDF à partir du contenu HTML
-    // doc.html(content.innerHTML, {
-    //   callback: () => {
-        // content.style.width = null;
-        // content.style.height = null;
-        // Enregistrer le PDF lorsqu'il est généré
         doc.save('bulletin_de_salaire.pdf');
       // }
     });
@@ -59,7 +50,6 @@ export class PayslipComponent {
       .subscribe(
         (response) => {
           this.payslipData = response;
-          console.log('Payslip Data:', this.payslipData);
         },
         (error) => {
           console.error('Error fetching payslip data:', error);
@@ -74,18 +64,13 @@ convertToWords(num: number): string {
   const units = ['', 'Un', 'Deux', 'Trois', 'Quatre', 'Cinq', 'Six', 'Sept', 'Huit', 'Neuf'];
   const teens = ['Dix', 'Onze', 'Douze', 'Treize', 'Quatorze', 'Quinze', 'Seize', 'Dix-sept', 'Dix-huit', 'Dix-neuf'];
   const tens = ['', 'Dix', 'Vingt', 'Trente', 'Quarante', 'Cinquante', 'Soixante', 'Soixante-dix', 'Quatre-vingt', 'Quatre-vingt-dix'];
-
   const numStr = num.toString();
-
-  // Gestion des cas spéciaux
   if (num === 0) {
       return 'Zéro';
   }
   if (num < 0) {
       return 'Moins ' + this.convertToWords(-num);
   }
-
-  // Gestion des nombres jusqu'à 99
   if (num < 100) {
       if (num < 10) {
           return units[num];
@@ -111,17 +96,11 @@ convertToWords(num: number): string {
       const remainder = num % 1000;
       return this.convertToWords(thousand) + ' Mille ' + (remainder !== 0 ? 'et ' + this.convertToWords(remainder) : '');
   }
-
-  // Gestion des millions et au-delà (vous pouvez étendre selon vos besoins)
-  // Dans cet exemple, nous nous arrêtons à un million
   if (num < 1000000000) {
       const million = Math.floor(num / 1000000);
       const remainder = num % 1000000;
       return this.convertToWords(million) + ' Million ' + (remainder !== 0 ? 'et ' + this.convertToWords(remainder) : '');
   }
-
-  // Gestion des nombres supérieurs à un milliard (à étendre selon vos besoins)
-
   return '';
 }
 }

@@ -33,7 +33,6 @@ export class DeleteDialogComponent {
     this.dialogRef.close();
   }
   confirmDelete(): void {
-    console.log(this.data);
     const leave = this.data._id ; // Convertir _id en chaîne de caractères
     this.myLeavesService.deleteMyLeaves(leave);
   }

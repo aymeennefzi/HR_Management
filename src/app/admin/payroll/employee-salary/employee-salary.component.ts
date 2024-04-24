@@ -246,6 +246,7 @@ export class EmployeeSalaryComponent
   generatePayroll(): void {
     this.employeeSalaryService.generatePayroll().subscribe(
       (response) => {
+        console.log(response);
         Swal.fire({
           icon: 'success',
           title: 'Success!',

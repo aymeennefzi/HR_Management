@@ -97,7 +97,6 @@ import Swal from 'sweetalert2';
 
       dayCellDidMount: (dayRenderInfo: any) => {
         const dateMoment = moment(dayRenderInfo.date);
-        console.log(dateMoment);
         if (dateMoment.day() === 6 || dateMoment.day() === 0) {
           dayRenderInfo.el.style.backgroundColor = '#d6e7e1';
         } else {
@@ -141,7 +140,6 @@ import Swal from 'sweetalert2';
         this.calanderS.getAllHolidays().subscribe((holidayData: Holidayss[]) => {
           this.combinedEvents = [...this.mapUserEvents(userData), ...this.mapHolidayEvents(holidayData)];
           this.updateCalendarOptions(this.combinedEvents);
-          console.log(this.combinedEvents)
         });
       });
     }
@@ -212,14 +210,11 @@ import Swal from 'sweetalert2';
           const userId = userData.user.id;
           this.calanderS.updateAttendanceList(userId, [calendarData]).subscribe(
             () => {
-              console.log('Attendance updated successfully');
             },
             error => {
-              console.error('Error updating attendance:', error);
             }
           );
         } else {
-          console.log('Remise de la carte annulée.');
         }
       });
     }

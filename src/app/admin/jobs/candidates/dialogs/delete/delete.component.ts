@@ -36,18 +36,12 @@ export class DeleteDialogComponent {
   onNoClick(): void {
     this.dialogRef.close();
   }
-  // confirmDelete(): void {
-  //   this.candidatesService.deleteCandidates(this.data.id);
-  // }
   confirmDelete(jobId: string): void {
     this.candidatesService.deleteCandidate(jobId).subscribe(
       () => {
-        // Gérer la suppression réussie
-        console.log('Job deleted successfully');
-        // Rafraîchir la liste des jobs si nécessaire
+        
       },
       (error) => {
-        // Gérer les erreurs de suppression
         console.error('Error deleting job:', error);
       }
     );

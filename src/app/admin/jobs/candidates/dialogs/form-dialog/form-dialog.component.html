@@ -33,14 +33,6 @@
         </div>
       </div>
       <div class="row">
-        <!-- <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 mb-2">
-          <mat-form-field class="example-full-width" appearance="outline">
-            <mat-label>CV</mat-label>
-            <input matInput formControlName="cv" required>
-            <mat-icon class="material-icons-outlined color-icon p-3" matSuffix>description</mat-icon>
-            <mat-error *ngIf="candidatesForm.get('cv')?.hasError('required')">CV is required</mat-error>
-          </mat-form-field>
-        </div> -->
         <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 mb-2">
           <mat-form-field class="example-full-width" appearance="outline">
             <mat-label>CV</mat-label>
@@ -60,12 +52,7 @@
               <mat-option *ngFor="let job of jobs" [value]="job._id">{{ job.title }}</mat-option>
             </mat-select>
             <mat-error *ngIf="contactForm.get('jobId')?.hasError('required')">Job is required</mat-error>
-          </mat-form-field>
-          
-          
-          
-          
-          
+          </mat-form-field> 
         </div>
       </div>
       <div class="row">

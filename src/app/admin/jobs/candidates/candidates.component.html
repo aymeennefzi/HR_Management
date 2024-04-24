@@ -89,40 +89,16 @@
                     <mat-header-cell *matHeaderCellDef mat-sort-header>Email</mat-header-cell>
                     <mat-cell *matCellDef="let row">{{ row.email }}</mat-cell>
                   </ng-container>
-                  
-                  <!-- <ng-container matColumnDef="cv">
-                    <mat-header-cell *matHeaderCellDef mat-sort-header>CV</mat-header-cell>
-                    <mat-cell *matCellDef="let row">{{ row.cv }}</mat-cell>
-                  </ng-container> -->
-                  
                   <ng-container matColumnDef="jobId">
                     <mat-header-cell *matHeaderCellDef mat-sort-header>Job Title</mat-header-cell>
                     <mat-cell *matCellDef="let row">{{ getJobTitle(row.jobId) }}</mat-cell>
-                   
                   </ng-container>
-
-                  <!-- <ng-container matColumnDef="cv">
-                    <mat-header-cell *matHeaderCellDef>CV</mat-header-cell>
-                    <mat-cell *matCellDef="let row">
-                      <a [href]="row.cv" target="_blank" matTooltip="Download CV">
-                        CV
-                      </a>
-                      <app-feather-icons [icon]="'download'" [class]="'col-green'" matTooltip="Download Resume">
-                      </app-feather-icons>
-                    </mat-cell>
-                  </ng-container> -->
-                  
-            
                   <ng-container matColumnDef="cv">
                     <mat-header-cell *matHeaderCellDef mat-sort-header>Curriculum vitae</mat-header-cell>
                     <mat-cell *matCellDef="let row" (contextmenu)="onContextMenu($event, row)">
                       <span class="mobile-label">Download:</span>
-                      <!-- <button mat-icon-button color="accent" class="tbl-action-btn" (click)="$event.stopPropagation()">
-                        <app-feather-icons [icon]="'download'" [class]="'col-green'" matTooltip="Download Resume">
-                        </app-feather-icons>
-                      </button> -->
                       <a [href]="row.cv" mat-icon-button color="accent" class="tbl-action-btn" download (click)="$event.stopPropagation()">
-                        <app-feather-icons [icon]="'download'" [class]="'col-green'" matTooltip="Download Resume"></app-feather-icons>
+                      <app-feather-icons [icon]="'download'" [class]="'col-green'" matTooltip="Download Resume"></app-feather-icons>
                     </a>
                     </mat-cell>
                   </ng-container>
@@ -140,26 +116,19 @@
                         <app-feather-icons [icon]="'trash-2'" [class]="'tbl-fav-delete'">
                         </app-feather-icons>
                       </button>
-                      <!-- <button mat-icon-button color="accent" (click)="deleteItem(c, rol)" class="tbl-action-btn" matTooltip="Delete">
-                        <app-feather-icons [icon]="'trash-2'" [class]="'tbl-fav-delete'"></app-feather-icons>
-                      </button> -->
-                      
                     </mat-cell>
                   </ng-container>
                   <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
-                <!-- <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row> -->
                 <mat-row *matRowDef="let row; columns: displayedColumns;" (click)="editCall(row)"
                   [style.cursor]="'pointer'" matRipple>
                 </mat-row>
               </table>
-              <!-- Loading spinner -->
               @if (exampleDatabase?.isTblLoading) {
                 <div class="tbl-spinner">
                   <mat-progress-spinner color="primary" [diameter]="40" mode="indeterminate">
                   </mat-progress-spinner>
                 </div>
               }
-              <!-- context menu start -->
               <div style="visibility: hidden; position: fixed" [style.left]="contextMenuPosition.x"
                 [style.top]="contextMenuPosition.y" [matMenuTriggerFor]="contextMenu">
               </div>

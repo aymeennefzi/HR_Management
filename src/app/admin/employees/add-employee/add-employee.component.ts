@@ -57,16 +57,42 @@ export class AddEmployeeComponent {
       roleName: [''],
       soldeConges: [''],
       soldeMaladie: [''],
+      uploadImg:[''],
 
     });
   }
- 
+  
+  addFile(event: any) {
+    if (event.target.files && event.target.files.length > 0) {
+      const file = event.target.files[0];
+      this.docForm.patchValue({
+        uploadImg: file
+      });
+    }
+  }
+  
   onSubmit(): void {
+
+    const payload=new FormData();
+    payload.append('firstName',this.docForm.value.firstName);
+    payload.append('lastName',this.docForm.value.lastName);
+    payload.append('email',this.docForm.value.email);
+    payload.append('etablissement',this.docForm.value.etablissement);
+    payload.append('EmailSecondaire',this.docForm.value.EmailSecondaire);
+    payload.append('TelSecondaire',this.docForm.value.TelSecondaire);
+    payload.append('dateEntree',this.docForm.value.dateEntree);
+    payload.append('fonction',this.docForm.value.fonction);
+    payload.append('Tel',this.docForm.value.Tel);
+    payload.append('Matricule',this.docForm.value.Matricule);
+    payload.append('password',this.docForm.value.password);
+    payload.append('roleName',this.docForm.value.roleName);
+    payload.append('soldeConges',this.docForm.value.soldeConges);
+    payload.append('soldeMaladie',this.docForm.value.soldeMaladie);
+    payload.append('profileImage',this.docForm.value.profileImage);  
+
     if (this.docForm.valid) {
-      console.log('Form Value', this.docForm.value);
       this.employeS.signUp(this.docForm.value).subscribe({
         next: (response) => {
-          console.log('Inscription réussie. Token reçu :', response.token);
           // Naviguer vers la route 'allEmployees' après l'inscription réussie
           this.router.navigate(['/admin/employees/allEmployees']);
         },
@@ -75,7 +101,6 @@ export class AddEmployeeComponent {
         }
       });
     } else {
-      console.log('Formulaire invalide. Veuillez corriger les erreurs.');
     }
   }
 }

@@ -100,11 +100,7 @@ export class AddprojectsComponent {
 
  
     };
-  
-    // Convert priority to a number if it's not already
-  
-    console.log('jj',formattedValues);
-    this.projectService.createProject(formattedValues).subscribe(
+      this.projectService.createProject(formattedValues).subscribe(
       () => {
     
         this.r.navigate(['admin/projects/allProjects']);

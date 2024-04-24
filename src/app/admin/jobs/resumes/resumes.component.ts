@@ -218,7 +218,6 @@ export class ResumesComponent
     const totalSelect = this.selection.selected.length;
     this.selection.selected.forEach((item) => {
       const index = this.dataSource?.renderedData.findIndex((d) => d === item);
-      // console.log(this.dataSource.renderedData.findIndex((d) => d === item));
       this.exampleDatabase?.dataChange.value.splice(index, 1);
 
       this.refreshTable();

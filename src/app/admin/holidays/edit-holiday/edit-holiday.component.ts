@@ -40,7 +40,6 @@ export class EditHolidayComponent {
     this.holidayForm = this.createContactForm();
   }
   onSubmit() {
-    console.log('Form Value', this.holidayForm.value);
   }
   createContactForm(): UntypedFormGroup {
     return this.fb.group({

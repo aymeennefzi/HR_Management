@@ -79,7 +79,6 @@ export class EmployeeProfileComponent implements OnInit  {
         const id = userData.user.id;
         const updatedEmployeeData = this.docForm.value;
         this.emploueeS.updateUser(id , updatedEmployeeData).subscribe(updatedEmployee =>{
-          console.log('update success')
           alert('update sucess')
           this.loadUserData();
           const aboutMeSection = this.elementRef.nativeElement.querySelector('#aboutMeSection');

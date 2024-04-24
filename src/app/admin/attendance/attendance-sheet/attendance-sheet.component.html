@@ -12,31 +12,6 @@
                         <h2>Attendance Sheet</h2>
                     </div>
                     <div class="body overflow-auto">
-                        <div class="example-container">
-                            <form [formGroup]="attendanceForm">
-                                <div class="row">
-                                    <div class="col-4">
-                                        <mat-form-field class="example-full-width" appearance="outline">
-                                            <mat-label>Choose start date</mat-label>
-                                            <input matInput [matDatepicker]="picker" formControlName="fromDate">
-                                            <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
-                                            <mat-datepicker #picker></mat-datepicker>
-                                        </mat-form-field>
-                                    </div>
-                                    <div class="col-4">
-                                        <mat-form-field class="example-full-width" appearance="outline">
-                                            <mat-label>Choose end date</mat-label>
-                                            <input matInput [matDatepicker]="picker2" formControlName="toDate">
-                                            <mat-datepicker-toggle matSuffix [for]="picker2"></mat-datepicker-toggle>
-                                            <mat-datepicker #picker2></mat-datepicker>
-                                        </mat-form-field>
-                                    </div>
-                                    <div class="col-4">
-                                        <button mat-raised-button color="primary" class="big-button">Search</button>
-                                    </div>
-                                </div>
-                            </form>
-                        </div>
                         <table class="table table-bordered border-bottom">
                             <thead>
                                 <tr role="row">

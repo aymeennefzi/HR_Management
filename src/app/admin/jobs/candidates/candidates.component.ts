@@ -230,40 +230,6 @@ export class CandidatesComponent
       }
     });
   }
-  // deleteItem(c: number, rol: Candidates): void {
-  //   if (!rol) {
-  //     console.error('Invalid row:', rol);
-  //     return;
-  //   }
-  //   Swal.fire({
-  //     title: 'Êtes-vous sûr?',
-  //     text: 'Vous ne pourrez pas récupérer cette candidature!',
-  //     icon: 'warning',
-  //     showCancelButton: true,
-  //     confirmButtonColor: '#3085d6',
-  //     cancelButtonColor: '#d33',
-  //     confirmButtonText: 'Oui, supprimer!',
-  //     cancelButtonText: 'Annuler'
-  //   }).then((result) => {
-  //     if (result.isConfirmed) {
-  //       // Appeler la fonction de suppression une fois que l'utilisateur a confirmé
-  //       this.candidatesService.deleteCandidate(rol._id).subscribe(
-  //         () => {
-  //           // Afficher une alerte de suppression réussie
-  //           Swal.fire('Supprimé!', 'La candidature a été supprimée avec succès.', 'success');
-  //           // Mettre à jour la liste des candidats après la suppression
-  //           this.exampleDatabase?.getAllCandidatess(); // Mettre à jour les données
-  //         },
-  //         (error) => {
-  //           // Afficher une alerte en cas d'erreur lors de la suppression
-  //           Swal.fire('Erreur!', 'Une erreur est survenue lors de la suppression de la candidature.', 'error');
-  //         }
-  //       );
-  //     }
-  //   });
-  // }
-  
-  
   private refreshTable() {
     this.paginator._changePageSize(this.paginator.pageSize);
   }
@@ -286,7 +252,6 @@ export class CandidatesComponent
     const totalSelect = this.selection.selected.length;
     this.selection.selected.forEach((item) => {
       const index = this.dataSource?.renderedData.findIndex((d) => d === item);
-      // console.log(this.dataSource.renderedData.findIndex((d) => d === item));
       this.exampleDatabase?.dataChange.value.splice(index, 1);
 
       this.refreshTable();
@@ -392,8 +357,7 @@ export class ExampleDataSource extends DataSource<Candidates> {
     super();
     this.baseUrl = baseUrl;
     // Reset to the first page when the user changes the filter.
-    this.filterChange.subscribe(() => (this.paginator.pageIndex = 0));
-    
+    this.filterChange.subscribe(() => (this.paginator.pageIndex = 0));  
   }
   /** Connect function called by the table to retrieve one stream containing the data to render. */
   connect(): Observable<Candidates[]> {
@@ -415,10 +379,7 @@ export class ExampleDataSource extends DataSource<Candidates> {
               candidates.jobId +
               candidates.candidateName +
               candidates.email +
-              candidates.cv
-              
-              
-            
+              candidates.cv     
             ).toLowerCase();
             return searchStr.indexOf(this.filter.toLowerCase()) !== -1;
           });
@@ -426,8 +387,7 @@ export class ExampleDataSource extends DataSource<Candidates> {
             if (!candidate.cv.startsWith('http://localhost:3000/files/uploads')) {
               candidate.cv = `http://localhost:3000/files/${candidate.cv}`;
             }
-          });
-         
+          });  
         // Sort filtered data
         const sortedData = this.sortData(this.filteredData.slice());
         // Grab the page's slice of the filtered sorted data.

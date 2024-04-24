@@ -2,7 +2,6 @@ import { Component, Inject, OnInit } from '@angular/core';
 import { FormsModule, ReactiveFormsModule, UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
 import { Departement } from '../../departement.model';
 import { MAT_DIALOG_DATA, MatDialogClose, MatDialogContent, MatDialogRef } from '@angular/material/dialog';
-// import { DialogData } from 'app/contacts/form/form.component';
 import { EmployeesService } from '../../departement.service';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -52,12 +51,6 @@ export class FormDialogComponent implements OnInit {
     console.log('Employee ID:', data.id);
     // Set the defaults
     this.action = data.action;
-    // if (this.action === 'edit' && data.employees && data.employees.name) {
-
-    //   this.dialogTitle = data.employees.name;
-    //   this.employees = data.employees;
-    //   console.log(this.data.employees.name); 
-    // } 
     if (this.action === 'edit' && this.data.id) {
       this.employeesService.getDepartementById(data.id).subscribe(employee => {
         console.log(employee);
@@ -77,26 +70,20 @@ export class FormDialogComponent implements OnInit {
         salaryExpenditure: this.employees.salaryExpenditure,
         trainingExpenditure: this.employees.trainingExpenditure,
       });
-      //  this.employeesForm = this.createContactForm();
       });
     }
     
     else {
       this.dialogTitle = 'New Employees';
-      // const blankObject = {} as Departement;
-      // Au lieu de passer un argument à la classe Departement, instanciez-la simplement sans argument
+     
       const blankObject = new Departement();
 
       this.employees = blankObject;
       this.initEmployeeForm();
-      // this.employeesForm = this.createContactForm();
     }
-    // this.employeesForm = this.createContactForm();
   }
   ngOnInit(): void {
   this.fb.group({
-    // id: [this.jobsList._id], // Assurez-vous que l'ID est initialisé correctement
-    // title: [this.jobsList.title, Validators.required],
     name:[this.employees.name,Validators.required],
     description:[this.employees.name,Validators.required],
     totalEmployees: [this.employees.totalEmployees,Validators.required],
@@ -113,7 +100,6 @@ export class FormDialogComponent implements OnInit {
       this.dialogTitle = employee.name;
       this.employees = employee;
       this.initEmployeeForm();
-        // Assigner les valeurs du formulaire avec les données de l'employé récupéré
     this.employeesForm.patchValue({
       _id: this.employees._id,
       name: this.employees.name,

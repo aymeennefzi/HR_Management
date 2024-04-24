@@ -129,12 +129,15 @@
                                <div class="row">
                                 <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-3">
                                   <mat-label>Upload Image</mat-label>
-                                  <app-file-upload formControlName="uploadImg"></app-file-upload>
+                                  <!-- <app-file-upload formControlName="uploadImg"></app-file-upload> -->
+                                  <!-- <app-file-upload (click)="addFile($event)" formControlName="uploadImg"></app-file-upload> -->
+                                  <mat-label>Upload Image</mat-label>
+                                  <input type="file" (change)="addFile($event)" formControlName="profileImage">
                                 </div>
                               </div> 
                               <div class="row">
                                 <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-3">
-                                  <button class="btn-space" [disabled]="!docForm.valid " mat-raised-button
+                                  <button class="btn-space" [disabled]="!docForm.valid " mat-raised-button type="submit"
                                   color="primary">Submit</button>
                                   <button type="button" mat-raised-button color="warn">Cancel</button>
                                 </div>

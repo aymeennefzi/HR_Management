@@ -129,7 +129,6 @@ export class LeaveRequestsComponent
     });
   }
   toggleStar(row: Leaves) {
-    console.log(row);
   }
   editCall(row: Leaves) {
     this.id = row._id;
@@ -168,16 +167,12 @@ export class LeaveRequestsComponent
   accepterDemande(id: string): void {
     this.leavesService.accepterDemandeConge(id).subscribe(
       (leave: Leaves) => {
-        // Traitement après l'acceptation de la demande de congé
-        console.log('Demande de congé acceptée :', leave);
       },
     );
   }
   refuserDemandeConge(id: string): void {
     this.leavesService.refuserDemandeConge(id).subscribe(
       (leave: Leaves) => {
-        // Traitement après l'acceptation de la demande de congé
-        console.log('Demande de congé acceptée :', leave);
       },
     );
   }
@@ -193,7 +188,6 @@ export class LeaveRequestsComponent
         const foundIndex = this.exampleDatabase?.dataChange.value.findIndex(
           (x) => x._id === this.id
         );
-        // for delete we use splice in order to remove single object from DataService
         if (foundIndex !== undefined && this.exampleDatabase) {
           this.exampleDatabase.dataChange.value.splice(foundIndex, 1);
           this.refreshTable();
@@ -229,7 +223,6 @@ export class LeaveRequestsComponent
     const totalSelect = this.selection.selected.length;
     this.selection.selected.forEach((item) => {
       const index = this.dataSource?.renderedData.findIndex((d) => d === item);
-      // console.log(this.dataSource.renderedData.findIndex((d) => d === item));
       this.exampleDatabase?.dataChange.value.splice(index, 1);
       this.refreshTable();
       this.selection = new SelectionModel<Leaves>(true, []);
@@ -247,9 +240,7 @@ export class LeaveRequestsComponent
       this.exampleDatabase,
       this.paginator,
       this.sort,
-      this.leavesService
-      
-      
+      this.leavesService   
     );
     this.subs.sink = fromEvent(this.filter.nativeElement, 'keyup').subscribe(
       () => {
@@ -295,48 +286,6 @@ export class ExampleDataSource extends DataSource<Leaves> {
     // Reset to the first page when the user changes the filter.
     this.filterChange.subscribe(() => (this.paginator.pageIndex = 0));
   }
- 
-  /** Connect function called by the table to retrieve one stream containing the data to render. */
-  // connect(): Observable<Leaves[]> {
-  //   // Listen for any changes in the base data, sorting, filtering, or pagination
-  //   const displayDataChanges = [
-  //     this.exampleDatabase.dataChange,
-  //     this._sort.sortChange,
-  //     this.filterChange,
-  //     this.paginator.page,
-  //   ];
-  //   const test =this.exampleDatabase.getAllUserswithconge;
-  //   console.log("data" , test);
-  //   return merge(...displayDataChanges).pipe(
-  //     map(() => {
-  //       // Filter data
-  //       this.filteredData = this.exampleDatabase.data
-  //         .slice()
-  //         .filter((leaves: Leaves) => {
-  //           const searchStr = (
-  //             leaves.startDate +
-  //             leaves.startTime +
-  //             leaves.endDate +
-  //             leaves.endTime +
-  //             leaves.leaveType +
-  //             leaves.status +
-  //             leaves.reason
-  //           ).toLowerCase();
-  //           return searchStr.indexOf(this.filter.toLowerCase()) !== -1;
-  //         });
-  //       // Sort filtered data
-  //       const sortedData = this.sortData(this.filteredData.slice());
-  //       // Grab the page's slice of the filtered sorted data.
-  //       const startIndex = this.paginator.pageIndex * this.paginator.pageSize;
-  //       this.renderedData = sortedData.splice(
-  //         startIndex,
-  //         this.paginator.pageSize
-  //       );
-  //       return this.renderedData;
-  //     })
-  //   );
-  // }
-
   connect(): Observable<Leaves[]> {
     // Listen for any changes in the base data, sorting, filtering, or pagination
     const displayDataChanges = [
@@ -352,13 +301,11 @@ export class ExampleDataSource extends DataSource<Leaves> {
         return this.leaveS.getAllUserswithconge();
       }),
       map((data: User[]) => {
-        console.log(data);
         // Flatten the data and include the user name in each leave
         const leaves: Leaves[] = [];
         data.forEach(user => {
           const id = user._id;
           const userName = user.name;
-          console.log(userName);
           user.leaves.forEach(leave => {
             leave.userName = userName; // Ajouter la propriété userName à chaque congé
             leaves.push(leave);
@@ -369,7 +316,6 @@ export class ExampleDataSource extends DataSource<Leaves> {
           .slice()
           .filter((leave: Leaves) => {
             const searchStr = (
-            
               leave.startDate +
               leave.startTime +
               leave.endDate +
@@ -430,6 +376,4 @@ export class ExampleDataSource extends DataSource<Leaves> {
       );
     });
   }
-
-  
 }

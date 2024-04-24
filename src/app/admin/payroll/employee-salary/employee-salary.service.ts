@@ -25,8 +25,6 @@ export class EmployeeSalaryService extends UnsubscribeOnDestroyAdapter {
     return this.dialogData;
   }
   /** CRUD METHODS */
-
-
   generatePayroll(): Observable<any> {
     const url = `${this.baseUrl}/generate`;
     return this.httpClient.post<any>(url, {});
@@ -41,57 +39,16 @@ export class EmployeeSalaryService extends UnsubscribeOnDestroyAdapter {
         },
         error: (error: HttpErrorResponse) => {
           this.isTblLoading = false;
-          console.log(error.name + ' ' + error.message);
         },
       });
   }
-  // getAllPayrollsWithUsersAndPoste(): Observable<any[]> {
-  //   return this.httpClient.get<any[]>('http://localhost:3000/payroll/withUsersAndPoste').pipe(
-  //     tap(payroll => console.log('payroll', payroll))
-  //   );
-  // }
-  
-    
-  
-  
-  
+
   addEmployeeSalary(employeeSalary: EmployeeSalary): void {
     this.dialogData = employeeSalary;
-
-    // this.httpClient.post(this.API_URL, employeeSalary)
-    //   .subscribe({
-    //     next: (data) => {
-    //       this.dialogData = employeeSalary;
-    //     },
-    //     error: (error: HttpErrorResponse) => {
-    //        // error code here
-    //     },
-    //   });
   }
   updateEmployeeSalary(employeeSalary: EmployeeSalary): void {
     this.dialogData = employeeSalary;
-
-    // this.httpClient.put(this.API_URL + employeeSalary.id, employeeSalary)
-    //     .subscribe({
-    //       next: (data) => {
-    //         this.dialogData = employeeSalary;
-    //       },
-    //       error: (error: HttpErrorResponse) => {
-    //          // error code here
-    //       },
-    //     });
   }
   deleteEmployeeSalary(id: number): void {
-    console.log(id);
-
-    // this.httpClient.delete(this.API_URL + id)
-    //     .subscribe({
-    //       next: (data) => {
-    //         console.log(id);
-    //       },
-    //       error: (error: HttpErrorResponse) => {
-    //          // error code here
-    //       },
-    //     });
   }
 }

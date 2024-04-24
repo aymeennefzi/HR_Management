@@ -39,6 +39,5 @@ export class AddHolidayComponent {
     });
   }
   onSubmit() {
-    console.log('Form Value', this.holidayForm.value);
   }
 }

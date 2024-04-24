@@ -23,7 +23,8 @@ export class TheMissionService extends UnsubscribeOnDestroyAdapter {
 
   assignUserToMission(missionId: string, useremail: string): Observable<Mission> {
     const data = { missionId, useremail };
-    return this.http.post<Mission>(`${this.baseUrl}`, data);
+
+    return this.http.post<Mission>(`${this.baseUrl}/assign-user`, data);
   }
   getDialogData() {
     return this.dialogData;
@@ -32,8 +33,6 @@ export class TheMissionService extends UnsubscribeOnDestroyAdapter {
   createMission(createMissionDto: CreateMissionDto): Observable<Mission> {
     return this.http.post<Mission>(`${this.baseUrl}/create`, createMissionDto);
   }
-
- 
 
   // Méthode pour mettre à jour la valeur de dataChange
   updateDataChange(missions: Mission[]): void {
@@ -54,7 +53,6 @@ export class TheMissionService extends UnsubscribeOnDestroyAdapter {
       },
       error: (error: HttpErrorResponse) => {
         this.isTblLoading = false;
-        console.log(error.name + ' ' + error.message);
       },
     });
   }

@@ -90,7 +90,6 @@ export class HeaderComponent
         this.notificationService.getNotifications().subscribe({
           next: (notifications) => {
             this.notifications = notifications;
-            console.log(notifications)
             // Mettez à jour ici pour compter seulement les notifications non vues
             this.updateNotificationsCount();
           },
@@ -98,7 +97,6 @@ export class HeaderComponent
         });
         this.notifications.unshift(notification); // Add the new notification to the beginning of the list
         this.updateNotificationsCount(true);
-        console.log("jjbhuftf" , notification)
       },
       error: (err) => console.error(err)
     });
