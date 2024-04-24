@@ -1,0 +1,61 @@
+<div class="addContainer">
+  <div class="modalHeader">
+    <div class="editRowModal">
+      <div class="modalHeader clearfix">
+        <div class="modal-about">
+          {{ dialogTitle }}
+        </div>
+      </div>
+    </div>
+    <button mat-icon-button class="modal-close-button" aria-label="Close dialog" (click)="closeDialog()">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+  <div mat-dialog-content>
+    <form class="register-form m-4" [formGroup]="PosteForm">
+      <div class="row">
+        <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 mb-2">
+          <mat-form-field class="example-full-width" appearance="outline">
+            <mat-label>Poste Name</mat-label>
+            <input matInput formControlName="PostName">
+            <mat-icon class="material-icons-outlined color-icon p-3" matSuffix>face</mat-icon>
+            <mat-error *ngIf="PosteForm.get('PostName')?.hasError('required')">
+              Poste Name is required
+            </mat-error>
+          </mat-form-field>
+        </div>
+        <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 mb-2">
+          <mat-form-field class="example-full-width" appearance="outline">
+            <mat-label>BasicSalary</mat-label>
+            <input matInput type="number" formControlName="BasicSalary">
+            <mat-error *ngIf="PosteForm.get('BasicSalary')?.hasError('required')">
+              Required
+            </mat-error>
+          </mat-form-field>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 mb-2">
+          <mat-form-field class="example-full-width" appearance="outline">
+            <mat-label>work Hours</mat-label>
+            <input matInput type="number" formControlName="Workshour">
+            <mat-error *ngIf="PosteForm.get('Workshour')?.hasError('required')">
+              Required
+            </mat-error>
+          </mat-form-field>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-2">
+          <div class="example-button-row" align="end">
+            <button mat-raised-button color="primary" [disabled]="!PosteForm.valid" (click)="savePoste()">Save</button>
+            <button mat-raised-button color="warn" (click)="closeDialog()">Cancel</button>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+<div class="modal-about">
+  {{ dialogTitle  }}
+</div>

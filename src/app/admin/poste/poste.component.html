@@ -1,0 +1,172 @@
+<section class="content">
+    <div class="content-block">
+      <div class="block-header">
+        <!-- breadcrumb -->
+        <app-breadcrumb [title]="'Poste'" [items]="['Postes']" [active_item]="'All Poste'">
+        </app-breadcrumb>
+      </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+          <div class="card">
+            <div class="materialTableHeader">
+              <div class="left">
+                <ul class="header-buttons-left ms-0">
+                  <li class="tbl-title">
+                    <h2>Poste Name</h2>
+                  </li>
+                  
+                   <li class="tbl-search-box">
+                    <label for="search-input"><i class="material-icons search-icon">search</i></label>
+                    <input placeholder="Search" type="text" #filter class="browser-default search-field"
+                      aria-label="Search box">
+                  </li> 
+                </ul>
+              </div>
+              <div class="right">
+                <ul class="tbl-export-btn">
+                  <li class="tbl-header-btn">
+                    <div class="m-l-10" matTooltip="ADD">
+                      <button mat-mini-fab color="primary" (click)="addNew()">
+                        <mat-icon class="col-white">add</mat-icon>
+                      </button>
+                    </div>
+                  </li>
+                  <li class="tbl-header-btn">
+                    <div class="m-l-10" matTooltip="REFRESH">
+                      <button mat-mini-fab color="primary" (click)="refresh()">
+                        <mat-icon class="col-white">refresh</mat-icon>
+                      </button>
+                    </div>
+                  </li>
+                  <li class="tbl-header-btn">
+                    <div class="m-l-10" [hidden]=!selection.hasValue() matTooltip="DELETE">
+                      <button mat-mini-fab color="warn" (click)="removeSelectedRows()">
+                        <mat-icon class="col-white">delete
+                        </mat-icon>
+                      </button>
+                    </div>
+                  </li>
+                  <!-- <li>
+                    <div class="export-button m-l-10" matTooltip="XLSX">
+                      <img src="assets/images/icons/xlsx.png" alt="" (click)="exportExcel()" />
+                    </div>
+                  </li> -->
+                </ul>
+              </div> 
+            </div>
+            <div class="body overflow-auto">
+              <div class="responsive_table">
+                <table mat-table [dataSource]="dataSource" matSort class="mat-cell advance-table">
+                  <!-- Column Definitions -->
+                  <ng-container matColumnDef="basicSalary">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header>Basic Salary</th>
+                    <td mat-cell *matCellDef="let row">{{ row.BasicSalary }}</td>
+                  </ng-container>
+                  <ng-container matColumnDef="postName">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header>Post Name</th>
+                    <td mat-cell *matCellDef="let row">{{ row.PostName }}</td>
+                  </ng-container>
+                  <ng-container matColumnDef="workshour">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header>Workshour</th>
+                    <td mat-cell *matCellDef="let row">{{ row.Workshour }}</td>
+                  </ng-container>
+                 
+                  
+
+                  <ng-container matColumnDef="assignUser">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header>Assign User</th>
+                    <td mat-cell *matCellDef="let row">
+                      <mat-form-field>
+                        <mat-label>Assign User</mat-label>
+                         <mat-select multiple [(ngModel)]="row.Users" (selectionChange)="onUserSelectionChange(row)">
+        <mat-option *ngFor="let user of usersWithoutPoste"[value]="user">
+          {{ user.firstName + ' ' + user.lastName }}
+        </mat-option>
+      </mat-select>
+                      </mat-form-field>
+                      
+                    </td>
+                  </ng-container>
+                  
+                  
+                  
+                  
+                  
+                  
+                  
+                  <ng-container matColumnDef="actions">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header>Actions</th>
+                    <mat-cell *matCellDef="let row; let i=index;" >
+                      <!-- (click)="editCall(row)" -->
+                      <button mat-icon-button color="primary" (click)="assignUsersToPost(row)" matTooltip="Assign">
+                        <mat-icon>assignment</mat-icon>
+                      </button>
+                      <button mat-icon-button color="accent" (click)="$event.stopPropagation()" 
+                        class="tbl-action-btn"   (click)="editPoste(row)"  matTooltip="EDIT">
+                        <app-feather-icons [icon]="'edit'" [class]="'tbl-fav-edit'">
+                        </app-feather-icons>
+                      </button>
+                     
+                      <button mat-icon-button color="accent" (click)="deleteItem(row._id)" matTooltip="Delete" class="tbl-action-btn">
+                        <app-feather-icons [icon]="'trash-2'" [class]="'tbl-fav-delete'"></app-feather-icons>
+                      </button>
+                      
+                    </mat-cell>
+                  </ng-container>
+               
+                  <!-- Define other columns similarly -->
+      
+                  <!-- Row Definitions -->
+                  <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                  <tr mat-row *matRowDef="let row; columns: displayedColumns;" [style.cursor]="'pointer'" matRipple></tr>
+                </table>
+      
+                <!-- Loading spinner -->
+                <!-- @if (exampleDatabase?.isTblLoading) {
+                  <div class="tbl-spinner">
+                    <mat-progress-spinner color="primary" [diameter]="40" mode="indeterminate"></mat-progress-spinner>
+                  </div>
+                } -->
+                <!-- No results message -->
+                <!-- @if (!exampleDatabase?.isTblLoading) {
+                  <div class="no-results" [style.display]="dataSource.renderedData.length === 0 ? '' : 'none'">
+                    No results
+                  </div>
+                } -->
+                <!-- Paginator -->
+                <mat-paginator #paginator [length]="dataSource.filteredData.length" [pageIndex]="0" [pageSize]="10"
+                  [pageSizeOptions]="[5, 10, 25, 100]">
+                </mat-paginator>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+</section>
+
+  
+<!-- <ng-template #dialogTemplate let-data let-dialogRef="dialogRef">
+    <h2 mat-dialog-title>Affecter un poste</h2>
+    <div mat-dialog-content>
+      <div *ngIf="(usersWithoutPoste$ | async) as usersWithoutPoste">
+        <mat-form-field>
+          <mat-label>Poste</mat-label>
+          <input matInput [(ngModel)]="posteId" placeholder="Poste">
+        </mat-form-field>
+        <mat-form-field>
+          <mat-label>Utilisateur</mat-label>
+          <mat-select [(value)]="selectedUserId">
+            <mat-option *ngFor="let user of usersWithoutPoste" [value]="user._id">{{ user.firstName }} {{ user.lastName }}</mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+    </div>
+    <div mat-dialog-actions>
+      <button mat-button (click)="dialogRef.close()">Annuler</button>
+      <button mat-button  [disabled]="!posteId || !selectedUserId">Affecter</button>
+    </div>
+  </ng-template> -->
+  

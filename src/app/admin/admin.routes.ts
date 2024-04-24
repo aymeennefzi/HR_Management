@@ -78,6 +78,16 @@ export const ADMIN_ROUTE: Route[] = [
   } */
   {
     path : 'performance' , component : PerformanceComponent
+  },
+  {
+    path: 'Policy',
+    loadChildren: () =>
+      import('./payment-policy/paymentPolicy.routes').then((m) => m.PAYMENTPOLICY_ROUTE),
+  },
+  {
+    path: 'Postes',
+    loadChildren: () =>
+      import('./poste/poste.routes').then((m) => m.POSTE_ROUTE),
   }
   
 ];

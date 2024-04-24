@@ -9,7 +9,7 @@ export const PAYROLL_ROUTE: Route[] = [
     component: EmployeeSalaryComponent,
   },
   {
-    path: "payslip",
+    path: "payslip/:id",
     component: PayslipComponent,
   },
   { path: "**", component: Page404Component },

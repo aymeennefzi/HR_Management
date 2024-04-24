@@ -44,6 +44,23 @@
         "INVOICE": "Invoice"
       }
     },
+    "POLICYPAYMENT": {
+      "TEXT": "Payment Policy",
+      "LIST": {
+        "PAYMENTP": "All Payments Policy"
+      }
+        
+      
+    },
+    "POSTE": {
+      "TEXT": "Postes",
+      "LIST": {
+        "POSTE": "Posts list"
+      
+      }
+    },
+
+   
     "PAYROLL": {
       "TEXT": "Payroll",
       "LIST": {

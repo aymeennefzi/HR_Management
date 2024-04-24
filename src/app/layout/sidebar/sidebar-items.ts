@@ -180,6 +180,55 @@ export const ROUTES: RouteInfo[] = [
      
     ],
   }, */
+  
+  {
+    path: '',
+    title: 'MENUITEMS.POLICYPAYMENT.TEXT',
+    iconType: 'feather',
+    icon: 'shield',
+    class: 'menu-toggle',
+    groupTitle: false,
+    badge: '',
+    badgeClass: '',
+    role: ['Admin'],
+    submenu: [
+      {
+        path: '/admin/Policy/paymentPolicy',
+        title: 'MENUITEMS.POLICYPAYMENT.LIST.PAYMENTP',
+        iconType: '',
+        icon: '',
+        class: 'ml-menu',
+        groupTitle: false,
+        badge: '',
+        badgeClass: '',
+        role: [''],
+        submenu: [],
+      },
+      ]}, 
+      {
+        path: '',
+        title: 'MENUITEMS.POSTE.TEXT',
+        iconType: 'feather',
+        icon: 'shield',
+        class: 'menu-toggle',
+        groupTitle: false,
+        badge: '',
+        badgeClass: '',
+        role: ['Admin'],
+        submenu: [
+          {
+            path: '/admin/Postes/Poste',
+            title: 'MENUITEMS.POSTE.LIST.POSTE',
+            iconType: '',
+            icon: '',
+            class: 'ml-menu',
+            groupTitle: false,
+            badge: '',
+            badgeClass: '',
+            role: [''],
+            submenu: [],
+          },
+          ]},
   {
     path: '',
     title: 'MENUITEMS.EMPLOYEES.TEXT',
