@@ -316,6 +316,59 @@ export const ROUTES: RouteInfo[] = [
   },
   {
     path: '',
+<<<<<<< HEAD
+=======
+    title: 'MENUITEMS.HOLIDAYS.TEXT',
+    iconType: 'feather',
+    icon: 'coffee',
+    class: 'menu-toggle',
+    groupTitle: false,
+    badge: '',
+    badgeClass: '',
+    role: ['Admin'],
+    submenu: [
+      {
+        path: '/admin/holidays/all-holidays',
+        title: 'MENUITEMS.HOLIDAYS.LIST.ALL-HOLIDAYS',
+        iconType: '',
+        icon: '',
+        class: 'ml-menu',
+        groupTitle: false,
+        badge: '',
+        badgeClass: '',
+        role: ['Admin'],
+        submenu: [],
+      },
+      {
+        path: '/admin/holidays/add-holiday',
+        title: 'MENUITEMS.HOLIDAYS.LIST.ADD-HOLIDAY',
+        iconType: '',
+        icon: '',
+        class: 'ml-menu',
+        groupTitle: false,
+        badge: '',
+        badgeClass: '',
+        role: ['Admin'],
+        submenu: [],
+      },
+      {
+        path: '/admin/holidays/edit-holiday',
+        title: 'MENUITEMS.HOLIDAYS.LIST.EDIT-HOLIDAY',
+        iconType: '',
+        icon: '',
+        class: 'ml-menu',
+        groupTitle: false,
+        badge: '',
+        badgeClass: '',
+        role: ['Admin'],
+        submenu: [],
+      },
+    ],
+  },
+
+  {
+    path: '',
+>>>>>>> 6e02b18396dd02e2f8f8c5a79db26ff423a6790d
     title: 'MENUITEMS.ATTENDANCE.TEXT',
     iconType: 'feather',
     icon: 'edit',
@@ -425,6 +478,18 @@ export const ROUTES: RouteInfo[] = [
         submenu: [],
       },
     ],
+  },
+  {
+    path: '/admin/Reviews',
+    title: 'Reviews',
+    iconType: 'feather',
+    icon: 'star',
+    class: '',
+    groupTitle: false,
+    badge: '',
+    badgeClass: '',
+    role: ['Admin'],
+    submenu: [],
   },
 
   // Employee Modules
@@ -566,7 +631,35 @@ export const ROUTES: RouteInfo[] = [
     submenu: [],
   },
 
+<<<<<<< HEAD
   
+=======
+  {
+    path: '/client/settings',
+    title: 'MENUITEMS.CLIENT.SETTINGS',
+    iconType: 'feather',
+    icon: 'settings',
+    class: '',
+    groupTitle: false,
+    badge: '',
+    badgeClass: '',
+    role: ['Client'],
+    submenu: [],
+  },
+  {
+    path: '/client/Avis',
+    title: 'MENUITEMS.CLIENT.AVIS',
+    iconType: 'feather',
+    icon: 'Star', // Nom de l'icône
+    class: '',
+    groupTitle: false,
+    badge: '',
+    badgeClass: '',
+    role: ['Client'],
+    submenu: [],
+  },
+
+>>>>>>> 6e02b18396dd02e2f8f8c5a79db26ff423a6790d
   // Common Module
   {
     path: 'calendar',

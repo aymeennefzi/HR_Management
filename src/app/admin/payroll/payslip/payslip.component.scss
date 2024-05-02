@@ -21,4 +21,18 @@
     background-size: cover;
 }
 
-
+@media print {
+    /* Styles pour la mise en page du PDF */
+    body {
+      font-family: Arial, sans-serif;
+      font-size: 12px;
+      margin: 0;
+      padding: 0;
+    }
+    /* Autres styles CSS pour la mise en page */
+  }
+  
+  .content {
+    font-size: 12px; /* Taille de police correcte */
+  }
+  

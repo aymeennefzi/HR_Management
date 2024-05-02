@@ -36,6 +36,7 @@ import { ActivatedRoute } from '@angular/router';
 import { ProjectService } from '../all-projects/core/project.service';
 import { RowHeightCache } from '@swimlane/ngx-datatable';
 import Swal from 'sweetalert2';
+import { FormBuilder } from '@angular/forms';
 
 @Component({
   selector: 'app-estimates',
@@ -80,6 +81,7 @@ _id!:any
   t!:any
   dataSource2!: MatTableDataSource<any>;
   constructor(
+    private fb: FormBuilder,
     private actR : ActivatedRoute,
     public httpClient: HttpClient,
     private projectService: ProjectService,

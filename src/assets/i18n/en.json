@@ -27,7 +27,8 @@
         "EDIT-EMPLOYEE": "Edit Employee",
         "PROFILE": "Employee Profile"
       }
-    },"POLICYPAYMENT": {
+    },
+    "POLICYPAYMENT": {
       "TEXT": "Payment Policy",
       "LIST": {
         "PAYMENTP": "All Payments Policy"
@@ -75,8 +76,8 @@
         "PAYSLIP": "Payslip"
       }
     },
-    "LEADERS": {
-      "TEXT": "Leaders"
+    "REVIEWS": {
+      "TEXT": "Reviews"
     },
     "JOBS": {
       "TEXT": "Jobs",
@@ -147,7 +148,8 @@
       },
       "BILLING": "Billing",
       "CHAT": "Chat",
-      "SETTINGS": "Settings"
+      "SETTINGS": "Settings",
+      "AVIS":"Review"
     },
     "APPS": {
       "TEXT": "Apps"
