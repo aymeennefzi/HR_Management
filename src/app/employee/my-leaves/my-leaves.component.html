@@ -108,17 +108,17 @@
                       <mat-cell mat-cell *matCellDef="let row" [ngClass]="{'disabled-row': row.status==='Approved' || row.status==='Declined'}">
                         <span class="mobile-label">Status:</span>
                         <div *ngIf="row.status==='Approved'">
-                          <span class="badge badge-pill badge-primary col-green">
+                          <span class="badge badge-solid-green">
                             {{row.status}}
                           </span>
                         </div>
                         <div *ngIf="row.status==='Declined'">
-                          <span class="badge badge-pill badge-primary col-red">
+                          <span class="badge badge-solid-orange">
                             {{row.status}}
                           </span>
                         </div>
                         <div *ngIf="row.status==='Pending'">
-                          <span class="badge badge-pill badge-primary col-blue">
+                          <span class="badge badge-solid-blue">
                             {{row.status}}
                           </span>
                         </div>
@@ -134,11 +134,12 @@
                         <ng-container matColumnDef="actions">
                           <mat-header-cell *matHeaderCellDef class="pr-0">Actions</mat-header-cell>
                           <mat-cell *matCellDef="let row; let i=index;" class="pr-0">
-                            <button mat-icon-button color="accent" (click)="$event.stopPropagation()" (click)="editCall(row)"
-                              class="tbl-action-btn" matTooltip="Edit">
-                              <app-feather-icons [icon]="'edit'" [class]="'tbl-fav-edit'">
-                              </app-feather-icons>
-                            </button>
+                            <button mat-icon-button color="accent" (click)="$event.stopPropagation()"
+                            (click)="editCall(row)" class="tbl-action-btn" matTooltip="Edit"
+                            [disabled]="row.leaveType === 'Approved'">
+                      <app-feather-icons [icon]="'edit'" [class]="'tbl-fav-edit'"></app-feather-icons>
+                    </button>
+                    
                             <button mat-icon-button color="accent" (click)="$event.stopPropagation()"
                               (click)="deleteItem(i, row)" class="tbl-action-btn" matTooltip="Delete">
                               <app-feather-icons [icon]="'trash-2'" [class]="'tbl-fav-delete'">

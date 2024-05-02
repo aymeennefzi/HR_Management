@@ -6,7 +6,7 @@ import {
 } from '@angular/material/snack-bar';
 import { MatMenuTrigger, MatMenuModule } from '@angular/material/menu';
 import { BehaviorSubject, fromEvent, merge, Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { map, switchMap, tap } from 'rxjs/operators';
 import { DataSource, SelectionModel } from '@angular/cdk/collections';
 import { UnsubscribeOnDestroyAdapter }  from '../../../shared';
 import { Direction } from '@angular/cdk/bidi';
@@ -30,6 +30,8 @@ import { Router } from '@angular/router';
 import { CookieService } from 'ngx-cookie-service';
 // import { FormDialogComponent } from 'app/calendar/dialogs/form-dialog/form-dialog.component';
 import { MissionemployeeService } from './missionemployee.service';
+import { FormDialogComponent } from 'app/admin/payment-policy/form-dialog/form-dialog.component';
+import { DeleteComponent } from 'app/client/missions/mymissions/dialogs/delete/delete.component';
 
 @Component({
   selector: 'app-missionemployee',
@@ -63,7 +65,7 @@ implements OnInit {
     'status',
     'startDate',
     'endDate',
-    'actions',
+
   ];
   exampleDatabase?: MissionemployeeService;
   dataSource!: ExampleDataSource;
@@ -75,7 +77,7 @@ implements OnInit {
     public httpClient: HttpClient,
     public CookieService:CookieService,
     public dialog: MatDialog,
-    public missionsService: MissionemployeeService,
+    public missionsService:MissionemployeeService,
     private snackBar: MatSnackBar,
     private r:Router
   ) {
@@ -89,7 +91,6 @@ implements OnInit {
   contextMenuPosition = { x: '0px', y: '0px' };
   ngOnInit() {
     this.loadData();
-    this.missionsService.getTokenFromCookie()
   }
   route(id:string){
     this.r.navigate(['admin/mission/assignusertomission/'+id])
@@ -104,32 +105,103 @@ implements OnInit {
     } else {
       tempDirection = 'ltr';
     }
-    // const dialogRef = this.dialog.open(FormDialogComponent, {
-    //   data: {
-    //     missions: this.mission,
-    //     action: 'add',
-    //   },
-    //   direction: tempDirection,
-    // });
-    // this.subs.sink = dialogRef.afterClosed().subscribe((result) => {
-    //   if (result === 1) {
-    //     // After dialog is closed we're doing frontend updates
-    //     // For add we're just pushing a new row inside DataServicex
-    //     this.exampleDatabase?.dataChange.value.unshift(
-    //       this.missionsService.getDialogData()
-    //     );
-    //     this.refreshTable();
-    //     this.showNotification(
-    //       'snackbar-success',
-    //       'Add Record Successfully...!!!',
-    //       'bottom',
-    //       'center'
-    //     );
-    //   }
-    // });
+    const dialogRef = this.dialog.open(FormDialogComponent, {
+      data: {
+        missions: this.mission,
+        action: 'add',
+      },
+      direction: tempDirection,
+    });
+    this.subs.sink = dialogRef.afterClosed().subscribe((result) => {
+      if (result === 1) {
+        // After dialog is closed we're doing frontend updates
+        // For add we're just pushing a new row inside DataServicex
+        this.exampleDatabase?.dataChange.value.unshift(
+          this.missionsService.getDialogData()
+        );
+        this.refreshTable();
+        this.showNotification(
+          'snackbar-success',
+          'Add Record Successfully...!!!',
+          'bottom',
+          'center'
+        );
+      }
+    });
   }
-
-
+  editCall(row: Mission) {
+    
+    this.id = row._id;
+    let tempDirection: Direction;
+    if (localStorage.getItem('isRtl') === 'true') {
+      tempDirection = 'rtl';
+    } else {
+      tempDirection = 'ltr';
+    }
+    const dialogRef = this.dialog.open(FormDialogComponent, {
+      data: {
+     mission: row,
+      id:row._id,
+        action: 'edit',
+      },
+      direction: tempDirection,
+    });
+    this.subs.sink = dialogRef.afterClosed().subscribe((result) => {
+      if (result === 1) {
+        // When using an edit things are little different, firstly we find record inside DataService by id
+        const foundIndex = this.exampleDatabase?.dataChange.value.findIndex(
+          (x) => x._id === this.id
+        );
+        // Then you update that record using data from dialogData (values you enetered)
+        if (foundIndex !== undefined && this.exampleDatabase !== undefined) {
+          this.exampleDatabase.dataChange.value[foundIndex] =
+            this.missionsService.getDialogData();
+          // And lastly refresh table
+          this.refreshTable();
+          this.showNotification(
+            'black',
+            'Edit Record Successfully...!!!',
+            'bottom',
+            'center'
+          );
+        }
+      }
+    });  }
+  deleteItem(i: string, row: Mission) {
+    this.index = i;
+    this.id = row._id;
+    let tempDirection: Direction;
+    if (localStorage.getItem('isRtl') === 'true') {
+      tempDirection = 'rtl';
+    } else {
+      tempDirection = 'ltr';
+    }
+  
+    const dialogRef = this.dialog.open(DeleteComponent, {
+      height: '270px',
+      width: '300px',
+      data: { id: row._id, title: row.title, description: row.description, status: row.status, startdate: row.startDate, enddate: row.endDate },
+      direction: tempDirection,
+    });
+    this.subs.sink = dialogRef.afterClosed().subscribe((result) => {
+      if (result === 1) {
+        const foundIndex = this.exampleDatabase?.dataChange.value.findIndex(
+          (x) => x._id === this.id
+        );
+        // for delete we use splice in order to remove single object from DataService
+        if (foundIndex !== undefined && this.exampleDatabase !== undefined) {
+          this.exampleDatabase.dataChange.value.splice(foundIndex, 1);
+          this.refreshTable();
+          this.showNotification(
+            'snackbar-danger',
+            'Delete Record Successfully...!!!',
+            'bottom',
+            'center'
+          );
+        }
+      }
+    });
+  }
   private refreshTable() {
     this.paginator._changePageSize(this.paginator.pageSize);
   }
@@ -168,22 +240,29 @@ implements OnInit {
       }
   }
   public loadData() {
-    this.exampleDatabase = new MissionemployeeService(this.httpClient,this.CookieService);
+    this.exampleDatabase = new MissionemployeeService(this.httpClient, this.CookieService);
     this.dataSource = new ExampleDataSource(
       this.exampleDatabase,
       this.paginator,
       this.sort
     );
   
-    this.subs.sink = fromEvent(this.filter.nativeElement, 'keyup').subscribe(
-      () => {
-        if (!this.dataSource) {
-          return;
-        }
-        this.dataSource.filter = this.filter.nativeElement.value;
+    this.subs.sink = fromEvent(this.filter.nativeElement, 'keyup').subscribe(() => {
+      if (!this.dataSource) {
+        return;
       }
-    );
+      this.dataSource.filter = this.filter.nativeElement.value;
+    });
+  
+    // Appel à getAllMissionse après initialisation de la source de données
+    this.exampleDatabase.getAllMissionse().subscribe((missions: Mission[]) => {
+      // Mettez à jour les données de votre composant
+      // Par exemple, vous pouvez affecter les données à votre source de données
+      this.dataSource.data = missions;
+    
+    });
   }
+  
   
   exportExcel() {
     // key name with space add in brackets
@@ -199,25 +278,36 @@ implements OnInit {
     TableExportUtil.exportToExcel(exportData, 'excel');
   }
   
-  // showNotification(
-  //   colorName: string,
-  //   text: string,
-  //   placementFrom: MatSnackBarVerticalPosition,
-  //   placementAlign: MatSnackBarHorizontalPosition
-  // ) {
-  //   this.snackBar.open(text, '', {
-  //     duration: 2000,
-  //     verticalPosition: placementFrom,
-  //     horizontalPosition: placementAlign,
-  //     panelClass: colorName,
-  //   });
-  // }
+  showNotification(
+    colorName: string,
+    text: string,
+    placementFrom: MatSnackBarVerticalPosition,
+    placementAlign: MatSnackBarHorizontalPosition
+  ) {
+    this.snackBar.open(text, '', {
+      duration: 2000,
+      verticalPosition: placementFrom,
+      horizontalPosition: placementAlign,
+      panelClass: colorName,
+    });
+  }
   // context menu
   onContextMenu(event: MouseEvent, item: Mission) {
   }
   }
   export class ExampleDataSource extends DataSource<Mission> {
   filterChange = new BehaviorSubject('');
+  private _data: Mission[] = [];
+
+  // Accesseur pour obtenir les données
+  get data(): Mission[] {
+    return this._data;
+  }
+
+  // Accesseur pour définir les données
+  set data(data: Mission[]) {
+    this._data = data;
+  }
   get filter(): string {
     return this.filterChange.value;
   }
@@ -236,6 +326,45 @@ implements OnInit {
     this.filterChange.subscribe(() => (this.paginator.pageIndex = 0));
   }
   /** Connect function called by the table to retrieve one stream containing the data to render. */
+  // connect(): Observable<Mission[]> {
+  //   // Listen for any changes in the base data, sorting, filtering, or pagination
+  //   const displayDataChanges = [
+  //     this.exampleDatabase.dataChange,
+  //     this._sort.sortChange,
+  //     this.filterChange,
+  //     this.paginator.page,
+  //   ];
+  //   //  this.exampleDatabase.getAllMissionse();
+  //   this.exampleDatabase.getAllMissionse().subscribe((missions: Mission[]) => {
+  //     console.log('Missions reçues : ', missions);
+  //   });
+    
+  //    console.log('ubs',this.exampleDatabase.getAllMissionse())
+  //   return merge(...displayDataChanges).pipe(
+  //     map(() => {
+  //       // Filter data
+  //       this.filteredData = this.exampleDatabase.data
+  //         .slice()
+  //         .filter((missions: Mission) => {
+  //           const searchStr = (
+  //             missions.title +
+  //             missions.description +
+  //             missions.status +
+  //             missions.startDate +
+  //             missions.endDate
+  //           ).toLowerCase();
+  //           return searchStr.indexOf(this.filter.toLowerCase()) !== -1;
+  //         });
+  //       const sortedData = this.sortData(this.filteredData.slice());
+  //       const startIndex = this.paginator.pageIndex * this.paginator.pageSize;
+  //       this.renderedData = sortedData.splice(
+  //         startIndex,
+  //         this.paginator.pageSize
+  //       );
+  //       return this.renderedData;
+  //     })
+  //   );
+  // }
   connect(): Observable<Mission[]> {
     // Listen for any changes in the base data, sorting, filtering, or pagination
     const displayDataChanges = [
@@ -244,32 +373,47 @@ implements OnInit {
       this.filterChange,
       this.paginator.page,
     ];
-    this.exampleDatabase.getAllMissions();
+    
+    // Fetch missions from the database
+    this.exampleDatabase.getAllMissionse().subscribe((missions: Mission[]) => {
+
+      // Here you can update the data in this.exampleDatabase.data if needed
+    });
+    
+    // Merge all observables and handle data changes
     return merge(...displayDataChanges).pipe(
       map(() => {
         // Filter data
         this.filteredData = this.exampleDatabase.data
-          .slice()
-          .filter((missions: Mission) => {
-            const searchStr = (
-              missions.title +
-              missions.description +
-              missions.status +
-              missions.startDate +
-              missions.endDate
-            ).toLowerCase();
-            return searchStr.indexOf(this.filter.toLowerCase()) !== -1;
-          });
+          ? this.exampleDatabase.data
+              .slice()
+              .filter((missions: Mission) => {
+                const searchStr = (
+                  missions.title +
+                  missions.description +
+                  missions.status +
+                  missions.startDate +
+                  missions.endDate
+                ).toLowerCase();
+                return searchStr.indexOf(this.filter.toLowerCase()) !== -1;
+              })
+          : [];
+        
+        // Sort filtered data
         const sortedData = this.sortData(this.filteredData.slice());
+        
+        // Grab the page's slice of the filtered sorted data.
         const startIndex = this.paginator.pageIndex * this.paginator.pageSize;
         this.renderedData = sortedData.splice(
           startIndex,
           this.paginator.pageSize
         );
+        
         return this.renderedData;
       })
     );
   }
+  
   disconnect() {
   }
   sortData(data: Mission[]): Mission[] {

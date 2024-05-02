@@ -9,7 +9,6 @@ import {
 } from '@angular/common/http';
 import { throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
-import { Attendances } from 'app/employee/attendance/attendance.model';
 import { User } from '@core';
 
 @Injectable({
@@ -18,15 +17,14 @@ import { User } from '@core';
 
 export class CalendarService {
   private readonly API_URL = 'http://localhost:3000/auth';
-
-  // private readonly API_URL = 'assets/data/calendar.json';
+  private readonly API_URL1 = 'http://localhost:3000/holidays';
+  private readonly API_URL2 = 'http://localhost:3000/attendance';
   httpOptions = {
     headers: new HttpHeaders({
       'Content-Type': 'application/json',
     }),
   };
   dataChange: BehaviorSubject<Calendar[]> = new BehaviorSubject<Calendar[]>([]);
-  // Temporarily stores data from dialogs
   dialogData!: Calendar;
   constructor(private httpClient: HttpClient) { }
   get data(): Calendar[] {
@@ -40,7 +38,6 @@ export class CalendarService {
       .get<Calendar[]>(this.API_URL)
       .pipe(catchError(this.errorHandler));
   }
-
   addUpdateCalendar(calendar: Calendar): void {
     this.dialogData = calendar;
   }
@@ -57,17 +54,12 @@ export class CalendarService {
     console.log(errorMessage);
     return throwError(errorMessage);
   }
-
   updateAttendanceList(personnelId: string, attend: Calendar[]): Observable<void> {
-    return this.httpClient.post<void>(this.API_URL + "/att/" + personnelId , attend);
+    return this.httpClient.post<void>(this.API_URL2 + "/att/" + personnelId , attend);
   }
   getAttendancesForUser(userId: string): Observable<Calendar[]> {
-    return this.httpClient.get<Calendar[]>(this.API_URL + "/" +  userId);
+    return this.httpClient.get<Calendar[]>(this.API_URL2 + "/" +  userId);
   }
-  private readonly API_URL1 = 'http://localhost:3000/holidays';
-  private readonly API_URL2 = 'http://localhost:3000/attendance';
-
-
   getAllHolidays(): Observable<Holidayss[]> {
     return this.httpClient.get<Holidayss[]>(this.API_URL1);
   }

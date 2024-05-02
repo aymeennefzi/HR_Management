@@ -9,14 +9,12 @@ import { UnsubscribeOnDestroyAdapter } from '@shared';
 })
 export class EmployeesService extends UnsubscribeOnDestroyAdapter {
   
-  private apiUrl = 'http://localhost:3000/auth'; // Remplacez cette URL par l'URL de votre backend
+  private apiUrl = 'http://localhost:3000/auth'; 
 
-  //private readonly API_URL = 'assets/data/employees.json';
   isTblLoading = true;
   dataChange: BehaviorSubject<Employees[]> = new BehaviorSubject<Employees[]>(
     []
   );
-  // Temporarily stores data from dialogs
   dialogData!: Employees;
   constructor(private httpClient: HttpClient) {
     super();
@@ -27,7 +25,6 @@ export class EmployeesService extends UnsubscribeOnDestroyAdapter {
   getDialogData() {
     return this.dialogData;
   }
-  /** CRUD METHODS */
   getAllEmployeess(): void {
     this.subs.sink = this.httpClient.get<Employees[]>(this.apiUrl).subscribe({
       next: (data) => {
@@ -40,7 +37,6 @@ export class EmployeesService extends UnsubscribeOnDestroyAdapter {
       },
     });
   }
-
   getAllUsers(): Observable<Employees[]> {
     return this.httpClient.get<Employees[]>(this.apiUrl + "/allusers"); 
   }
@@ -54,35 +50,14 @@ export class EmployeesService extends UnsubscribeOnDestroyAdapter {
           this.dialogData = employees;
         },
         error: (error: HttpErrorResponse) => {
-           // error code here
         },
       });
   }
   updateEmployees(employees: Employees): void {
     this.dialogData = employees;
-
-    // this.httpClient.put(this.API_URL + employees.id, employees)
-    //     .subscribe({
-    //       next: (data) => {
-    //         this.dialogData = employees;
-    //       },
-    //       error: (error: HttpErrorResponse) => {
-    //          // error code here
-    //       },
-    //     });
   }
   deleteEmployees(id: number): void {
     console.log(id);
-
-    // this.httpClient.delete(this.API_URL + id)
-    //     .subscribe({
-    //       next: (data) => {
-    //         console.log(id);
-    //       },
-    //       error: (error: HttpErrorResponse) => {
-    //          // error code here
-    //       },
-    //     });
   }
   getImageById(_id: string): Observable<Blob> {
     return this.httpClient.get('http://localhost:3000/auth/uplo/' + _id, { responseType: 'blob' });
@@ -92,11 +67,11 @@ export class EmployeesService extends UnsubscribeOnDestroyAdapter {
     return this.httpClient.get<Blob>(`http://localhost:3000/auth/${imageId}`, { responseType: 'blob' as 'json' });
   }
   activateUser(userId: string): Observable<Employees> {
-    const body = { userId }; // Créez un objet contenant l'ID de l'utilisateur
+    const body = { userId };
     return this.httpClient.post<Employees>(this.apiUrl + "/activate", body);
   }
   desactivatedUser(userId: string): Observable<Employees> {
-    const body = { userId }; // Créez un objet contenant l'ID de l'utilisateur
+    const body = { userId };
     return this.httpClient.post<Employees>(this.apiUrl + "/deactivate", body);
   }
   signUp(employees: Employees): Observable<{ token: string }> {
@@ -105,7 +80,16 @@ export class EmployeesService extends UnsubscribeOnDestroyAdapter {
   getUserById(userId: string): Observable<Employees> {
     return this.httpClient.get<Employees>(this.apiUrl +"/finduser/"+ userId );
   }
-  updateUser(userId: string, updateDto: Employees): Observable<Employees> {
+  updateUser(userId: string, updateDto: any): Observable<any> {
     return this.httpClient.patch<Employees>(this.apiUrl + "/updateProfile/" + userId , updateDto);
+  }
+  uploadImage(userId: string, file: File): Observable<any> {
+    const formData: FormData = new FormData();
+    formData.append('file', file, file.name);
+
+    return this.httpClient.post<any>(`${this.apiUrl}/uploadImage/${userId}`, formData);
+  }
+  getUserByToken(token: string): Observable<any> {
+    return this.httpClient.get<any>(`${this.apiUrl}/userbytoken/${token}`)
   }
 }

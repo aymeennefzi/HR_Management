@@ -4,7 +4,7 @@ import { CreateMissionDto } from '@core/Dtos/CreateMission.Dto';
 import { Mission } from '@core/models/mission';
 import { UnsubscribeOnDestroyAdapter } from '@shared';
 import { CookieService } from 'ngx-cookie-service';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { BehaviorSubject, Observable, catchError, tap, throwError } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -46,7 +46,7 @@ export class MissionemployeeService extends UnsubscribeOnDestroyAdapter {
   addMission(missions: Mission): void {
     this.dialogData = missions;
 
-    console.log(this.getTokenFromCookie());
+  
   }
   deleteMission(missionId: string): Observable<void> {
    const url = `${this.baseUrl}/${missionId}`;
@@ -63,30 +63,54 @@ deleteMultipleMissions(missionIds: (string | undefined)[]): Observable<void> {
   return this.http.delete<void>(url);
 }
 
-getAllMissions(): void {
-  const employeeId = this.getTokenFromCookie();
+// getAllMissionse():  Observable<any[]> {
+//   const clientId = this.getTokenFromCookie();
+//   console.log("Fetching missions for client ID:", clientId); // Ajouter un log avant la requête HTTP
 
-  if (!employeeId) {
-    console.log("erreur dans id");
+//   if (!clientId) {
+//     throw new Error('ID du client introuvable dans le cookie.');
+//   }
 
+//   this.subs.sink = this.http.get<Mission| Mission[]>(${this.baseUrl}/employee/${clientId}).subscribe({
+//     next: (data: any) => {
+//       const missionsArray = Array.isArray(data) ? data : [data]; // Ensure data is an array
+//       console.log("data", missionsArray);
+//       console.log("Missions fetched successfully:", data); // Ajouter un log après la récupération des données
+//       this.isTblLoading = false;
+//       this.dataChange.next(missionsArray);
+//     },
+//     error: (error: HttpErrorResponse) => {
+//       console.log('Erreur lors de la récupération des missions:', error); // Ajouter un log en cas d'erreur
+//       this.isTblLoading = false;
+//       console.error(error.name + ' ' + error.message);
+//     },
+//   });
+// }
+
+getAllMissionse(): Observable<Mission[]> {
+  const clientId = this.getTokenFromCookie();
+ // Ajouter un log avant la requête HTTP
+
+  if (!clientId) {
     throw new Error('ID du client introuvable dans le cookie.');
   }
 
-  this.subs.sink = this.http.get<Mission | Mission[]>(`${this.baseUrl}/employee/${employeeId}`).subscribe({
-    next: (data: Mission | Mission[]) => {
-      const missionsArray = Array.isArray(data) ? data : [data]; // Ensure data is an array
-      console.log("inside getall")
-      console.log(missionsArray)
+  return this.http.get< Mission |Mission[]>(`${this.baseUrl}/employee/${clientId}`).pipe(
+    tap((data:any) => {
+       const missionsArray = Array.isArray(data) ? data : [data];
+   // Ajouter un log après la récupération des données
       this.isTblLoading = false;
-      this.dataChange.next(missionsArray); // Assign array of Mission objects
-      console.log(this.dataChange);
-    },
-    error: (error: HttpErrorResponse) => {
+      this.dataChange.next(missionsArray);
+    }),
+    catchError((error: HttpErrorResponse) => {
+   // Ajouter un log en cas d'erreur
       this.isTblLoading = false;
-      console.log(error.name + ' ' + error.message);
-    },
-  });
+   
+      return throwError(error); // Renvoyer l'erreur pour la traiter ultérieurement
+    })
+  );
 }
+
   createAndAssignMission(createMissionDto: CreateMissionDto): Observable<Mission> {
     const clientId=  this.getTokenFromCookie();
     const url = `${this.baseUrl}/${clientId}`;
@@ -95,7 +119,7 @@ getAllMissions(): void {
   getTokenFromCookie(): string | null {
     if (this.cookieService.check('token')) {
       let s =this.cookieService.get('token');
-      console.log(s);
+
       return s;
     } else {
       return null;

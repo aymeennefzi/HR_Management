@@ -1,4 +1,5 @@
 
+
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { MatDialog } from '@angular/material/dialog';
@@ -234,7 +235,7 @@ export class AllthemissionsComponent
           },
           (error) => {
             // Gérez les erreurs de suppression
-            console.error('Erreur lors de la suppression des missions:', error);
+       
           }
         );
       }

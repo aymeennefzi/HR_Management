@@ -64,8 +64,7 @@ displayedColumns = [
   'description',
   'status',
   'startDate',
-  'endDate',
-  'actions',
+  'endDate'
 ];
 exampleDatabase?: MissionService;
 dataSource!: ExampleDataSource;
@@ -130,44 +129,7 @@ addNew() {
     }
   });
 }
-editCall(row: Mission) {
-  
-  this.id = row._id;
-  let tempDirection: Direction;
-  if (localStorage.getItem('isRtl') === 'true') {
-    tempDirection = 'rtl';
-  } else {
-    tempDirection = 'ltr';
-  }
-  const dialogRef = this.dialog.open(FormDialogComponent, {
-    data: {
-   mission: row,
-    id:row._id,
-      action: 'edit',
-    },
-    direction: tempDirection,
-  });
-  this.subs.sink = dialogRef.afterClosed().subscribe((result) => {
-    if (result === 1) {
-      // When using an edit things are little different, firstly we find record inside DataService by id
-      const foundIndex = this.exampleDatabase?.dataChange.value.findIndex(
-        (x) => x._id === this.id
-      );
-      // Then you update that record using data from dialogData (values you enetered)
-      if (foundIndex !== undefined && this.exampleDatabase !== undefined) {
-        this.exampleDatabase.dataChange.value[foundIndex] =
-          this.missionsService.getDialogData();
-        // And lastly refresh table
-        this.refreshTable();
-        this.showNotification(
-          'black',
-          'Edit Record Successfully...!!!',
-          'bottom',
-          'center'
-        );
-      }
-    }
-  });  }
+
 deleteItem(i: string, row: Mission) {
   this.index = i;
   this.id = row._id;

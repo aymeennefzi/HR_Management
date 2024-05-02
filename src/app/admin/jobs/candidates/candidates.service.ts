@@ -9,6 +9,7 @@ import { UnsubscribeOnDestroyAdapter } from '@shared';
 })
 export class CandidatesService extends UnsubscribeOnDestroyAdapter {
   private readonly API_URL = 'http://localhost:3000/application';
+  private apiUrl = 'http://localhost:3000/application/generate'
   downloadExcelUrl = `${this.API_URL}/download`;
   isTblLoading = true;
   dataChange: BehaviorSubject<Candidates[]> = new BehaviorSubject<Candidates[]>(
@@ -70,40 +71,14 @@ updateCandidate(id: string, updateCandidateDto: any): Observable<any> {
   }
   addCandidates(candidates: Candidates): void {
     this.dialogData = candidates;
-
-    // this.httpClient.post(this.API_URL, candidates)
-    //   .subscribe({
-    //     next: (data) => {
-    //       this.dialogData = candidates;
-    //     },
-    //     error: (error: HttpErrorResponse) => {
-    //        // error code here
-    //     },
-    //   });
   }
   updateCandidates(candidates: Candidates): void {
     this.dialogData = candidates;
-
-    // this.httpClient.put(this.API_URL + candidates.id, candidates)
-    //     .subscribe({
-    //       next: (data) => {
-    //         this.dialogData = candidates;
-    //       },
-    //       error: (error: HttpErrorResponse) => {
-    //          // error code here
-    //       },
-    //     });
   }
   deleteCandidates(id: number): void {
     console.log(id);
-    // this.httpClient.delete(this.API_URL + id)
-    //     .subscribe({
-    //       next: (data) => {
-    //         console.log(id);
-    //       },
-    //       error: (error: HttpErrorResponse) => {
-    //          // error code here
-    //       },
-    //     });
   }
+  generateCv(cvData: any): Observable<Blob> {
+    return this.httpClient.post<Blob>(this.apiUrl, cvData, { responseType: 'blob' as 'json' });
+}
 }

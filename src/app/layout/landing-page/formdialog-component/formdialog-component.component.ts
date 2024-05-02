@@ -13,6 +13,7 @@ import { Candidates } from 'app/admin/jobs/candidates/candidates.model';
 import { CandidatesService } from 'app/admin/jobs/candidates/candidates.service';
 import { JobsList } from 'app/admin/jobs/jobs-list/jobs-list.model';
 import { JobsListService } from 'app/admin/jobs/jobs-list/jobs-list.service';
+import Swal from 'sweetalert2';
 export interface DialogData {
   jobId: string;
   action: string;
@@ -120,21 +121,8 @@ export class FormdialogComponentComponent implements OnInit {
   }
   getCvPath(): string {
     // Vérifiez si le candidat a un CV et retournez le chemin approprié
-    return this.candidates.cv ? `file:///${this.candidates.cv}` : ''; // Modifiez ceci pour ajuster le format du chemin si nécessaire
+    return this.candidates.cv ? `file:///${this.candidates.cv} `: ''; // Modifiez ceci pour ajuster le format du chemin si nécessaire
   }
-//   onJobSelect(jobId: string): void {
-//     // Vérifier si la liste des jobs est chargée
-//     if (this.jobs.length > 0) {
-//         const selectedJob = this.jobs.find(job => job._id === jobId);
-//         if (selectedJob) {
-//             this.selectedJobTitle = selectedJob.title;
-//             this.contactForm.patchValue({
-//                 jobTitle: selectedJob.title,
-//                 jobId: selectedJob._id
-//             });
-//         }
-//     }
-// }
 onJobSelect(jobId: string): void {
   const selectedJob = this.jobs.find(job => job._id === jobId);
   if (selectedJob) {
@@ -142,10 +130,6 @@ onJobSelect(jobId: string): void {
       this.contactForm.get('jobTitle')!.setValue(selectedJob.title); // Met à jour le champ jobTitle dans le formulaire
   }
 }
-
-
-
- 
   onFileSelected(event: any) {
     this.cvFile = event.target.files[0] as File;
     // Utilisez 'controls' pour accéder aux contrôles du formulaire
@@ -166,7 +150,6 @@ onJobSelect(jobId: string): void {
   
  
   submit() {
-    // emppty stuff
   }
   onNoClick(): void {
     this.dialogRef.close();
@@ -174,34 +157,79 @@ onJobSelect(jobId: string): void {
  
   
  
-  public confirmAdd(): void {
-    if (this.contactForm && this.contactForm.valid && this.cvFile) {
-      const jobId = this.contactForm.get('jobId')!.value;
-      console.log('Job ID:', jobId);
-      if (jobId) { // Vérifiez si l'ID du job est défini
-        const formData = new FormData();
-        formData.append('candidateName', this.contactForm.get('candidateName')!.value);
-        formData.append('email', this.contactForm.get('email')!.value);
-        formData.append('jobId', jobId);
-        formData.append('cv', this.cvFile);
-        // Ajout
-        // Appelez la méthode d'ajout du service avec les données du formulaire
-        this.candidatesService.applyforjob(formData).subscribe(
-          (response) => {
-            console.log('Application submitted successfully:', response);
-            alert('Application submitted successfully!');
-            this.dialogRef.close(true); // Fermer le dialogue après l'ajout réussi
-          },
-          (error) => {
-            console.error('Error submitting application:', error);
-            // Gérer les erreurs d'ajout
-          }
-        );
-      } else {
-        console.error('Error: Job ID is null');
-        // Gérer le cas où l'ID du job est null
-      }
+//   public confirmAdd(): void {
+//     if (this.contactForm && this.contactForm.valid && this.cvFile) {
+//       const jobId = this.contactForm.get('jobId')!.value;
+//       console.log('Job ID:', jobId);
+//       if (jobId) { // Vérifiez si l'ID du job est défini
+//         const formData = new FormData();
+//         formData.append('candidateName', this.contactForm.get('candidateName')!.value);
+//         formData.append('email', this.contactForm.get('email')!.value);
+//         formData.append('jobId', jobId);
+//         formData.append('cv', this.cvFile);
+//         // Ajout
+//         // Appelez la méthode d'ajout du service avec les données du formulaire
+//         this.candidatesService.applyforjob(formData).subscribe(
+//           (response) => {
+//             console.log('Application submitted successfully:', response);
+//             alert('Application submitted successfully!');
+//             this.dialogRef.close(true); // Fermer le dialogue après l'ajout réussi
+//           },
+//           (error) => {
+//             console.error('Error submitting application:', error);
+//             // Gérer les erreurs d'ajout
+//           }
+//         );
+//       } else {
+//         console.error('Error: Job ID is null');
+//         // Gérer le cas où l'ID du job est null
+//       }
+//     }
+// }
+public confirmAdd(): void {
+  if (this.contactForm && this.contactForm.valid && this.cvFile) {
+    const jobId = this.contactForm.get('jobId')!.value;
+    console.log('Job ID:', jobId);
+    if (jobId) { // Vérifiez si l'ID du job est défini
+      const formData = new FormData();
+      formData.append('candidateName', this.contactForm.get('candidateName')!.value);
+      formData.append('email', this.contactForm.get('email')!.value);
+      formData.append('jobId', jobId);
+      formData.append('cv', this.cvFile);
+      // Ajout
+      // Appelez la méthode d'ajout du service avec les données du formulaire
+      this.candidatesService.applyforjob(formData).subscribe(
+        (response) => {
+          console.log('Application submitted successfully:', response);
+          Swal.fire({
+            icon: 'success',
+            title: 'Success!',
+            text: 'Application submitted successfully!',
+          }).then((result) => {
+            if (result.isConfirmed || result.isDismissed) {
+              this.dialogRef.close(true); // Fermer le dialogue après l'ajout réussi
+            }
+          });
+        },
+        (error) => {
+          console.error('Error submitting application:', error);
+          Swal.fire({
+            icon: 'error',
+            title: 'Oops...',
+            text: 'Error submitting application!',
+          });
+          // Gérer les erreurs d'ajout
+        }
+      );
+    } else {
+      console.error('Error: Job ID is null');
+      Swal.fire({
+        icon: 'error',
+        title: 'Oops...',
+        text: 'Job ID is null!',
+      });
+      // Gérer le cas où l'ID du job est null
     }
+  }
 }
-
 }

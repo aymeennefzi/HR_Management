@@ -1,3 +1,4 @@
+
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
@@ -17,12 +18,10 @@ import { MatMenuTrigger, MatMenuModule } from '@angular/material/menu';
 import { BehaviorSubject, fromEvent, merge, Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { FormDialogComponent } from './dialogs/form-dialog/form-dialog.component';
-import { DeleteDialogComponent } from './dialogs/delete/delete.component';
 import { EmployeeSalaryService } from './employee-salary.service';
 import { SelectionModel } from '@angular/cdk/collections';
 import { UnsubscribeOnDestroyAdapter } from '@shared';
 import { Direction } from '@angular/cdk/bidi';
-import { TableExportUtil, TableElement } from '@shared';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatRippleModule } from '@angular/material/core';
 import { FeatherIconsComponent } from '@shared/components/feather-icons/feather-icons.component';
@@ -230,7 +229,7 @@ export class EmployeeSalaryComponent
       const index: number = this.dataSource.renderedData.findIndex(
         (d) => d === item
       );
-       console.log(this.dataSource.renderedData.findIndex((d) => d === item));
+   
       this.exampleDatabase?.dataChange.value.splice(index, 1);
 
       this.refreshTable();
@@ -246,7 +245,7 @@ export class EmployeeSalaryComponent
   generatePayroll(): void {
     this.employeeSalaryService.generatePayroll().subscribe(
       (response) => {
-        console.log(response);
+      
         Swal.fire({
           icon: 'success',
           title: 'Success!',
@@ -261,7 +260,7 @@ export class EmployeeSalaryComponent
             text: "Ce n'est pas le jour de paiement.",
           });
         } else {
-          console.error('Erreur lors de la planification de la paie:', error);
+    
           Swal.fire({
             icon: 'error',
             title: 'Erreur!',
@@ -375,13 +374,12 @@ export class ExampleDataSource extends DataSource<EmployeeSalary> {
             const searchStr = (
               employeeSalary._id+
               employeeSalary.user._id+
-              employeeSalary.user.poste._id+
               employeeSalary.user.firstName +
               employeeSalary.user.lastName +
               employeeSalary.user.Matricule +
               employeeSalary.user.email +
-              employeeSalary.netSalary+
-              employeeSalary.user.poste.PostName
+              employeeSalary.netSalary
+           
             ).toLowerCase();
             return searchStr.indexOf(this.filter.toLowerCase()) !== -1;
           });

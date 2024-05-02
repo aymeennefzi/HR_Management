@@ -33,10 +33,12 @@ export class Leaves {
   personnelId!:String;
   userName?: string; 
   numOfDays !: number ;
+  image !: string ;
 }
 
 export interface User {
   _id: string;
   name: string;
   leaves: Leaves[];
+  image : string;
 }

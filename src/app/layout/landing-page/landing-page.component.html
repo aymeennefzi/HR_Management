@@ -11,7 +11,7 @@
         <a class="nav-item nav-link">About</a>
         <a routerLink="/services" class="nav-item nav-link">Services</a>
          <a  class="nav-item nav-link">Contact</a>
-         <button  class="nav-item nav-link" routerlink = "authentication/signin">SignIn</button>
+         <button  class="nav-item nav-link" (click)="route()">SignIn</button>
       </div>
     </div>
 </nav>
@@ -276,7 +276,37 @@
   </div>
 </div>
 <!-- Service End -->
-
+<div class="container-fluid py-5 wow fadeInUp" data-wow-delay="0.1s">
+  <div class="container py-5">
+    <div class="section-title text-center position-relative pb-3 mb-5 mx-auto" style="max-width: 600px;">
+      <h5 class="fw-bold text-primary text-uppercase">Latest jobs</h5>
+      <h1 class="mb-0">Current jobs opening</h1>
+    </div>
+    <div class="row g-5">
+      <div class="col-lg-4 wow slideInUp" *ngFor="let job of jobsList" data-wow-delay="0.3s">
+        <div class="blog-item bg-light rounded overflow-hidden">
+          <div class="blog-img position-relative overflow-hidden">
+            <img class="img-fluid" src="./assets/landingHome/img/blog-3.jpg" alt=""> 
+          </div>
+          <div class="p-4">
+            <div class="d-flex mb-3">
+              <small class="me-3"><i class="far fa-user text-primary me-2"></i>{{ job.recruitingManager }}</small>
+              <small><i class="far fa-calendar-alt text-primary me-2"></i>{{ job.publicationDate | date }}</small>
+            </div>
+            <h4 class="mb-3">{{ job.title }}</h4>
+            <p>{{ job.description }}</p>
+            <p><strong><mat-icon class="custom-icon">location_on</mat-icon> Location:</strong> {{ job.location }}</p>
+            <p><strong><mat-icon class="custom-icon">description</mat-icon> Contract Type:</strong> {{ job.contractType }}</p>
+            <p><strong><mat-icon class="custom-icon">attach_money</mat-icon> Salary:</strong> {{ job.salary }}</p>
+            <p><strong><mat-icon class="custom-icon">event</mat-icon> Application Deadline:</strong> {{ job.applicationDeadline | date }}</p>
+            <!-- <a class="text-uppercase" href="">Read More <i class="bi bi-arrow-right"></i></a> -->
+            <a class="text-uppercase" (click)="openDialog(job._id,job.title, $event)">Read More <i class="bi bi-arrow-right"></i></a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 <!-- Footer Start -->
  <div class="container-fluid bg-dark text-light mt-1 wow fadeInUp" data-wow-delay="0.1s">
   <div class="container">
@@ -327,6 +357,12 @@
               <a class="text-light" href="#"><i class="bi bi-arrow-right text-primary me-2"></i>Contact Us</a>
             </div>
           </div>
+          <div class="col-lg-4 col-md-12 pt-5 pt-lg-5 mb-5 ">
+            <div class="section-title section-title-sm position-relative pb-3 mb-4">
+              <h3 class="text-light mb-0">Generate your resume</h3>
+            </div>
+            <p>Create your tailor-made CV in just a few clicks! Click on our dedicated button to access our user-friendly CV generation tool. Simplify your job search today!</p>
+            <button mat-button (click)="openCV()" class="btn btn-danger py-md-3 px-md-4 animated slideInRight"><strong>Click on me</strong></button>
         </div>
       </div>
     </div>
@@ -344,6 +380,9 @@
     </div>
   </div>
 </div> 
+
+
+
 <div class="container">
   <div class="chatbox">
     <div class="chatbox__support">

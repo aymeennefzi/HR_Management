@@ -85,21 +85,6 @@ export class HeaderComponent
     if (cookieData) {
       this.userData = JSON.parse(cookieData);
     }
-    this.notificationService.notificationListener().subscribe({
-      next: (notification: any) => {
-        this.notificationService.getNotifications().subscribe({
-          next: (notifications) => {
-            this.notifications = notifications;
-            // Mettez à jour ici pour compter seulement les notifications non vues
-            this.updateNotificationsCount();
-          },
-          error: (err) => console.error(err)
-        });
-        this.notifications.unshift(notification); // Add the new notification to the beginning of the list
-        this.updateNotificationsCount(true);
-      },
-      error: (err) => console.error(err)
-    });
   }
   openNotifications() {
     this.notificationsCount = ''; // Réinitialise le compteur à une chaîne vide

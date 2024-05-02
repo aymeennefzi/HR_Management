@@ -8,7 +8,6 @@ export class EmployeeSalary {
     email: string;
     Matricule: string;
     poste: {
-      _id: string;
       PostName: string;
     };
   };
@@ -23,7 +22,7 @@ export class EmployeeSalary {
       email: data.user.email,
       Matricule: data.user.Matricule,
       poste: {
-        _id: data.user.poste._id,
+        //  _id: data.user.poste._id,
         PostName: data.user.poste.PostName
       }
     };
@@ -32,4 +31,3 @@ export class EmployeeSalary {
 
  
  
-

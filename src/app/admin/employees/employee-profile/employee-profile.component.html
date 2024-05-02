@@ -226,8 +226,7 @@
                   <div class="col-lg-4 col-md-12">
                     <div class="form-group">
                         <mat-label>Upload Image</mat-label>
-                        <app-file-upload formControlName="uploadImg"></app-file-upload>
-                    </div>
+                        <input type="file" (change)="onFileSelected($event)" accept="image/*">                    </div>
                   </div>
                   <div class="header">
                 <h2>

@@ -5,9 +5,12 @@
       <app-breadcrumb [title]="'Leave Requests'" [items]="['Leaves']" [active_item]="'Leave Requests'">
       </app-breadcrumb>
     </div>
+
     <div class="row">
       <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
         <div class="card">
+          <!-- your-component.component.html -->
+        
           <div class="materialTableHeader">
             <div class="left">
               <ul class="header-buttons-left ms-0">
@@ -45,11 +48,11 @@
                   </mat-header-cell>
                   <mat-cell *matCellDef="let row">{{row.id}}</mat-cell>
                 </ng-container> -->
-                <ng-container matColumnDef="img">
+                <ng-container matColumnDef="profileImage">
                   <mat-header-cell mat-header-cell *matHeaderCellDef [ngClass]="'tbl-col-width-per-6'"> Image
                   </mat-header-cell>
                   <mat-cell mat-cell *matCellDef="let row" class="table-img tbl-col-width-per-6"> <span
-                      class="mobile-label">Image:</span><img [src]="row.img" />
+                      class="mobile-label">Image:</span><img [src]="row.image" />
                   </mat-cell>
                 </ng-container>
                 <ng-container matColumnDef="name">
@@ -109,19 +112,20 @@
                     <span class="mobile-label">Status:</span>
                     @if (row.status==='Approved') {
                       <div>
-                        <span class="badge badge-pill badge-primary col-green">
+                        <span class="badge badge-solid-green">
                         {{row.status}}</span>
                       </div>
                     }
                     @if (row.status==='Declined') {
                       <div>
-                        <span class="badge badge-pill badge-primary col-red">
+
+                        <span class="badge badge-solid-orange">
                         {{row.status}}</span>
                       </div>
                     }
                     @if (row.status==='Pending') {
                       <div>
-                        <span class="badge badge-pill badge-primary col-blue">
+                        <span class="badge badge-solid-blue">
                         {{row.status}}</span>
                       </div>
                     }
@@ -163,7 +167,7 @@
                 </ng-container>
                 <mat-header-row *matHeaderRowDef="displayedColumns">
                 </mat-header-row>
-                <mat-row *matRowDef="let row; columns: displayedColumns;" (click)="detailsCall(row)"
+                <mat-row *matRowDef="let row; columns: displayedColumns;"
                   [style.cursor]="'pointer'" matRipple>
                 </mat-row>
               </table>

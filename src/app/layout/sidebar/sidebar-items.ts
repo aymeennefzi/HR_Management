@@ -151,33 +151,7 @@ export const ROUTES: RouteInfo[] = [
      
     ],
   },
-  {
-    path: '',
-    title: ' Missions',
-    iconType: 'feather',
-    icon: 'grid',
-    class: 'menu-toggle',
-    groupTitle: false,
-    badge: '',
-    badgeClass: '',
-    role: ['Client'],
-    submenu: [
-   
-      {
-        path: '/client/mission/missions',
-        title: 'Demande Missions',
-        iconType: '',
-        icon: '',
-        class: 'ml-menu',
-        groupTitle: false,
-        badge: '',
-        badgeClass: '',
-        role: [''],
-        submenu: [],
-      },
-     
-    ],
-  },
+
   {
     path: '',
     title: 'Mission',
@@ -288,22 +262,21 @@ export const ROUTES: RouteInfo[] = [
         role: [''],
         submenu: [],
       },
-      {
-        path: '/admin/employees/edit-employee',
-        title: 'MENUITEMS.EMPLOYEES.LIST.EDIT-EMPLOYEE',
-        iconType: '',
-        icon: '',
-        class: 'ml-menu',
-        groupTitle: false,
-        badge: '',
-        badgeClass: '',
-        role: [''],
-        submenu: [],
-      },
+      // {
+      //   path: '/admin/employees/edit-employee',
+      //   title: 'MENUITEMS.EMPLOYEES.LIST.EDIT-EMPLOYEE',
+      //   iconType: '',
+      //   icon: '',
+      //   class: 'ml-menu',
+      //   groupTitle: false,
+      //   badge: '',
+      //   badgeClass: '',
+      //   role: [''],
+      //   submenu: [],
+      // },
    
     ],
   },
- 
   {
     path: '',
     title: 'MENUITEMS.LEAVES.TEXT',
@@ -317,7 +290,19 @@ export const ROUTES: RouteInfo[] = [
     submenu: [
       {
         path: '/admin/leaves/leave-requests',
-        title: 'MENUITEMS.LEAVES.LIST.LEAVE-REQUESTS',
+        title: 'Leave History',
+        iconType: '',
+        icon: '',
+        class: 'ml-menu',
+        groupTitle: false,
+        badge: '',
+        badgeClass: '',
+        role: ['Admin'],
+        submenu: [],
+      },
+      {
+        path: '/admin/leaves/employee',
+        title: 'Leave Management',
         iconType: '',
         icon: '',
         class: 'ml-menu',
@@ -328,55 +313,6 @@ export const ROUTES: RouteInfo[] = [
         submenu: [],
       },
     ]
-  },
-  {
-    path: '',
-    title: 'MENUITEMS.HOLIDAYS.TEXT',
-    iconType: 'feather',
-    icon: 'coffee',
-    class: 'menu-toggle',
-    groupTitle: false,
-    badge: '',
-    badgeClass: '',
-    role: ['Admin'],
-    submenu: [
-      {
-        path: '/admin/holidays/all-holidays',
-        title: 'MENUITEMS.HOLIDAYS.LIST.ALL-HOLIDAYS',
-        iconType: '',
-        icon: '',
-        class: 'ml-menu',
-        groupTitle: false,
-        badge: '',
-        badgeClass: '',
-        role: ['Admin'],
-        submenu: [],
-      },
-      {
-        path: '/admin/holidays/add-holiday',
-        title: 'MENUITEMS.HOLIDAYS.LIST.ADD-HOLIDAY',
-        iconType: '',
-        icon: '',
-        class: 'ml-menu',
-        groupTitle: false,
-        badge: '',
-        badgeClass: '',
-        role: ['Admin'],
-        submenu: [],
-      },
-      {
-        path: '/admin/holidays/edit-holiday',
-        title: 'MENUITEMS.HOLIDAYS.LIST.EDIT-HOLIDAY',
-        iconType: '',
-        icon: '',
-        class: 'ml-menu',
-        groupTitle: false,
-        badge: '',
-        badgeClass: '',
-        role: ['Admin'],
-        submenu: [],
-      },
-    ],
   },
   {
     path: '',
@@ -413,6 +349,7 @@ export const ROUTES: RouteInfo[] = [
         role: ['Admin'],
         submenu: [],
       },
+    
     ],
   },
   {
@@ -590,6 +527,33 @@ export const ROUTES: RouteInfo[] = [
     ],
   },
   {
+    path: '',
+    title: ' Missions',
+    iconType: 'feather',
+    icon: 'grid',
+    class: 'menu-toggle',
+    groupTitle: false,
+    badge: '',
+    badgeClass: '',
+    role: ['Client'],
+    submenu: [
+   
+      {
+        path: '/client/mission/missions',
+        title: 'Demande Missions',
+        iconType: '',
+        icon: '',
+        class: 'ml-menu',
+        groupTitle: false,
+        badge: '',
+        badgeClass: '',
+        role: [''],
+        submenu: [],
+      },
+     
+    ],
+  },
+  {
     path: '/client/billing',
     title: 'Attendance',
     iconType: 'feather',
@@ -602,19 +566,7 @@ export const ROUTES: RouteInfo[] = [
     submenu: [],
   },
 
-  {
-    path: '/client/settings',
-    title: 'MENUITEMS.CLIENT.SETTINGS',
-    iconType: 'feather',
-    icon: 'settings',
-    class: '',
-    groupTitle: false,
-    badge: '',
-    badgeClass: '',
-    role: ['Client'],
-    submenu: [],
-  },
-
+  
   // Common Module
   {
     path: 'calendar',

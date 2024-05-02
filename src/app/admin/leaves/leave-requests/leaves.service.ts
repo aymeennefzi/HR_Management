@@ -34,7 +34,7 @@ export class LeavesService extends UnsubscribeOnDestroyAdapter {
   }
 
   accepterDemandeConge(id: string): Observable<Leaves> {
-    const url = (this.API_URL + "/" + id + "/accept");
+    const url = (this.API_URL + "/approve/" + id + "/accept");
     return this.httpClient.put<Leaves>(url, null);
   }
   updateLeaves(leaves: Leaves): void {

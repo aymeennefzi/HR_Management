@@ -136,8 +136,6 @@ export class CandidatesComponent
     });
     this.subs.sink = dialogRef.afterClosed().subscribe((result) => {
       if (result === 1) {
-        // After dialog is closed we're doing frontend updates
-        // For add we're just pushing a new row inside DataServicex
         this.exampleDatabase?.dataChange.value.unshift(
           this.candidatesService.getDialogData()
         );
@@ -166,12 +164,7 @@ export class CandidatesComponent
         action: 'edit',
       },
       direction: tempDirection,
-      // data: {
-      //   id: row._id,
-      //   jobsList: row,
-      //   action: 'edit',
-      // },
-      // direction: tempDirection,
+
     });
     this.subs.sink = dialogRef.afterClosed().subscribe((result) => {
       if (result === 1) {

@@ -1,4 +1,4 @@
-import {  Component, Input, OnInit } from '@angular/core';
+import {  AfterViewInit, Component, Input, OnInit } from '@angular/core';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import interactionPlugin, { Draggable } from '@fullcalendar/interaction';
 import timeGridPlugin from '@fullcalendar/timegrid';
@@ -26,6 +26,7 @@ import Swal from 'sweetalert2';
 
 
 
+
 @Component({
   selector: 'app-calendar',
   templateUrl: './calendar.component.html',
@@ -47,6 +48,7 @@ import Swal from 'sweetalert2';
   export class CalendarComponent extends UnsubscribeOnDestroyAdapter implements OnInit{
   events!: any[];
   holidays!: any[];
+  
   @Input() event!: EventInput;
   holidayss!: Holidayss[];
   combinedEvents !: any ;
@@ -58,17 +60,30 @@ import Swal from 'sweetalert2';
     this.holidays =[];
     this.options = {
       plugins: [dayGridPlugin, timeGridPlugin, interactionPlugin ],
-     
       headerToolbar: {
         left: 'prev,next today',
         center: 'title',
-        right: 'dayGridMonth,timeGridWeek,timeGridDay'
+        right: 'timeGridFourDay '
       },
+      // ,dayGridMonth,timeGridWeek,timeGridDay
       editable: true,
       weekends: true,
       themeSystem: 'bootstrap5',
-      initialView: 'dayGridMonth',
+      initialView: 'timeGridFourDay',
+      googleCalendarApiKey: 'AIzaSyAI8Ron1vfcPASOXCYvS_BHqpW_n683ulY',
+      events: {
+        googleCalendarId: 'aymen.nefzi@esprit.tn',
+      },
+      views: {
+        timeGridFourDay: {
+          type: 'dayGrid',
+          duration: { days: 7 },
+          buttonText: '7 day'
+        }
+      },
+      contentHeight: 200,
       drop: this.handleDrop.bind(this),
+      
       droppable: true,
       eventDidMount: function(info: any) {
         const extendedProps = info.event.extendedProps;
@@ -94,7 +109,6 @@ import Swal from 'sweetalert2';
           }
         }
       },
-
       dayCellDidMount: (dayRenderInfo: any) => {
         const dateMoment = moment(dayRenderInfo.date);
         if (dateMoment.day() === 6 || dateMoment.day() === 0) {
@@ -109,8 +123,8 @@ import Swal from 'sweetalert2';
       ngOnInit() {
       this.setupDraggableEvents();
       this.loadEventsAndHolidays(); 
-    }   
       
+    }   
     setupDraggableEvents(): number {
       const draggableEl = document.getElementById('external-events');
       let eventValueCount = 0; // Initialiser le compteur à zéro
@@ -131,6 +145,7 @@ import Swal from 'sweetalert2';
       }
       return eventValueCount;
     }
+
     loadEventsAndHolidays(): void {
       const cookieData = this.cookieService.get('user_data');
       const userData = JSON.parse(cookieData);
@@ -146,6 +161,7 @@ import Swal from 'sweetalert2';
     customDayCellDidMount(dayRenderInfo: any): void {
         const date = dayRenderInfo.date;
         const isHoliday = this.holidays.some(event => moment(event.date).isSame(date, 'day') && event.backgroundColor === 'red')
+        console.log(isHoliday);
       // Colorer en rouge les jours fériés
       if (isHoliday) {
         dayRenderInfo.el.style.backgroundColor = 'red';
@@ -159,17 +175,20 @@ import Swal from 'sweetalert2';
         }
       }
     }  
-    // Mapper les événements des utilisateurs
+
     mapUserEvents(userData: Calendar[]): any[] {
+      console.log(userData); 
       return userData.map(item => ({
-        title: item.etat,
-        date: new Date(item.date),
+        title: item.status ,// Ajuster le titre en fonction de l'état
+        date: item.date  , // Inclure la date pour chaque événement
         extendedProps: { etat: item.etat || '' },
         editable: item.etat !== 'Approved' && item.etat !== 'Declined' // Rendre draggable seulement si l'état n'est pas "Approved" ou "Declined"
-
       }));
     }
-    // Mapper les jours fériés
+    // Sélectionnez tous les éléments avec la classe "fc-event-time"
+    
+
+
     mapHolidayEvents(holidayData: Holidayss[]): any[] {
       return holidayData.map(item => ({
         title: item.name,
@@ -184,11 +203,10 @@ import Swal from 'sweetalert2';
       this.events = combinedEvents;
       this.options = { ...this.options, events: this.events };
     }
+    
     handleDrop(eventDropInfo: any): void {
-      // Récupérer la date et la valeur de la carte
       const date = eventDropInfo.dateStr;
       const cardValue = eventDropInfo.draggedEl.querySelector('.fc-event-main')?.textContent;
-      // Afficher une boîte de dialogue de confirmation avec SweetAlert2
       Swal.fire({
         title: 'Confirmer',
         text: 'Voulez-vous vraiment remettre cette carte dans le calendrier?',
@@ -197,7 +215,7 @@ import Swal from 'sweetalert2';
         confirmButtonColor: '#3085d6',
         cancelButtonColor: '#d33',
         confirmButtonText: 'Oui',
-        cancelButtonText: 'Annuler'
+        cancelButtonText: 'Annuler',
       }).then((result) => {
         if (result.isConfirmed) {
           // Si l'utilisateur confirme, mettre à jour les données dans le calendrier
@@ -210,6 +228,7 @@ import Swal from 'sweetalert2';
           const userId = userData.user.id;
           this.calanderS.updateAttendanceList(userId, [calendarData]).subscribe(
             () => {
+              this.ngOnInit();
             },
             error => {
             }

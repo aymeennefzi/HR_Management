@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, Observable } from 'rxjs';
 import { Today } from './today.model';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { UnsubscribeOnDestroyAdapter } from '@shared';
@@ -8,7 +8,7 @@ import { UnsubscribeOnDestroyAdapter } from '@shared';
   providedIn: 'root',
 })
 export class TodayService extends UnsubscribeOnDestroyAdapter {
-  private readonly API_URL = 'assets/data/today.json';
+  private readonly API_URL = 'http://localhost:3000/Conge';
   isTblLoading = true;
   dataChange: BehaviorSubject<Today[]> = new BehaviorSubject<Today[]>([]);
   // Temporarily stores data from dialogs
@@ -22,6 +22,7 @@ export class TodayService extends UnsubscribeOnDestroyAdapter {
   getDialogData() {
     return this.dialogData;
   }
+  
   /** CRUD METHODS */
   getAllTodays(): void {
     this.subs.sink = this.httpClient.get<Today[]>(this.API_URL).subscribe({
@@ -34,5 +35,8 @@ export class TodayService extends UnsubscribeOnDestroyAdapter {
         console.log(error.name + ' ' + error.message);
       },
     });
+  }
+  getAllUserswithconge(): Observable<any[]> {
+    return this.httpClient.get<any[]>(this.API_URL + "/leaves");
   }
 }

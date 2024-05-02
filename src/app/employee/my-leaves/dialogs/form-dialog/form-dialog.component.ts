@@ -13,6 +13,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { CookieService } from 'ngx-cookie-service';
 import { MyLeavesComponent } from '../../my-leaves.component';
 import { NotifcationServiceService } from 'app/layout/header/Notifcation.service';
+import Swal from 'sweetalert2';
 
 export interface DialogData {
   id: number;
@@ -95,51 +96,96 @@ createContactForm(): UntypedFormGroup {
   });
 }
 
-submit() {  
+// submit() {  
+//   if (this.myLeavesForm.valid) {
+//     const cookieDataString: string = this.cookieService.get('user_data');
+//     if (cookieDataString) {
+//     const cookieData = JSON.parse(decodeURIComponent(cookieDataString));
+//     if (cookieData && cookieData.user && cookieData.user.id) {
+//       const personnelId: string = cookieData.user.id;
+//     const formValue = this.myLeavesForm.value;
+//     const payload = {
+//       ...formValue,
+//       personnelId: personnelId
+//     };
+//     if (this.action === 'edit') {
+//       // Utilize the appropriate update method from the service
+//       this.myLeavesService.updateMyLeaves(this.myLeaves._id ,payload).subscribe({
+
+//         next: (data) => {
+//         },
+//         error: (error) => {
+//         }
+//       });
+//     } else {
+//       this.myLeavesService.addMyLeaves(payload).subscribe({
+//         next: (data) => {
+//          const notificationDetails = {
+//           title: 'New Project Added',
+//           description: `Project ${payload.name} has been successfully added.`,
+     
+//         };
+        
+//         this.notificationService.createNotification( notificationDetails).subscribe(() => {
+//           alert('Project added and notification sent!');
+//         }, error => {
+//         });
+//         },
+//         error: (error) => {
+//         }
+//       });
+//     }
+//   } else {
+//   }
+// }
+//   }
+// }
+submit() {
   if (this.myLeavesForm.valid) {
     const cookieDataString: string = this.cookieService.get('user_data');
     if (cookieDataString) {
-    const cookieData = JSON.parse(decodeURIComponent(cookieDataString));
-    if (cookieData && cookieData.user && cookieData.user.id) {
-      const personnelId: string = cookieData.user.id;
-    const formValue = this.myLeavesForm.value;
-    const payload = {
-      ...formValue,
-      personnelId: personnelId
-    };
-    if (this.action === 'edit') {
-      // Utilize the appropriate update method from the service
-      this.myLeavesService.updateMyLeaves(this.myLeaves._id ,payload).subscribe({
-
-        next: (data) => {
-        },
-        error: (error) => {
-        }
-      });
-    } else {
-      this.myLeavesService.addMyLeaves(payload).subscribe({
-        next: (data) => {
-         const notificationDetails = {
-          title: 'New Project Added',
-          description: `Project ${payload.name} has been successfully added.`,
-     
+      const cookieData = JSON.parse(decodeURIComponent(cookieDataString));
+      if (cookieData && cookieData.user && cookieData.user.id) {
+        const personnelId: string = cookieData.user.id;
+        const formValue = this.myLeavesForm.value;
+        const payload = {
+          ...formValue,
+          personnelId: personnelId
         };
-        
-        this.notificationService.createNotification( notificationDetails).subscribe(() => {
-          alert('Project added and notification sent!');
-        }, error => {
-        });
-        },
-        error: (error) => {
+
+        if (this.action === 'edit') {
+          this.myLeavesService.updateMyLeaves(this.myLeaves._id, payload).subscribe({
+            next: (data) => {
+              // Handle success
+            },
+            error: (error) => {
+              Swal.fire('Erreur', 'This leave has been processed by the administrator. ', 'error');
+            }
+          });
+        } else {
+          this.myLeavesService.addMyLeaves(payload).subscribe({
+            next: (data) => {
+              const notificationDetails = {
+                title: 'Nouveau projet ajouté',
+                description: `Le projet ${payload.name} a été ajouté avec succès.`,
+              };
+            },
+            error: (error) => {
+                Swal.fire('Sorry', 'Le solde de congés est insuffisant.', 'error');
+             
+            }
+          });
         }
-      });
+      } else {
+        // Handle missing user ID in cookie data
+      }
+    } else {
+      // Handle missing cookie data
     }
   } else {
+    // Handle invalid form
   }
 }
-  }
-}
-
 onNoClick(): void {
   this.dialogRef.close();
 }

@@ -11,7 +11,7 @@ import {
   MatSnackBarHorizontalPosition,
   MatSnackBarVerticalPosition,
 } from '@angular/material/snack-bar';
-import { BehaviorSubject, fromEvent, merge, Observable } from 'rxjs';
+import { BehaviorSubject, fromEvent, merge, Observable, Subscription } from 'rxjs';
 import { map, switchMap } from 'rxjs/operators';
 import { MatMenuTrigger, MatMenuModule } from '@angular/material/menu';
 import { SelectionModel } from '@angular/cdk/collections';
@@ -20,7 +20,7 @@ import { DeleteComponent } from './delete/delete.component';
 import { UnsubscribeOnDestroyAdapter } from '@shared';
 import { Direction } from '@angular/cdk/bidi';
 import { TableExportUtil, TableElement } from '@shared';
-import { formatDate, NgClass, DatePipe } from '@angular/common';
+import { formatDate, NgClass, DatePipe, CommonModule } from '@angular/common';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatRippleModule } from '@angular/material/core';
 import { MatCheckboxModule } from '@angular/material/checkbox';
@@ -29,6 +29,9 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { BreadcrumbComponent } from '@shared/components/breadcrumb/breadcrumb.component';
+import { WebSocketServiceService } from '../web-socket-service.service';
+import { Socket, SocketIoModule } from 'ngx-socket-io';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-leave-requests',
@@ -49,6 +52,9 @@ import { BreadcrumbComponent } from '@shared/components/breadcrumb/breadcrumb.co
     MatProgressSpinnerModule,
     MatPaginatorModule,
     DatePipe,
+    SocketIoModule,
+    CommonModule,
+    FormsModule
   ],
 })
 export class LeaveRequestsComponent
@@ -56,8 +62,8 @@ export class LeaveRequestsComponent
   implements OnInit {
   filterToggle = false;
   displayedColumns = [
-    'select',
-    'img',
+    // 'select',
+    'profileImage',
     'name',
     'type',
     'from',
@@ -66,20 +72,24 @@ export class LeaveRequestsComponent
     'numOfDays',
     'status',
     'reason',
-    'actions',
+     //'actions',
   ];
   exampleDatabase?: LeavesService;
   dataSource!: ExampleDataSource;
   selection = new SelectionModel<Leaves>(true, []);
   id?: string;
   leaves?: Leaves;
+  receivedMessage !: string;
+
   constructor(
     public httpClient: HttpClient,
     public dialog: MatDialog,
     public leavesService: LeavesService,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
+    private webS: WebSocketServiceService
   ) {
     super();
+    
   }
   @ViewChild(MatPaginator, { static: true }) paginator!: MatPaginator;
   @ViewChild(MatSort, { static: true }) sort!: MatSort;
@@ -87,120 +97,47 @@ export class LeaveRequestsComponent
   @ViewChild(MatMenuTrigger)
   contextMenu?: MatMenuTrigger;
   contextMenuPosition = { x: '0px', y: '0px' };
+  messageToSend!: string;
+  private messageSubscription!: Subscription;
 
   ngOnInit() {
     this.loadData();
+    
   }
+ 
   refresh() {
     this.loadData();
-  }
-  addNew() {
-    const dialogRef = this.dialog.open(FormComponent, {
-      data: {
-        leaves: this.leaves,
-        action: 'add',
-      },
-    });
-    this.subs.sink = dialogRef.afterClosed().subscribe((result) => {
-      if (result === 1) {
-        // After dialog is closed we're doing frontend updates
-        // For add we're just pushing a new row inside DataServicex
-        this.exampleDatabase?.dataChange.value.unshift(
-          this.leavesService.getDialogData()
-        );
-        this.refreshTable();
-        this.showNotification(
-          'snackbar-success',
-          'Add Record Successfully...!!!',
-          'bottom',
-          'center'
-        );
-      }
-    });
-  }
-  detailsCall(row: Leaves) {
-    this.dialog.open(FormComponent, {
-      data: {
-        leaves: row,
-        action: 'details',
-      },
-      height: '85%',
-      width: '45%',
-    });
+
   }
   toggleStar(row: Leaves) {
   }
-  editCall(row: Leaves) {
-    this.id = row._id;
-    const dialogRef = this.dialog.open(FormComponent, {
-      data: {
-        leaves: row,
-        action: 'edit',
-      },
-    });
-    this.subs.sink = dialogRef.afterClosed().subscribe((result) => {
-      if (result === 1) {
-        // When using an edit things are little different, firstly we find record inside DataService by id
-        const foundIndex = this.exampleDatabase?.dataChange.value.findIndex(
-          (x) => x._id === this.id
-        );
-        // Then you update that record using data from dialogData (values you enetered)
-        if (foundIndex !== undefined) {
-          if (this.exampleDatabase !== undefined) {
-            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-            this.exampleDatabase!.dataChange.value[foundIndex] =
-              this.leavesService.getDialogData();
-            // And lastly refresh table
-            this.refreshTable();
-            this.showNotification(
-              'black',
-              'Edit Record Successfully...!!!',
-              'bottom',
-              'center'
-            );
-          }
-        }
-      }
-    });
-  }
+
+  private socket !: Socket;
+  message: string = '';
 
   accepterDemande(id: string): void {
     this.leavesService.accepterDemandeConge(id).subscribe(
       (leave: Leaves) => {
+        console.log(leave);
+        const id1 ="660f83cd8d1bfc8173f09d51";
+        const message = 'Votre demande de congé a été acceptée.';
       },
     );
   }
+  sendMessage() {
+    if (this.message.trim() !== '') {
+      this.webS.sendMessage(this.message);
+      this.message = '';
+    }
+  }
+ 
   refuserDemandeConge(id: string): void {
     this.leavesService.refuserDemandeConge(id).subscribe(
       (leave: Leaves) => {
       },
     );
   }
-  deleteItem(row: Leaves) {
-    this.id = row._id;
-    const dialogRef = this.dialog.open(DeleteComponent, {
-      height: '270px',
-      width: '330px',
-      data: row,
-    });
-    this.subs.sink = dialogRef.afterClosed().subscribe((result) => {
-      if (result === 1) {
-        const foundIndex = this.exampleDatabase?.dataChange.value.findIndex(
-          (x) => x._id === this.id
-        );
-        if (foundIndex !== undefined && this.exampleDatabase) {
-          this.exampleDatabase.dataChange.value.splice(foundIndex, 1);
-          this.refreshTable();
-          this.showNotification(
-            'snackbar-danger',
-            'Delete Record Successfully...!!!',
-            'bottom',
-            'center'
-          );
-        }
-      }
-    });
-  }
+
   private refreshTable() {
     this.paginator._changePageSize(this.paginator.pageSize);
   }
@@ -219,21 +156,7 @@ export class LeaveRequestsComponent
         this.selection.select(row)
       );
   }
-  removeSelectedRows() {
-    const totalSelect = this.selection.selected.length;
-    this.selection.selected.forEach((item) => {
-      const index = this.dataSource?.renderedData.findIndex((d) => d === item);
-      this.exampleDatabase?.dataChange.value.splice(index, 1);
-      this.refreshTable();
-      this.selection = new SelectionModel<Leaves>(true, []);
-    });
-    this.showNotification(
-      'snackbar-danger',
-      totalSelect + ' Record Delete Successfully...!!!',
-      'bottom',
-      'center'
-    );
-  }
+
   public loadData() {
     this.exampleDatabase = new LeavesService(this.httpClient);
     this.dataSource = new ExampleDataSource(
@@ -297,17 +220,19 @@ export class ExampleDataSource extends DataSource<Leaves> {
 
     return merge(...displayDataChanges).pipe(
       switchMap(() => {
-        // Call the service to fetch the data
         return this.leaveS.getAllUserswithconge();
       }),
       map((data: User[]) => {
         // Flatten the data and include the user name in each leave
+        console.log("reeee" , data)
         const leaves: Leaves[] = [];
         data.forEach(user => {
           const id = user._id;
           const userName = user.name;
+          const img =user.image
           user.leaves.forEach(leave => {
             leave.userName = userName; // Ajouter la propriété userName à chaque congé
+           leave.image = img;
             leaves.push(leave);
           });
         });

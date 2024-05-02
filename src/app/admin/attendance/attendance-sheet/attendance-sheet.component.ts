@@ -50,6 +50,7 @@ export class AttendanceSheetComponent implements OnInit {
     this.calanderS.getUsersWithAttendances().subscribe({
       next: (users: User[]) => {
         this.users = users; 
+        console.log(users)
       },
       error: (error) => {
         console.error('Error fetching users with attendances:', error); 

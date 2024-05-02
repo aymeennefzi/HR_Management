@@ -1,3 +1,4 @@
+
 import { Component } from '@angular/core';
 import { FormsModule, ReactiveFormsModule, UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -63,7 +64,7 @@ export class AssignUsertoMissionComponent {
       error: (error) => {
         // Handle any errors that occur during the subscription
         Swal.fire('Erreur', 'Cet employé est indisponible à cette date.', 'error');
-        console.error('Error during mission assignment', error);
+      
       }
     });
   }

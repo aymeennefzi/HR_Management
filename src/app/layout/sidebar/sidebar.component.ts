@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import {
   Router,
   NavigationEnd,
@@ -24,6 +23,8 @@ import { NgScrollbar } from 'ngx-scrollbar';
 import { UnsubscribeOnDestroyAdapter } from '@shared';
 import { CookieService } from 'ngx-cookie-service';
 import { EmployeesService } from 'app/admin/employees/allEmployees/employees.service';
+import { Subscription } from 'rxjs';
+import { ImageService } from 'app/admin/employees/image.service';
 @Component({
   selector: 'app-sidebar',
   templateUrl: './sidebar.component.html',
@@ -40,7 +41,7 @@ import { EmployeesService } from 'app/admin/employees/allEmployees/employees.ser
 })
 export class SidebarComponent
   extends UnsubscribeOnDestroyAdapter
-  implements OnInit
+  implements OnInit, OnDestroy 
 {
   public sidebarItems!: RouteInfo[];
   public innerHeight?: number;
@@ -52,6 +53,7 @@ export class SidebarComponent
   userType?: string;
   headerHeight = 60;
   currentRoute?: string;
+  private imageUpdatedSubscription!: Subscription;
   constructor(
     @Inject(DOCUMENT) private document: Document,
     private renderer: Renderer2,
@@ -59,7 +61,7 @@ export class SidebarComponent
     private authService: AuthService,
     private router: Router,
     private cookieS : CookieService,
-    private employeS : EmployeesService
+    private employeS : EmployeesService,private imageService: ImageService
   ) {
     super();
     this.elementRef.nativeElement.closest('body');
@@ -69,6 +71,26 @@ export class SidebarComponent
       }
     });
   }
+  handleImageUpload(userId: string, file: File) {
+    this.employeS.uploadImage(userId, file).subscribe({
+      next: (res) => {
+        // Le téléchargement de l'image a réussi, vous pouvez traiter la réponse ici
+        this.userImg = res.imageUrl; // Assurez-vous que res.imageUrl contient l'URL de l'image téléchargée
+        
+        // Mettez à jour l'image dans le navigateur si this.userImg n'est pas undefined
+        const imageElement = document.querySelector('.img-circle.user-img-circle') as HTMLImageElement;
+        if (imageElement && this.userImg) { // Ajoutez cette condition pour vérifier que this.userImg n'est pas undefined
+          imageElement.src = this.userImg;
+        }
+      },
+      error: (error) => {
+        // Gérez les erreurs de téléchargement de l'image ici
+        console.error('Error uploading image:', error);
+      },
+    });
+  }
+  
+  
   @HostListener('window:resize', ['$event'])
   windowResizecall() {
     this.setMenuHeight();
@@ -95,42 +117,53 @@ export class SidebarComponent
   userData: any; // Variable pour stocker les données utilisateur
 
   ngOnInit() {
-    const cookieData = this.cookieS.get('user_data'); // Obtenez le contenu du cookie
+    this.imageUpdatedSubscription = this.imageService.imageUpdated$.subscribe((imageUrl: string) => {
+      // Mettez à jour l'image avec l'URL reçu de l'événement
+      console.log("imgurl",imageUrl);
+      this.userImg = imageUrl;
+    });
+    const token = this.cookieS.get('token'); // Obtenez le token depuis le cookie
   
-    if (cookieData) {
-      try {
-        const userData = JSON.parse(cookieData); // Décoder le contenu du cookie     
-        const userRole = userData.user.role;
-        const firstName = userData?.user?.firstname || '';
-        const lastName =  userData?.user?.lastname || '';
-        console.log(lastName);
-        this.userFullName = `${firstName} ${lastName}`;
-        this.userImg =userData?.user.profileImage;
-        if (userRole.includes('Admin')) {
-          this.sidebarItems = ROUTES.filter((item) => item.role.includes('Admin'));
-          this.userType = 'Admin';
-        } else if (userRole.includes('Client')) {
-          this.sidebarItems = ROUTES.filter((item) => item.role.includes('Client'));
-          this.userType = 'Client';
-        } else if (userRole.includes('Employe')) {
-          this.sidebarItems = ROUTES.filter((item) => item.role.includes('Employee'));
-          this.userType = 'Employe';
-        } else {
-          this.sidebarItems = [];
-          this.userType = 'Unknown';
+    if (token) {
+      // Utilisez le token pour récupérer les données de l'utilisateur
+      this.employeS.getUserByToken(token).subscribe(
+        (userData: any) => {
+          console.log(userData); // Affichez userData pour vérification
+  
+          // Mettez à jour les données de l'utilisateur avec les données obtenues
+          const userRole = userData.role; // Accès direct aux rôles de l'utilisateur
+          const firstName = userData?.firstname || '';
+          const lastName = userData?.lastname || '';
+          this.userFullName = `${firstName} ${lastName}`;
+        this.userImg = userData?.profileImage;
+  
+          if (userRole.includes('Admin')) {
+            this.sidebarItems = ROUTES.filter((item) => item.role.includes('Admin'));
+            this.userType = 'Admin';
+          } else if (userRole.includes('Client')) {
+            this.sidebarItems = ROUTES.filter((item) => item.role.includes('Client'));
+            this.userType = 'Client';
+          } else if (userRole.includes('Employe')) {
+            this.sidebarItems = ROUTES.filter((item) => item.role.includes('Employee'));
+            this.userType = 'Employe';
+          } else {
+            this.sidebarItems = [];
+            this.userType = 'Unknown';
+          }
+        },
+        (error) => {
+          console.error('Erreur lors de la récupération des données utilisateur:', error);
         }
-      } catch (error) {
-        console.error('Erreur lors du décodage du cookie:', error);
-        // Gérez les erreurs de décodage du cookie
-      }
+      );
     } else {
-      console.error('Le cookie "user_data" n\'est pas défini');
-      // Gérez le cas où le cookie n'est pas défini
+      console.error('Le cookie "token" n\'est pas défini');
     }
   
     this.initLeftSidebar();
     this.bodyTag = this.document.body;
   }
+  
+  
   initLeftSidebar() {
     // eslint-disable-next-line @typescript-eslint/no-this-alias
     const _this = this;
@@ -171,6 +204,9 @@ export class SidebarComponent
   logout() {
 this.authService.logout();}
 imageUrl!: string;
+  override ngOnDestroy() {
+  this.imageUpdatedSubscription.unsubscribe();
+}
 
 
 }

@@ -10,10 +10,10 @@ export const ATTENDANCE_ROUTE: Route[] = [
     path: 'today',
     component: TodayComponent,
   },
-  {
-    path: 'employee',
-    component: EmployeeComponent,
-  },
+  // {
+  //   path: 'employee',
+  //   component: EmployeeComponent,
+  // },
   {
     path: 'attendance-sheet',
     component: AttendanceSheetComponent,

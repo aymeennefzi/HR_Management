@@ -19,7 +19,6 @@ import { UnsubscribeOnDestroyAdapter } from '@shared';
 import { MyLeaves } from './my-leaves.model';
 import { MyLeavesService } from './my-leaves.service';
 import { Direction } from '@angular/cdk/bidi';
-import { TableExportUtil, TableElement } from '@shared';
 import { formatDate, NgClass, DatePipe, CommonModule } from '@angular/common';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatRippleModule } from '@angular/material/core';
@@ -31,6 +30,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { BreadcrumbComponent } from '@shared/components/breadcrumb/breadcrumb.component';
 import { CookieService } from 'ngx-cookie-service';
+
 
 @Component({
   selector: 'app-my-leaves',
@@ -82,9 +82,10 @@ export class MyLeavesComponent
     public dialog: MatDialog,
     public myLeavesService: MyLeavesService,
     private snackBar: MatSnackBar,
-    private cookieService : CookieService 
+    private cookieService : CookieService ,
   ) {
     super();
+    
   }
   @ViewChild(MatPaginator, { static: true }) paginator!: MatPaginator;
   @ViewChild(MatSort, { static: true }) sort!: MatSort;
@@ -95,6 +96,7 @@ export class MyLeavesComponent
 
   ngOnInit() {
     this.loadData();
+    
   }
   refresh() {
     this.loadData();
@@ -130,6 +132,9 @@ export class MyLeavesComponent
       }
     });
   }
+  isLeaveTypeApproved(row: any): boolean {
+    return row.leaveType === 'Approved';
+  }
   editCall(row: MyLeaves) {
     this.id = row._id;
     let tempDirection: Direction;
@@ -147,11 +152,9 @@ export class MyLeavesComponent
     });
     this.subs.sink = dialogRef.afterClosed().subscribe((result) => {
       if (result === 1) {
-        // When using an edit things are little different, firstly we find record inside DataService by id
         const foundIndex = this.exampleDatabase?.dataChange.value.findIndex(
           (x) => x._id === this.id
         );
-        // Then you update that record using data from dialogData (values you enetered)
         if (foundIndex != null && this.exampleDatabase) {
           this.exampleDatabase.dataChange.value[foundIndex] =
             this.myLeavesService.getDialogData();
@@ -167,7 +170,6 @@ export class MyLeavesComponent
       }
     });
   }
- 
  deleteItem(i: number, row: MyLeaves) {
     this.index = i;
     this.id = row._id;
@@ -343,7 +345,7 @@ export class ExampleDataSource extends DataSource<MyLeaves> {
       })
     );
   }
-  
+ 
   
   disconnect() {
     //disconnect
