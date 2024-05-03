@@ -96,11 +96,8 @@
     "@types/d3": "^7.4.3",
     "@types/echarts": "^4.9.21",
     "@types/jasmine": "~5.1.2",
-<<<<<<< HEAD
     "@types/socket.io-client": "^3.0.0",
-=======
     "@types/qrcode": "^1.5.5",
->>>>>>> 6e02b18396dd02e2f8f8c5a79db26ff423a6790d
     "@typescript-eslint/eslint-plugin": "^6.11.0",
     "@typescript-eslint/parser": "^6.11.0",
     "eslint": "^8.54.0",

@@ -4,6 +4,7 @@ import { AuthGuard } from '@core/guard/auth.guard';
 import { AuthLayoutComponent } from './layout/app-layout/auth-layout/auth-layout.component';
 import {LandingPageComponent} from "./layout/landing-page/landing-page.component";
 import { Page404Component } from './authentication/page404/page404.component';
+import { ServiceComponentComponent } from './layout/landing-page/service-component/service-component.component';
 
 export const APP_ROUTE: Route[] = [
   //{ path: '', redirectTo: '/home', pathMatch: 'full' }, // Redirection vers '/home' par défaut
