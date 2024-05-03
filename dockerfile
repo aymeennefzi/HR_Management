@@ -4,5 +4,5 @@ WORKDIR /app
 COPY . .
 RUN npm install
 RUN npm run build
-EXPOSE 4200
+EXPOSE 80
 CMD ["ng","serve","--host", "0.0.0.0", "--disable-host-check"]
