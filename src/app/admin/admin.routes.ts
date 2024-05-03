@@ -59,7 +59,7 @@ export const ADMIN_ROUTE: Route[] = [
       import('./payroll/payroll.routes').then((m) => m.PAYROLL_ROUTE),
   },
   {
-    path: 'leads',
+    path: 'Reviews',
     loadChildren: () =>
       import('./leads/leads.routes').then((m) => m.LEADS_ROUTE),
   },

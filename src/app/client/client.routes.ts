@@ -4,6 +4,7 @@ import { DashboardComponent } from './dashboard/dashboard.component';
 import { BillingComponent } from './billing/billing.component';
 import { SettingsComponent } from './settings/settings.component';
 import { ChatComponent } from './chat/chat.component';
+import { TicketsComponent } from './supports/tickets/tickets.component';
 export const CLIENT_ROUTE: Route[] = [
   {
     path: 'dashboard',
@@ -25,6 +26,9 @@ export const CLIENT_ROUTE: Route[] = [
   {
     path: 'billing',
     component: BillingComponent,
+  },
+  { path:'Avis',
+  component: TicketsComponent,
   },
   {
     path: 'chat',

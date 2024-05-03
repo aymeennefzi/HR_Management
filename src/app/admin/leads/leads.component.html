@@ -1,8 +1,8 @@
-<section class="content">
+Revie<section class="content">
   <div class="content-block">
     <div class="block-header">
       <!-- breadcrumb -->
-      <app-breadcrumb [title]="'Leaders'" [items]="['Leads']" [active_item]="'Leaders'">
+      <app-breadcrumb [title]="''" [items]="['']" [active_item]="'Reviews'">
       </app-breadcrumb>
     </div>
     <div class="row">
@@ -12,7 +12,7 @@
             <div class="left">
               <ul class="header-buttons-left ms-0">
                 <li class="tbl-title">
-                  <h2>Leaders</h2>
+                  <h2>Reviews</h2>
                 </li>
                 <li class="tbl-search-box">
                   <label for="search-input"><i class="material-icons search-icon">search</i></label>
@@ -21,11 +21,11 @@
                   </li>
                 </ul>
               </div>
-              <div class="right">
+               <div class="right">
                 <ul class="tbl-export-btn">
                   <li class="tbl-header-btn">
                     <div class="m-l-10" matTooltip="ADD">
-                      <button mat-mini-fab color="primary" (click)="addNew()">
+                      <button mat-mini-fab color="primary" >
                         <mat-icon class="col-white">add</mat-icon>
                       </button>
                     </div>
@@ -47,11 +47,11 @@
                   </li>
                   <li>
                     <div class="export-button m-l-10" matTooltip="XLSX">
-                      <img src="assets/images/icons/xlsx.png" alt="" (click)="exportExcel()" />
+                      <img src="assets/images/icons/xlsx.png" alt=""  />
                     </div>
                   </li>
                 </ul>
-              </div>
+              </div> 
             </div>
             <div class="body overflow-auto">
               <div class="responsive_table">
@@ -71,69 +71,90 @@
                     </mat-cell>
                   </ng-container>
                   <!-- ID Column -->
-                  <ng-container matColumnDef="id">
+                  <!-- <ng-container matColumnDef="_id">
                     <mat-header-cell *matHeaderCellDef mat-sort-header>Id</mat-header-cell>
-                    <mat-cell *matCellDef="let row">{{row.id}}</mat-cell>
-                  </ng-container>
-                  <ng-container matColumnDef="img">
-                    <mat-header-cell mat-header-cell *matHeaderCellDef [ngClass]="'tbl-col-width-per-7'"> Image
-                    </mat-header-cell>
-                    <mat-cell mat-cell *matCellDef="let row" class="table-img tbl-col-width-per-7"><span
-                    class="mobile-label">Image:</span> <img [src]="row.img" />
-                  </mat-cell>
-                </ng-container>
-                <ng-container matColumnDef="name">
-                  <mat-header-cell *matHeaderCellDef mat-sort-header>Name</mat-header-cell>
-                  <mat-cell *matCellDef="let row" (contextmenu)="onContextMenu($event, row)">
-                    <span class="mobile-label">Name:</span>{{row.name}}</mat-cell>
-                  </ng-container>
-                  <ng-container matColumnDef="department">
-                    <mat-header-cell *matHeaderCellDef mat-sort-header>Department</mat-header-cell>
-                    <mat-cell *matCellDef="let row" (contextmenu)="onContextMenu($event, row)">
-                      <span class="mobile-label">Department:</span> {{row.department}}
+                    <mat-cell *matCellDef="let row">{{row._id}}</mat-cell>
+                  </ng-container> -->
+                  <ng-container matColumnDef="Date">
+                    <mat-header-cell mat-header-cell *matHeaderCellDef [ngClass]="'tbl-col-width-per-7'"> Date </mat-header-cell>
+                    <mat-cell mat-cell *matCellDef="let row" class="table-img tbl-col-width-per-7">
+                      <span class="mobile-label">Date:</span> {{ row.Date }}
                     </mat-cell>
                   </ng-container>
-                  <ng-container matColumnDef="role">
-                    <mat-header-cell *matHeaderCellDef mat-sort-header>Role</mat-header-cell>
+                  
+                  
+                <ng-container matColumnDef="EmployeeName">
+                  <mat-header-cell *matHeaderCellDef mat-sort-header>Name</mat-header-cell>
+                  <mat-cell *matCellDef="let row" (contextmenu)="onContextMenu($event, row)">
+                    <span class="mobile-label">Name:</span>{{row.EmployeeName}}</mat-cell>
+                  </ng-container>
+                  <ng-container matColumnDef="EmployeeEmail">
+                    <mat-header-cell *matHeaderCellDef mat-sort-header>Employee Email</mat-header-cell>
                     <mat-cell *matCellDef="let row" (contextmenu)="onContextMenu($event, row)">
-                      <span class="mobile-label">Role:</span>{{row.role}}</mat-cell>
+                      <span class="mobile-label">Email:</span> {{row.EmployeeEmail}}
+                    </mat-cell>
+                  </ng-container>
+                  <ng-container matColumnDef="ClientName">
+                    <mat-header-cell *matHeaderCellDef mat-sort-header>Client Name</mat-header-cell>
+                    <mat-cell *matCellDef="let row" (contextmenu)="onContextMenu($event, row)">
+                      <span class="mobile-label">Client Name:</span>{{row.ClientName}}</mat-cell>
                     </ng-container>
-                    <ng-container matColumnDef="project">
-                      <mat-header-cell *matHeaderCellDef mat-sort-header>Project</mat-header-cell>
+                    <ng-container matColumnDef="FileName">
+                      <mat-header-cell *matHeaderCellDef mat-sort-header>FileName</mat-header-cell>
                       <mat-cell *matCellDef="let row" (contextmenu)="onContextMenu($event, row)">
-                        <span class="mobile-label">Project:</span>{{row.project}}</mat-cell>
+                        <span class="mobile-label">FileName:</span>{{row.FileName}}</mat-cell>
                       </ng-container>
-                      <ng-container matColumnDef="mobile">
-                        <mat-header-cell *matHeaderCellDef mat-sort-header>Mobile</mat-header-cell>
-                        <mat-cell *matCellDef="let row" (contextmenu)="onContextMenu($event, row)">
-                          <span class="mobile-label">Mobile:</span> {{row.mobile}}</mat-cell>
-                        </ng-container>
-                        <ng-container matColumnDef="email">
-                          <mat-header-cell *matHeaderCellDef mat-sort-header>Email</mat-header-cell>
-                          <mat-cell *matCellDef="let row" (contextmenu)="onContextMenu($event, row)">
-                            <span class="mobile-label">Email:</span>{{row.email}}</mat-cell>
-                          </ng-container>
+                      <ng-container matColumnDef="PositiveSentiment">
+                        <mat-header-cell *matHeaderCellDef mat-sort-header>Positive Sentiment</mat-header-cell>
+                        <mat-cell *matCellDef="let row" (contextmenu)="onContextMenu($event, row)" [ngClass]="{'positive': row.PositiveSentiment > 50.00, 'negative': row.PositiveSentiment <= 50.00}">
+                          <span class="mobile-label">Positive Sentiment:</span> {{row.PositiveSentiment}}
+                        </mat-cell>
+                      </ng-container>
+                      
+                      <ng-container matColumnDef="NegativeSentiment">
+                        <mat-header-cell *matHeaderCellDef mat-sort-header>Negative Sentiment</mat-header-cell>
+                        <mat-cell *matCellDef="let row" (contextmenu)="onContextMenu($event, row)" [ngClass]="{'positive': row.NegativeSentiment > 50.00, 'negative': row.NegativeSentiment <= 50.00}">
+                          <span class="mobile-label">Negative Sentiment:</span> {{row.NegativeSentiment}}
+                        </mat-cell>
+                      </ng-container>
+                      
                           <!-- actions -->
                           <ng-container matColumnDef="actions">
                             <mat-header-cell class="pr-0" *matHeaderCellDef>Actions</mat-header-cell>
                             <mat-cell *matCellDef="let row; let i=index;" class="pr-0">
-                              <button mat-icon-button color="accent" (click)="$event.stopPropagation()" (click)="editCall(row)"
+                              <button mat-icon-button color="accent" (click)="$event.stopPropagation()" 
                                 class="tbl-action-btn" matTooltip="Edit">
                                 <app-feather-icons [icon]="'edit'" [class]="'tbl-fav-edit'">
                                 </app-feather-icons>
                               </button>
                               <button mat-icon-button color="accent" (click)="$event.stopPropagation()"
-                                (click)="deleteItem(i, row)" class="tbl-action-btn" matTooltip="Delete">
+                                 class="tbl-action-btn" matTooltip="Delete">
                                 <app-feather-icons [icon]="'trash-2'" [class]="'tbl-fav-delete'">
                                 </app-feather-icons>
                               </button>
                             </mat-cell>
                           </ng-container>
+                          <ng-container matColumnDef="actions1">
+                            <mat-header-cell class="pr-0" *matHeaderCellDef>Actions</mat-header-cell>
+                            <mat-cell *matCellDef="let row; let i=index;" class="pr-0">
+                              <button mat-icon-button color="accent" (click)="downloadReport(row.FileName)" 
+                            class="tbl-action-btn" matTooltip="Download">
+                          <mat-icon>cloud_download</mat-icon>
+                            </button>
+
+                              <!-- <button mat-icon-button color="accent" (click)="$event.stopPropagation()"
+                                 class="tbl-action-btn" matTooltip="Delete">
+                                <app-feather-icons [icon]="'trash-2'" [class]="'tbl-fav-delete'">
+                                </app-feather-icons>
+                              </button> -->
+                            </mat-cell>
+                          </ng-container>
+
                           <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
-                        <!-- <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row> -->
-                        <mat-row *matRowDef="let row; columns: displayedColumns;" (click)="editCall(row)"
+                        <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
+                        <!-- <mat-row *matRowDef="let row; columns: displayedColumns;" (click)="editCall(row)"
                           [style.cursor]="'pointer'" matRipple>
-                        </mat-row>
+                         </mat-row>  -->
                       </table>
                       <!-- Loading spinner -->
                       @if (exampleDatabase?.isTblLoading) {
@@ -148,15 +169,15 @@
                       </div>
                       <mat-menu #contextMenu="matMenu">
                         <ng-template matMenuContent let-item="item">
-                          <button mat-menu-item (click)="addNew()">
+                          <button mat-menu-item >
                             <mat-icon>add_box</mat-icon>
                             <span>Add Record</span>
                           </button>
-                          <button mat-menu-item (click)="editCall(item)">
+                          <button mat-menu-item >
                             <mat-icon>create</mat-icon>
                             <span>Edit Record</span>
                           </button>
-                          <button mat-menu-item (click)="deleteItem(item.id,item)">
+                          <button mat-menu-item >
                             <mat-icon>delete</mat-icon>
                             <span>Delete Record</span>
                           </button>
@@ -191,7 +212,7 @@
                       <!-- context menu end -->
                       @if (!exampleDatabase?.isTblLoading) {
                         <div class="no-results"
-                          [style.display]="dataSource.renderedData.length === 0 ? '' : 'none'">
+                        [style.display]="dataSource.renderedData.length === 0 ? '' : 'none'">
                           No results
                         </div>
                       }
@@ -199,6 +220,7 @@
                         [pageSizeOptions]="[5, 10, 25, 100]">
                       </mat-paginator>
                     </div>
+                    
                   </div>
                 </div>
               </div>

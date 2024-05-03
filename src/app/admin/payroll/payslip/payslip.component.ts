@@ -1,26 +1,32 @@
 import { CommonModule } from '@angular/common';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Component, ElementRef, ViewChild } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { BreadcrumbComponent } from '@shared/components/breadcrumb/breadcrumb.component';
-import jsPDF from 'jspdf';
-import html2canvas from 'html2canvas';
+import { QRCodeModule } from 'angularx-qrcode';
+import { CookieService } from 'ngx-cookie-service';
+
+
 @Component({
   selector: 'app-payslip',
   templateUrl: './payslip.component.html',
   styleUrls: ['./payslip.component.scss'],
   standalone: true,
   imports: [BreadcrumbComponent,
-  CommonModule],
+  CommonModule,
+  QRCodeModule],
 })
 export class PayslipComponent {
   payslipData: any;
-  @ViewChild('content', { static: false }) content!: ElementRef;
+  @ViewChild('content') content!: ElementRef;
 
-
-  constructor(private route: ActivatedRoute, private http: HttpClient) { }
-
+  constructor(private route: ActivatedRoute, private http: HttpClient,private cookieService:CookieService) { }
+  authToken!: string;
+  userId: string=this.retrieveUserName() ;
+  private apiKey = 'QdL_M_q5VGXRj2fY8Er9';
+  private apiUrl = 'https://docraptor.com/docs';
   ngOnInit(): void {
+
     this.route.paramMap.subscribe(params => {
       const payrollId = params.get('id');
       if (payrollId) {
@@ -28,21 +34,45 @@ export class PayslipComponent {
       }
     });
   }
- downloadAsPDF() {
-    const doc = new jsPDF();
-    const content = this.content.nativeElement;
-    html2canvas(content).then(canvas => {
-      const imageData = canvas.toDataURL('image/png');
-      // Calculer les dimensions pour l'insertion de l'image dans le PDF
-      const imgWidth = 210; // Largeur maximale de l'image
-      const imgHeight = canvas.height * imgWidth / canvas.width;
-
-      // Insérer l'image dans le PDF
-      doc.addImage(imageData, 'PNG', 0, 0, imgWidth, imgHeight);
-        doc.save('bulletin_de_salaire.pdf');
-      // }
+  
+  generatePDF(htmlContent: string) {
+    return this.http.post(this.apiUrl, {
+      document_content: htmlContent,
+      // Autres options de mise en page ou de configuration
+    }, {
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Basic ${btoa(this.apiKey + ':')}`
+      },
+      responseType: 'blob' // Pour recevoir une réponse de type Blob
     });
   }
+
+  downloadPDF() {
+    const content = this.content.nativeElement.innerHTML;
+    this.generatePDF(content).subscribe(
+      (blob: Blob) => {
+        const fileURL = URL.createObjectURL(blob);
+        window.open(fileURL);
+      },
+      (error) => {
+        console.error('Erreur lors de la génération du PDF:', error);
+      }
+    );
+  }
+
+private retrieveUserName(): string {
+  const cookieData = this.cookieService.get('user_data');
+  let userName: string = ''; 
+  if (cookieData) {
+    const userData = JSON.parse(cookieData);
+    const { firstname, lastname } = userData.user; 
+    userName = `${firstname} ${lastname}`;
+  }
+
+  return userName; 
+}
+
 
 
   getPayslipData(payrollId: string) {
@@ -83,14 +113,12 @@ convertToWords(num: number): string {
       }
   }
 
-  // Gestion des centaines et des milliers
   if (num < 1000) {
       const hundred = Math.floor(num / 100);
       const remainder = num % 100;
       return units[hundred] + ' Cent ' + (remainder !== 0 ? 'et ' + this.convertToWords(remainder) : '');
   }
 
-  // Gestion des milliers et des millions
   if (num < 1000000) {
       const thousand = Math.floor(num / 1000);
       const remainder = num % 1000;

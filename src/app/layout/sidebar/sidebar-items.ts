@@ -378,6 +378,7 @@ export const ROUTES: RouteInfo[] = [
       },
     ],
   },
+
   {
     path: '',
     title: 'MENUITEMS.ATTENDANCE.TEXT',
@@ -488,6 +489,18 @@ export const ROUTES: RouteInfo[] = [
         submenu: [],
       },
     ],
+  },
+  {
+    path: '/admin/Reviews',
+    title: 'Reviews',
+    iconType: 'feather',
+    icon: 'star',
+    class: '',
+    groupTitle: false,
+    badge: '',
+    badgeClass: '',
+    role: ['Admin'],
+    submenu: [],
   },
 
   // Employee Modules
@@ -607,6 +620,18 @@ export const ROUTES: RouteInfo[] = [
     title: 'MENUITEMS.CLIENT.SETTINGS',
     iconType: 'feather',
     icon: 'settings',
+    class: '',
+    groupTitle: false,
+    badge: '',
+    badgeClass: '',
+    role: ['Client'],
+    submenu: [],
+  },
+  {
+    path: '/client/Avis',
+    title: 'MENUITEMS.CLIENT.AVIS',
+    iconType: 'feather',
+    icon: 'Star', // Nom de l'icône
     class: '',
     groupTitle: false,
     badge: '',

@@ -1,0 +1,48 @@
+.custom-card {
+    background: linear-gradient(to right, #2196F3, #1976D2); /* Dégradé de couleur bleue */
+    color: white; /* Couleur du texte */
+    width: 90%; /* Largeur de la carte */
+    margin: auto; /* Centrage horizontal */
+  }
+  
+  .custom-header {
+    background-color: transparent; /* Fond de l'en-tête transparent */
+  }
+  
+  .custom-form-field {
+    width: 100%; /* Largeur du champ de formulaire */
+    margin-bottom: 15px; /* Marge entre les champs de formulaire */
+  }
+  
+  .custom-actions {
+    justify-content: center; /* Centrer les actions */
+  }
+  
+  .editor-container {
+    border: 1px solid white; /* Bordure autour de l'éditeur */
+    border-radius: 5px; /* Bordure arrondie */
+    padding: 10px; /* Rembourrage */
+  }
+  
+  .blue-icon {
+    color: #0D47A1; /* Couleur de l'icône bleue foncée */
+  }
+  .custom-title {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    margin-bottom: 50px;
+  }
+  
+  .title-text {
+    margin: 0 10px; /* Marge autour du texte du titre */
+  }
+  
+  .star-icon {
+    color: gold; /* Couleur de l'icône d'étoile */
+  }
+  .ck.ck-editor__editable {
+    color: black !important;
+}
+

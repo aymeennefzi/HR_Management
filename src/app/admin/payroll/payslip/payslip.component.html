@@ -193,7 +193,7 @@
                                             <p><strong>Name:</strong> {{ payslipData.payroll.user.firstName }} {{ payslipData.payroll.user.lastName }}</p>
                                             <p><strong>Email:</strong> {{ payslipData.payroll.user.email }}</p>
                                             <p><strong>Matricule:</strong> {{ payslipData.payroll.user.Matricule }}</p>
-                                            <p><strong>Poste:</strong> {{ payslipData.payroll.user.poste.posteName }}</p>
+                                            <p><strong>Poste:</strong> {{ payslipData.payroll.user.poste.PostName }}</p>
                                             <!-- Autres détails de l'employé à afficher -->
                                         </div>
                                     </div>
@@ -231,10 +231,11 @@
                     </div>
                     <div class="d-flex justify-content-end">
                         <div class="d-flex flex-column mt-2"> <span class="fw-bolder">For Priya
-                                Jain</span> <span class="mt-4">Authorised Signatory</span> </div>
+                                Jain</span> <span class="mt-4">Authorised Signatory</span> <qrcode [qrdata]="userId"></qrcode>
+                            </div>
                     </div>
                     <div class="print">
-                        <button class="printer-button" (click)="downloadAsPDF()">
+                        <button class="printer-button" (click)="downloadPDF()">
                             <span class="printer-icon"></span>
                             <strong>Print this receipt</strong>
                         </button>

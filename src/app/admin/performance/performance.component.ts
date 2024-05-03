@@ -19,7 +19,7 @@ import { TableElement, TableExportUtil, UnsubscribeOnDestroyAdapter } from '@sha
 import { BreadcrumbComponent } from '@shared/components/breadcrumb/breadcrumb.component';
 import { FeatherIconsComponent } from '@shared/components/feather-icons/feather-icons.component';
 import { BehaviorSubject, fromEvent, map, merge, Observable } from 'rxjs';
-import { FormDialogComponent } from '../leads/dialogs/form-dialog/form-dialog.component';
+// import { FormDialogComponent } from '../leads/dialogs/form-dialog/form-dialog.component';
 import { ProjectService } from '../projects/all-projects/core/project.service';
 import { Performance } from './performance';
 import { PerformanceService } from './performance.service';
@@ -42,7 +42,6 @@ import { PerformanceService } from './performance.service';
     MatPaginatorModule,
     DatePipe,
   MatDividerModule,
-  FormDialogComponent
   ],
   templateUrl: './performance.component.html',
   styleUrl: './performance.component.scss'

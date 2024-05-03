@@ -1,10 +1,9 @@
-import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, Inject, OnInit, ViewChild } from '@angular/core';
 import { LeadsService } from './leads.service';
 import { HttpClient } from '@angular/common/http';
-import { MatDialog } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
 import { MatSort, MatSortModule } from '@angular/material/sort';
-import { Leads } from './leads.model';
 import { DataSource } from '@angular/cdk/collections';
 import {
   MatSnackBar,
@@ -14,7 +13,7 @@ import {
 import { MatMenuTrigger, MatMenuModule } from '@angular/material/menu';
 import { BehaviorSubject, fromEvent, merge, Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { FormDialogComponent } from './dialogs/form-dialog/form-dialog.component';
+// import { FormDialogComponent } from './dialogs/form-dialog/form-dialog.component';
 import { DeleteDialogComponent } from './dialogs/delete/delete.component';
 import { SelectionModel } from '@angular/cdk/collections';
 import { UnsubscribeOnDestroyAdapter } from '@shared';
@@ -30,6 +29,8 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { BreadcrumbComponent } from '@shared/components/breadcrumb/breadcrumb.component';
+import { Report } from './leads.model';
+import { CookieService } from 'ngx-cookie-service';
 
 @Component({
   selector: 'app-leads',
@@ -58,26 +59,29 @@ export class LeadsComponent
 {
   displayedColumns = [
     'select',
-    'img',
-    'name',
-    'department',
-    'role',
-    'project',
-    'mobile',
-    'email',
-    'actions',
+    
+      'PositiveSentiment', 
+      'NegativeSentiment' ,
+      // 'FileName',
+       'EmployeeName',
+       'EmployeeEmail',
+        'Date',
+      'ClientName',
+      'actions1',
+    // 'actions',
   ];
   exampleDatabase?: LeadsService;
   dataSource!: ExampleDataSource;
-  selection = new SelectionModel<Leads>(true, []);
+  selection = new SelectionModel<Report>(true, []);
   index?: number;
-  id?: number;
-  leads?: Leads;
+  _id?: string;
+  leads?: Report;
   constructor(
     public httpClient: HttpClient,
     public dialog: MatDialog,
     public leadsService: LeadsService,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
+    private cookies:CookieService
   ) {
     super();
   }
@@ -93,108 +97,108 @@ export class LeadsComponent
   refresh() {
     this.loadData();
   }
-  addNew() {
-    let tempDirection: Direction;
-    if (localStorage.getItem('isRtl') === 'true') {
-      tempDirection = 'rtl';
-    } else {
-      tempDirection = 'ltr';
-    }
-    const dialogRef = this.dialog.open(FormDialogComponent, {
-      data: {
-        leads: this.leads,
-        action: 'add',
-      },
-      direction: tempDirection,
-    });
-    this.subs.sink = dialogRef.afterClosed().subscribe((result) => {
-      if (result === 1) {
-        // After dialog is closed we're doing frontend updates
-        // For add we're just pushing a new row inside DataServicex
-        this.exampleDatabase?.dataChange.value.unshift(
-          this.leadsService.getDialogData()
-        );
-        this.refreshTable();
-        this.showNotification(
-          'snackbar-success',
-          'Add Record Successfully...!!!',
-          'bottom',
-          'center'
-        );
-      }
-    });
-  }
-  editCall(row: Leads) {
-    this.id = row.id;
-    let tempDirection: Direction;
-    if (localStorage.getItem('isRtl') === 'true') {
-      tempDirection = 'rtl';
-    } else {
-      tempDirection = 'ltr';
-    }
-    const dialogRef = this.dialog.open(FormDialogComponent, {
-      data: {
-        leads: row,
-        action: 'edit',
-      },
-      direction: tempDirection,
-    });
-    this.subs.sink = dialogRef.afterClosed().subscribe((result) => {
-      if (result === 1) {
-        // When using an edit things are little different, firstly we find record inside DataService by id
-        const foundIndex = this.exampleDatabase?.dataChange.value.findIndex(
-          (x) => x.id === this.id
-        );
-        // Then you update that record using data from dialogData (values you enetered)
-        if (foundIndex != null && this.exampleDatabase) {
-          this.exampleDatabase.dataChange.value[foundIndex] =
-            this.leadsService.getDialogData();
-          // And lastly refresh table
-          this.refreshTable();
-          this.showNotification(
-            'black',
-            'Edit Record Successfully...!!!',
-            'bottom',
-            'center'
-          );
-        }
-      }
-    });
-  }
-  deleteItem(i: number, row: Leads) {
-    this.index = i;
-    this.id = row.id;
-    let tempDirection: Direction;
-    if (localStorage.getItem('isRtl') === 'true') {
-      tempDirection = 'rtl';
-    } else {
-      tempDirection = 'ltr';
-    }
-    const dialogRef = this.dialog.open(DeleteDialogComponent, {
-      height: '280px',
-      width: '300px',
-      data: row,
-      direction: tempDirection,
-    });
-    this.subs.sink = dialogRef.afterClosed().subscribe((result) => {
-      if (result === 1) {
-        const foundIndex = this.exampleDatabase?.dataChange.value.findIndex(
-          (x) => x.id === this.id
-        );
-        // for delete we use splice in order to remove single object from DataService
-        if (foundIndex != null && this.exampleDatabase) {
-          this.exampleDatabase.dataChange.value.splice(foundIndex, 1);
-          this.refreshTable();
-          this.showNotification(
-            'snackbar-danger',
-            'Delete Record Successfully...!!!',
-            'bottom',
-            'center'
-          );
-        }
-      }
-    });
-  }
+  // addNew() {
+  //   let tempDirection: Direction;
+  //   if (localStorage.getItem('isRtl') === 'true') {
+  //     tempDirection = 'rtl';
+  //   } else {
+  //     tempDirection = 'ltr';
+  //   }
+  //   const dialogRef = this.dialog.open(FormDialogComponent, {
+  //     data: {
+  //       leads: this.leads,
+  //       action: 'add',
+  //     },
+  //     direction: tempDirection,
+  //   });
+  //   this.subs.sink = dialogRef.afterClosed().subscribe((result) => {
+  //     if (result === 1) {
+  //       // After dialog is closed we're doing frontend updates
+  //       // For add we're just pushing a new row inside DataServicex
+  //       this.exampleDatabase?.dataChange.value.unshift(
+  //         this.leadsService.getDialogData()
+  //       );
+  //       this.refreshTable();
+  //       this.showNotification(
+  //         'snackbar-success',
+  //         'Add Record Successfully...!!!',
+  //         'bottom',
+  //         'center'
+  //       );
+  //     }
+  //   });
+  // }
+  // editCall(row: Leads) {
+  //   this.id = row.id;
+  //   let tempDirection: Direction;
+  //   if (localStorage.getItem('isRtl') === 'true') {
+  //     tempDirection = 'rtl';
+  //   } else {
+  //     tempDirection = 'ltr';
+  //   }
+  //   const dialogRef = this.dialog.open(FormDialogComponent, {
+  //     data: {
+  //       leads: row,
+  //       action: 'edit',
+  //     },
+  //     direction: tempDirection,
+  //   });
+  //   this.subs.sink = dialogRef.afterClosed().subscribe((result) => {
+  //     if (result === 1) {
+  //       // When using an edit things are little different, firstly we find record inside DataService by id
+  //       const foundIndex = this.exampleDatabase?.dataChange.value.findIndex(
+  //         (x) => x.id === this.id
+  //       );
+  //       // Then you update that record using data from dialogData (values you enetered)
+  //       if (foundIndex != null && this.exampleDatabase) {
+  //         this.exampleDatabase.dataChange.value[foundIndex] =
+  //           this.leadsService.getDialogData();
+  //         // And lastly refresh table
+  //         this.refreshTable();
+  //         this.showNotification(
+  //           'black',
+  //           'Edit Record Successfully...!!!',
+  //           'bottom',
+  //           'center'
+  //         );
+  //       }
+  //     }
+  //   });
+  // }
+  // deleteItem(i: number, row: Leads) {
+  //   this.index = i;
+  //   this.id = row.id;
+  //   let tempDirection: Direction;
+  //   if (localStorage.getItem('isRtl') === 'true') {
+  //     tempDirection = 'rtl';
+  //   } else {
+  //     tempDirection = 'ltr';
+  //   }
+  //   const dialogRef = this.dialog.open(DeleteDialogComponent, {
+  //     height: '280px',
+  //     width: '300px',
+  //     data: row,
+  //     direction: tempDirection,
+  //   });
+  //   this.subs.sink = dialogRef.afterClosed().subscribe((result) => {
+  //     if (result === 1) {
+  //       const foundIndex = this.exampleDatabase?.dataChange.value.findIndex(
+  //         (x) => x.id === this.id
+  //       );
+  //       // for delete we use splice in order to remove single object from DataService
+  //       if (foundIndex != null && this.exampleDatabase) {
+  //         this.exampleDatabase.dataChange.value.splice(foundIndex, 1);
+  //         this.refreshTable();
+  //         this.showNotification(
+  //           'snackbar-danger',
+  //           'Delete Record Successfully...!!!',
+  //           'bottom',
+  //           'center'
+  //         );
+  //       }
+  //     }
+  //   });
+  // }
   private refreshTable() {
     this.paginator._changePageSize(this.paginator.pageSize);
   }
@@ -223,7 +227,7 @@ export class LeadsComponent
       this.exampleDatabase?.dataChange.value.splice(index, 1);
 
       this.refreshTable();
-      this.selection = new SelectionModel<Leads>(true, []);
+      this.selection = new SelectionModel<Report>(true, []);
     });
     this.showNotification(
       'snackbar-danger',
@@ -233,7 +237,7 @@ export class LeadsComponent
     );
   }
   public loadData() {
-    this.exampleDatabase = new LeadsService(this.httpClient);
+    this.exampleDatabase = new LeadsService(this.httpClient,this.cookies);
     this.dataSource = new ExampleDataSource(
       this.exampleDatabase,
       this.paginator,
@@ -249,20 +253,20 @@ export class LeadsComponent
     );
   }
   // export table data in excel file
-  exportExcel() {
-    // key name with space add in brackets
-    const exportData: Partial<TableElement>[] =
-      this.dataSource.filteredData.map((x) => ({
-        Name: x.name,
-        Email: x.email,
-        Mobile: x.mobile,
-        Department: x.department,
-        Role: x.role,
-        Project: x.project,
-      }));
+  // exportExcel() {
+  //   // key name with space add in brackets
+  //   const exportData: Partial<TableElement>[] =
+  //     this.dataSource.filteredData.map((x) => ({
+  //       Name: x.name,
+  //       Email: x.email,
+  //       Mobile: x.mobile,
+  //       Department: x.department,
+  //       Role: x.role,
+  //       Project: x.project,
+  //     }));
 
-    TableExportUtil.exportToExcel(exportData, 'excel');
-  }
+  //   TableExportUtil.exportToExcel(exportData, 'excel');
+  // }
 
   showNotification(
     colorName: string,
@@ -278,7 +282,7 @@ export class LeadsComponent
     });
   }
   // context menu
-  onContextMenu(event: MouseEvent, item: Leads) {
+  onContextMenu(event: MouseEvent, item: Report) {
     event.preventDefault();
     this.contextMenuPosition.x = event.clientX + 'px';
     this.contextMenuPosition.y = event.clientY + 'px';
@@ -288,8 +292,26 @@ export class LeadsComponent
       this.contextMenu.openMenu();
     }
   }
+
+
+  downloadReport(filename: string): void {
+    this.leadsService.downloadReport(filename).subscribe((response: Blob) => {
+      // Gérer la réponse ici, par exemple télécharger le fichier
+      const blob = new Blob([response], { type: 'application/pdf' });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    }, error => {
+      console.error('Erreur lors du téléchargement du fichier :', error);
+    });
+  }
+
 }
-export class ExampleDataSource extends DataSource<Leads> {
+export class ExampleDataSource extends DataSource<Report> {
   filterChange = new BehaviorSubject('');
   get filter(): string {
     return this.filterChange.value;
@@ -297,8 +319,8 @@ export class ExampleDataSource extends DataSource<Leads> {
   set filter(filter: string) {
     this.filterChange.next(filter);
   }
-  filteredData: Leads[] = [];
-  renderedData: Leads[] = [];
+  filteredData: Report[] = [];
+  renderedData: Report[] = [];
   constructor(
     public exampleDatabase: LeadsService,
     public paginator: MatPaginator,
@@ -309,7 +331,7 @@ export class ExampleDataSource extends DataSource<Leads> {
     this.filterChange.subscribe(() => (this.paginator.pageIndex = 0));
   }
   /** Connect function called by the table to retrieve one stream containing the data to render. */
-  connect(): Observable<Leads[]> {
+  connect(): Observable<Report[]> {
     // Listen for any changes in the base data, sorting, filtering, or pagination
     const displayDataChanges = [
       this.exampleDatabase.dataChange,
@@ -317,20 +339,22 @@ export class ExampleDataSource extends DataSource<Leads> {
       this.filterChange,
       this.paginator.page,
     ];
-    this.exampleDatabase.getAllLeadss();
+    this.exampleDatabase.getAllReports();
     return merge(...displayDataChanges).pipe(
       map(() => {
         // Filter data
         this.filteredData = this.exampleDatabase.data
           .slice()
-          .filter((leads: Leads) => {
+          .filter((leads: Report) => {
             const searchStr = (
-              leads.name +
-              leads.department +
-              leads.role +
-              leads.project +
-              leads.email +
-              leads.mobile
+              leads._id +
+              leads.PositiveSentiment +
+              leads.NegativeSentiment +
+              leads.FileName +
+              leads.EmployeeName +
+              leads.EmployeeEmail+
+              leads.Date+
+              leads.ClientName
             ).toLowerCase();
             return searchStr.indexOf(this.filter.toLowerCase()) !== -1;
           });
@@ -350,7 +374,7 @@ export class ExampleDataSource extends DataSource<Leads> {
     //disconnect
   }
   /** Returns a sorted copy of the database data. */
-  sortData(data: Leads[]): Leads[] {
+  sortData(data: Report[]): Report[] {
     if (!this._sort.active || this._sort.direction === '') {
       return data;
     }
@@ -359,19 +383,19 @@ export class ExampleDataSource extends DataSource<Leads> {
       let propertyB: number | string = '';
       switch (this._sort.active) {
         case 'id':
-          [propertyA, propertyB] = [a.id, b.id];
+          [propertyA, propertyB] = [a._id, b._id];
           break;
         case 'name':
-          [propertyA, propertyB] = [a.name, b.name];
+          [propertyA, propertyB] = [a.ClientName, b.ClientName];
           break;
         case 'email':
-          [propertyA, propertyB] = [a.email, b.email];
+          [propertyA, propertyB] = [a.Date, b.Date];
           break;
         case 'time':
-          [propertyA, propertyB] = [a.department, b.department];
+          [propertyA, propertyB] = [a.EmployeeEmail, b.EmployeeEmail];
           break;
         case 'mobile':
-          [propertyA, propertyB] = [a.mobile, b.mobile];
+          [propertyA, propertyB] = [a.FileName, b.FileName];
           break;
       }
       const valueA = isNaN(+propertyA) ? propertyA : +propertyA;
@@ -381,4 +405,7 @@ export class ExampleDataSource extends DataSource<Leads> {
       );
     });
   }
+
+
+
 }

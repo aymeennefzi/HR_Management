@@ -33,6 +33,6 @@ export class DeleteDialogComponent {
     this.dialogRef.close();
   }
   confirmDelete(): void {
-    this.leadsService.deleteLeads(this.data.id);
+    // this.leadsService.deleteLeads(this.data.id);
   }
 }
